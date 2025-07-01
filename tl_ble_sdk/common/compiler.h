@@ -39,7 +39,7 @@
 
 #define _attribute_aes_data_sec_            __attribute__((section(".aes_data")))
 
-#define _attribute_data_retention_sec_      __attribute__((section(".retention_data")))
+// #define _attribute_data_retention_sec_      __attribute__((section(".retention_data")))
 
 #define _attribute_aligned_(s)              __attribute__((aligned(s)))
 
