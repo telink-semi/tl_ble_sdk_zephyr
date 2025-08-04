@@ -57,7 +57,11 @@ drv_api_error_code_e drv_get_error_code(void)
 __attribute__((weak)) void drv_timeout_handler(unsigned int error_code)
 {
     g_error_code = error_code;
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+    protected_sys_reboot();
+#else
     sys_reboot();
+#endif
 }
 
 /**

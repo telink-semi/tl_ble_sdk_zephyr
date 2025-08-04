@@ -41,9 +41,16 @@ zephyr_compile_definitions(
 	-DBLC_PM_DEEP_RETENTION_MODE_EN=0
 	-DPM_DEEPSLEEP_RETENTION_ENABLE=0
 	-DBLMS_PM_ENABLE=0
-	-DBLC_PM_EN=0    
+	-DBLC_PM_EN=0
 )
 
+if(CONFIG_SOC_RISCV_TELINK_TL322X)        #TODO: For TLK_ONLY_BLE_HOST, but I don't know what to use.
+zephyr_compile_options(
+        -DTLK_ONLY_BLE_HOST=1
+        -DTLK_MAILBOX_MESSAGE_HOST_EN=1
+        -DDUAL_CORE_MODE_ENABLED=1
+)
+endif()
 file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/error_handler/*.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/*.c
@@ -124,11 +131,11 @@ if(CONFIG_I2C_TELINK_B9X OR CONFIG_I2C_TELINK_TLX)
 endif()
 
 if(CONFIG_BT OR CONFIG_IEEE802154)
-	if(NOT ${SOC} STREQUAL "TL721X")
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
+	if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
 	endif()
 	if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
 	endif()
 endif()
 
@@ -139,7 +146,11 @@ endif()
 
 if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+	if(CONFIG_SOC_RISCV_TELINK_TL322X)
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb1hw.c)
+	else()
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+	endif()
 endif()
 
 if(CONFIG_PM)
