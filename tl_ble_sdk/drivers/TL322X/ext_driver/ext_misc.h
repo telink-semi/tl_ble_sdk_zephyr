@@ -61,11 +61,24 @@
 
 
 /******************************* core_start ******************************************************************/
-#define irq_disable                 core_interrupt_disable
-#define irq_enable                  core_interrupt_enable
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+    #ifndef irq_enable
+        #define irq_enable                  core_interrupt_enable
+    #endif
+    #ifndef irq_disable
+        #define irq_disable                 core_interrupt_disable
+    #endif
+#else
+    #define irq_disable                 core_interrupt_disable
+    #define irq_enable                  core_interrupt_enable
+#endif
 #define irq_restore(en)             core_restore_interrupt(en)
 
-#define start_reboot                sys_reboot   //This function serves to reboot chip.
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+    #define start_reboot                protected_sys_reboot   //This function serves to reboot chip.
+#else
+    #define start_reboot                sys_reboot            //This function serves to reboot chip.
+#endif
 /******************************* core_end ********************************************************************/
 
 
