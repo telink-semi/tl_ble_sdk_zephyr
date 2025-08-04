@@ -52,9 +52,52 @@ unsigned char flash_unlock_mid156085(void)
     return flash_unlock_mid156085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
 }
 
-
 mid156085_lock_block_e flash_get_lock_block_mid156085(void)
 {
     return flash_get_lock_block_mid156085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
 
+
+unsigned char flash_lock_mid146085(mid146085_lock_block_e data)
+{
+    return flash_lock_mid146085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM,data);
+}
+unsigned char flash_unlock_mid146085(void)
+{
+    return flash_unlock_mid146085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
+
+mid146085_lock_block_e flash_get_lock_block_mid146085(void)
+{
+    return flash_get_lock_block_mid146085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
+
+unsigned char flash_lock_mid166085(mid166085_lock_block_e data)
+{
+    return flash_lock_mid166085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM,data);
+}
+unsigned char flash_unlock_mid166085(void)
+{
+    return flash_unlock_mid166085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
+
+mid166085_lock_block_e flash_get_lock_block_mid166085(void)
+{
+    return flash_get_lock_block_mid166085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
+
+
+
+unsigned char flash_lock_mid1560c8(mid1560c8_lock_block_e data)
+{
+    return flash_lock_mid1560c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM,data);
+}
+unsigned char flash_unlock_mid1560c8(void)
+{
+    return flash_unlock_mid1560c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
+
+mid1560c8_lock_block_e flash_get_lock_block_mid1560c8(void)
+{
+    return flash_get_lock_block_mid1560c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
 }

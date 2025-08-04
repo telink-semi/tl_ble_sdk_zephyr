@@ -33,10 +33,10 @@
 #define ACL_PERIPHR_SMP_ENABLE        1 //1 for smp,  0 no security
 #define ACL_CENTRAL_SMP_ENABLE        1 //1 for smp,  0 no security
 #define ACL_CENTRAL_SIMPLE_SDP_ENABLE 1 //simple service discovery for ACL central
+
 #define BLE_OTA_SERVER_ENABLE         1
 
 #define BLE_APP_PM_ENABLE             1
-
 #define BATT_CHECK_ENABLE             0
 
 
@@ -49,11 +49,7 @@
  *    be directly used on user's mass production application without any change. User should refer to sample code, understand the
  *    principles and methods, then change and implement a more appropriate mechanism according to their application if needed.
  */
-#if (MCU_CORE_TYPE == MCU_CORE_TL322X)
-    #define APP_FLASH_PROTECTION_ENABLE 0
-#else
-    #define APP_FLASH_PROTECTION_ENABLE 1
-#endif
+#define APP_FLASH_PROTECTION_ENABLE 1
 
 /* Flash 4line mode:
  *  enable the 4 line mode of flash, read and write.
