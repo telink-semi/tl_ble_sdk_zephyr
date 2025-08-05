@@ -44,7 +44,7 @@ zephyr_compile_definitions(
 	-DBLC_PM_EN=0
 )
 
-if(CONFIG_SOC_RISCV_TELINK_TL322X)        #TODO: For TLK_ONLY_BLE_HOST, but I don't know what to use.
+if(CONFIG_TELINK_TL322X_ENABLE_N22)
 zephyr_compile_options(
         -DTLK_ONLY_BLE_HOST=1
         -DTLK_MAILBOX_MESSAGE_HOST_EN=1
@@ -116,6 +116,10 @@ endif()
 
 if(CONFIG_GPIO_TELINK_B9X OR CONFIG_GPIO_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
+endif()
+
+if(CONFIG_UART_TELINK_B9X OR CONFIG_UART_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/uart.c)
 endif()
 
 if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
