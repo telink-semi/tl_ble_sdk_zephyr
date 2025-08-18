@@ -26,17 +26,16 @@
 #include "soc.h"
 /*******************************      i2c registers: 0x140280      ******************************/
 
+#define i2c_base_addr(i)                     ((i)  ? (0x802401c0) : (0x80140280)) /* i2c[0-1] */
 
-#define REG_I2C_BASE           0x140280
 
-
-#define reg_i2c_data_buf0_addr 0x80140288
+#define reg_i2c_data_buf0_addr(i)       i2c_base_addr(i) +0x08
 
 
 /**
  *  i2c clock = pclk/(4*DivClock)
  */
-#define reg_i2c_sp REG_ADDR8(REG_I2C_BASE)
+#define reg_i2c_sp(i)      REG_ADDR8(i2c_base_addr(i))
 
 
 /**
@@ -44,7 +43,7 @@
  * BIT[0] to set  write or read bit:0=0 for write, bit:0=1 for read.
  * BIT[7:1] for ID.
  */
-#define reg_i2c_id REG_ADDR8(REG_I2C_BASE + 0x01)
+#define reg_i2c_id(i)      REG_ADDR8(i2c_base_addr(i) + 0x01)
 
 enum
 {
@@ -60,7 +59,7 @@ enum
  * BIT_RNG[3:5] Indicate what state the i2c is in when it acts as master, BIT_RNG[3:5] default value is 0x06 it means master's state is IDLE.
  * BIT_RNG[6:7] Indicate what state the i2c is in when it acts as slave.
  */
-#define reg_i2c_mst REG_ADDR8(REG_I2C_BASE + 0x02)
+#define reg_i2c_mst(i)     REG_ADDR8(i2c_base_addr(i) + 0x02)
 
 enum
 {
@@ -84,12 +83,12 @@ enum
  * BIT[6] rx_end.An interrupt is generated when i2c agreement is received.
  * BIT[7] tx_end.An interrupt is generated when i2c agreement is sent.
  */
-#define reg_i2c_mask0 REG_ADDR8(REG_I2C_BASE + 0x03)
+#define reg_i2c_mask0(i)      REG_ADDR8(i2c_base_addr(i) + 0x03)
 
 /*
  *  This register is used to indicate the interrupt status of i2c.
  */
-#define reg_i2c_status0 REG_ADDR8(REG_I2C_BASE + 0x0f)
+#define reg_i2c_status0(i)       REG_ADDR8(i2c_base_addr(i) + 0x0f)
 
 enum
 {
@@ -116,7 +115,7 @@ enum
  *        If it is in manual mode,when the master is reading, you need to configure this bit to determine whether it will ack.
  *        BIT[7] = 0,return ack. BIT[7] = 1,return nak.
  */
-#define reg_i2c_sct1 REG_ADDR8(REG_I2C_BASE + 0x04)
+#define reg_i2c_sct1(i)          REG_ADDR8(i2c_base_addr(i) + 0x04)
 
 enum
 {
@@ -135,7 +134,7 @@ enum
  * BIT_RNG[0,3] to configure the interrupt trigger level of rx_status, for example BIT_RNG[0:3]=0x04,when rx 4bytes,will trigger interrupt.
  * BIT_RNG[4,7] to configure the interrupt trigger level of tx_status, for example BIT_RNG[0:3]=0x04,when tx 4bytes,will trigger interrupt.
  */
-#define reg_i2c_trig REG_ADDR8(REG_I2C_BASE + 0x05)
+#define reg_i2c_trig(i)          REG_ADDR8(i2c_base_addr(i) + 0x05)
 
 enum
 {
@@ -155,7 +154,7 @@ enum
  * BIT[6]: mask the slave stretch interrupt,when tx_fifo is empty or rx_fifo is full,will generate interrupt.
  */
 
-#define reg_i2c_ctrl2 REG_ADDR8(REG_I2C_BASE + 0x06)
+#define reg_i2c_ctrl2(i)          REG_ADDR8(i2c_base_addr(i) + 0x06)
 
 typedef enum
 {
@@ -176,7 +175,7 @@ typedef enum
  *        but not under dma because there is a mechanism for setting it to 1 under DMA.
  * BIT[5] auto_clear function.
  */
-#define reg_i2c_ctrl3 REG_ADDR8(REG_I2C_BASE + 0x07)
+#define reg_i2c_ctrl3(i)             REG_ADDR8(i2c_base_addr(i) + 0x07)
 
 enum
 {
@@ -187,12 +186,12 @@ enum
     FLD_AUTO_RXCLR_EN        = BIT(5),
 };
 
-#define reg_i2c_data_buf(i) REG_ADDR8((REG_I2C_BASE + 0x08 + (i)))
+#define reg_i2c_data_buf(i,j)              REG_ADDR8((i2c_base_addr(i) + 0x08 + (j)))
 /**
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
  */
-#define reg_i2c_data_buf0 REG_ADDR8(REG_I2C_BASE + 0x08)
+#define reg_i2c_data_buf0(i)        REG_ADDR8(i2c_base_addr(i) + 0x08)
 
 enum
 {
@@ -203,7 +202,7 @@ enum
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
  */
-#define reg_i2c_data_buf1 REG_ADDR8(REG_I2C_BASE + 0x09)
+#define reg_i2c_data_buf1(i)          REG_ADDR8(i2c_base_addr(i) + 0x09)
 
 enum
 {
@@ -214,7 +213,7 @@ enum
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
  */
-#define reg_i2c_data_buf2 REG_ADDR8(REG_I2C_BASE + 0x0a)
+#define reg_i2c_data_buf2(i)               REG_ADDR8(i2c_base_addr(i) + 0x0a)
 
 enum
 {
@@ -225,7 +224,7 @@ enum
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
  */
-#define reg_i2c_data_buf3 REG_ADDR8(REG_I2C_BASE + 0x0b)
+#define reg_i2c_data_buf3(i)       REG_ADDR8(i2c_base_addr(i) + 0x0b)
 
 enum
 {
@@ -237,7 +236,7 @@ enum
  * BIT_RNG[0,3]  rx_bufcnt is equivalent to a pointer to fifo, one in data plus one, one out data minus one.
  * BIT_RNG[4,7]  tx_bufcnt is equivalent to a pointer to fifo, one in data plus one, one out data minus one.
  */
-#define reg_i2c_buf_cnt REG_ADDR8(REG_I2C_BASE + 0x0c)
+#define reg_i2c_buf_cnt(i)     REG_ADDR8(i2c_base_addr(i) + 0x0c)
 
 enum
 {
@@ -255,7 +254,7 @@ enum
  * BIT_RNG[4,6] wbcnt is the accumulation of this action write.
  * BIT[7]       the rx_done interrupt,consistent with eagle's rx_done functionality
  */
-#define reg_i2c_status REG_ADDR8(REG_I2C_BASE + 0x0d)
+#define reg_i2c_status(i)             REG_ADDR8(i2c_base_addr(i) + 0x0d)
 
 enum
 {
@@ -276,7 +275,7 @@ enum
  * BIT[3] judge slave rx_fifo is full.
  * BIT[3] the stretch interrupt status.
  */
-#define i2c_slave_status1 REG_ADDR8(REG_I2C_BASE + 0x0e)
+#define i2c_slave_status1(i)              REG_ADDR8(i2c_base_addr(i) + 0x0e)
 
 enum
 {
@@ -289,7 +288,7 @@ enum
 };
 
 //As a master, you need to configure this length for both sending and receiving, and the hardware needs to know what the length is.
-#define reg_i2c_len(i) REG_ADDR8(REG_I2C_BASE + 0x10 + (i))
+#define reg_i2c_len(i,j)            REG_ADDR8(i2c_base_addr(i) + 0x10 + (j))
 
 
 /**
@@ -299,7 +298,7 @@ enum
  *  BIT[2] When the master is in the dataw phase, the flag is 1 until the next start.
  *  BIT[3] When the master is in the datar phase, the flag is 1 until the next start.
  * */
-#define reg_i2c_mst_status REG_ADDR8(REG_I2C_BASE + 0x13)
+#define reg_i2c_mst_status(i)             REG_ADDR8(i2c_base_addr(i) + 0x13)
 
 enum
 {
@@ -308,56 +307,6 @@ enum
     FLD_DATAW_BUSY = BIT(2),
     FLD_DATAR_BUSY = BIT(3),
 
-};
-
-/*******************************      i2c1_m registers: 0x140480     ******************************/
-
-
-#define REG_I2C1_M_BASE 0x140480
-
-#define reg_i2c1_m_sp   REG_ADDR8(REG_I2C1_M_BASE + 0x00)
-#define reg_i2c1_m_id   REG_ADDR8(REG_I2C1_M_BASE + 0x01)
-
-enum
-{
-    FLD_I2C1_M_WRITE_READ_BIT = BIT(0),
-    FLD_I2C1_M_ID             = BIT_RNG(1, 7),
-};
-
-#define reg_i2c1_m_mst REG_ADDR8(REG_I2C1_M_BASE + 0x02)
-
-enum
-{
-    FLD_I2C1_M_MST_BUSY   = BIT(0),
-    FLD_I2C1_M_MST_SCS_N  = BIT(1),
-    FLD_I2C1_M_MAT_ACK_IN = BIT(2),
-};
-
-#define reg_i2c1_m_sct0 REG_ADDR8(REG_I2C1_M_BASE + 0x03)
-
-enum
-{
-    FLD_I2C1_M_MASTER           = BIT(1), // 1: master, 0: slave
-    FLD_I2C1_M_R_CLK_STRETCH_EN = BIT(3),
-};
-
-#define reg_i2c1_m_ad   REG_ADDR8(REG_I2C1_M_BASE + 0x04)
-#define reg_i2c1_m_dw   REG_ADDR8(REG_I2C1_M_BASE + 0x05)
-#define reg_i2c1_m_dr   REG_ADDR8(REG_I2C1_M_BASE + 0x06)
-
-
-#define reg_i2c1_m_ctrl REG_ADDR8(REG_I2C1_M_BASE + 0x07)
-
-enum
-{
-    FLD_I2C1_M_LS_ID    = BIT(0),
-    FLD_I2C1_M_LS_ADDR  = BIT(1),
-    FLD_I2C1_M_LS_DATAW = BIT(2),
-    FLD_I2C1_M_LS_DATAR = BIT(3),
-    FLD_I2C1_M_LS_START = BIT(4),
-    FLD_I2C1_M_LS_STOP  = BIT(5),
-    FLD_I2C1_M_LS_ID_R  = BIT(6),
-    FLD_I2C1_M_LS_ACK   = BIT(7),
 };
 
 #endif

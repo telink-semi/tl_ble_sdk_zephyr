@@ -56,8 +56,8 @@ enum
 #define areg_0x10e                       0x10e
 enum
 {
-    FLD_AUDIO_PD_FILTCAP_CTL            = BIT_RNG(0,1),
-    FLD_AUDIO_PD_VMIDSEL                = BIT_RNG(2,3),
+    FLD_AUDIO_FILTCAP_CTL               = BIT_RNG(0,1),
+    FLD_AUDIO_VMIDSEL                   = BIT_RNG(2,3),
     FLD_AUDIO_PD_PGA                    = BIT(4),
     FLD_AUDIO_PD_BIAS                   = BIT(5),
     FLD_AUDIO_PD_ADC                    = BIT(6),

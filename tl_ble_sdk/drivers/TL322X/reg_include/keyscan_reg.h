@@ -91,6 +91,7 @@ enum
 enum
 {
     FLD_KS_CNT_H     = BIT_RNG(0, 2),
+    FLD_KS_RXDONE_IRQ = BIT(3),
     FLD_KS_GATED_CLR = BIT(4),
     FLD_KS_GATED     = BIT(5),
     FLD_KS_CNT16_EN  = BIT(6),

@@ -510,7 +510,7 @@ void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk)
  * @param[in]  pin - the pin needs to set the output function.
  * @return     none.
  */
-void gpio_pem_task(pem_chn_e chn, gpio_pin_e pin)
+void gpio_set_pem_task(pem_chn_e chn, gpio_pin_e pin)
 {
     unsigned short group = (pin & 0xf00) >> 8;
     unsigned char  bit   = pin & 0xff;
@@ -528,7 +528,7 @@ void gpio_pem_task(pem_chn_e chn, gpio_pin_e pin)
  * @param[in]  pin - the pin needs to set the input function.
  * @return     none.
  */
-void gpio_pem_event(pem_chn_e chn, gpio_pin_e pin)
+void gpio_set_pem_event(pem_chn_e chn, gpio_pin_e pin)
 {
     unsigned char group = (pin & 0xf00) >> 8;
     unsigned char bit   = pin & 0xff;

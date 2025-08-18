@@ -87,6 +87,8 @@ static inline int pm_is_MCU_deepRetentionWakeup(void)
 {
 #if !defined(MCU_CORE_TL322X_N22)
     return (g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
+#else
+    return 0;
 #endif
 }
 
@@ -100,6 +102,8 @@ static inline int pm_is_deepPadWakeup(void)
 {
 #if !defined(MCU_CORE_TL322X_N22)
     return g_pm_status_info.is_pad_wakeup;
+#else
+    return 0;
 #endif
 }
 
@@ -130,5 +134,11 @@ static inline int pm_get_wake_src(void)
 
 #define cpu_set_gpio_wakeup             pm_set_gpio_wakeup
 
-
+typedef enum{
+    PM_MCU_IDLE,      // MCU is in idle state
+    PM_MCU_STARTING,  //Starting up (initialization process, not fully ready)
+    PM_MCU_RUN,       // MCU is in running state
+    PM_MCU_WFI,       // MCU is in wait-for-interrupt state
+    PM_MCU_RFU        // Reserved for future use
+}tlk_pm_mcuStatus_t;
 #endif /* DRIVERS_TL721X_DRIVER_EXT_EXT_PM_H_ */

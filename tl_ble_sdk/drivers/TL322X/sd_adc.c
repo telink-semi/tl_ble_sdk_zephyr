@@ -84,7 +84,7 @@ void sd_adc_set_vmid(sd_adc_vmid_power_switch_e en)
     if (en)
     {
         /***enable vmid voltage and set vmid driving ability***/
-        analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~FLD_AUDIO_PD_VMID)) | (FLD_AUDIO_PD_VMIDSEL));
+        analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~FLD_AUDIO_PD_VMID)) | (FLD_AUDIO_VMIDSEL));
     }
     else
     {
@@ -105,7 +105,6 @@ void sd_adc_power_on(sd_adc_mode_e mode)
     switch (mode)
     {
         case SD_ADC_SAMPLE_MODE:
-
             BM_SET(reg_clk_en4, FLD_CLK4_DC_EN);//dc clk signal enable
             analog_write_reg8(areg_0x10c, analog_read_reg8(areg_0x10c) & (~FLD_L_PD_BUFFER));//power on two sd_adc buffer at the positive and negative.
             analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~(FLD_AUDIO_PD_BIAS|FLD_AUDIO_PD_ADC))));
@@ -113,7 +112,7 @@ void sd_adc_power_on(sd_adc_mode_e mode)
         case SD_ADC_AUDIO_MODE:
             sd_adc_data_weighted_average_en();
             analog_write_reg8(areg_0x10d, (analog_read_reg8(areg_0x10d) & (~(FLD_AUDIO_MUTE_PGA | FLD_AUDIO_PGA_DIS))));
-            analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~(FLD_AUDIO_PD_PGA | FLD_AUDIO_PD_BIAS | FLD_AUDIO_PD_ADC))));
+            analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~(FLD_AUDIO_PD_PGA | FLD_AUDIO_PD_BIAS | FLD_AUDIO_PD_ADC | FLD_AUDIO_FILTCAP_CTL))));
             break;
         default:
             break;
@@ -137,7 +136,7 @@ void sd_adc_power_off(sd_adc_mode_e mode)
             break;
         case SD_ADC_AUDIO_MODE:
             analog_write_reg8(areg_0x10d, (analog_read_reg8(areg_0x10d) | FLD_AUDIO_MUTE_PGA | FLD_AUDIO_PGA_DIS));
-            analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) | FLD_AUDIO_PD_PGA | FLD_AUDIO_PD_BIAS | FLD_AUDIO_PD_ADC));
+            analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) | FLD_AUDIO_PD_PGA | FLD_AUDIO_PD_BIAS | FLD_AUDIO_PD_ADC | FLD_AUDIO_FILTCAP_CTL));
             break;
         default:
             break;

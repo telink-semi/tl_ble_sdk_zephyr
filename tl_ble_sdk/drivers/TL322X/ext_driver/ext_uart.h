@@ -88,9 +88,9 @@
  */
 #ifndef TLKAPI_DEBUG_UART_TX_PIN
     #ifdef MCU_CORE_N22_ENABLE
-        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PA3
-    #else
         #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PE0
+    #else
+        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PG1
     #endif
 #endif
 
@@ -98,7 +98,7 @@
  * @brief   debug UART RX pin selection, user can change in app_config.h
  */
 #ifndef TLKAPI_DEBUG_UART_RX_PIN
-#define TLKAPI_DEBUG_UART_RX_PIN                    GPIO_FC_PC5
+#define TLKAPI_DEBUG_UART_RX_PIN                    GPIO_FC_PG0
 #endif
 
 

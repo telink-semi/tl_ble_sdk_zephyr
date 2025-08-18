@@ -1266,7 +1266,7 @@ enum
 enum
 {
     FLD_RF_R_TX_ID       = BIT_RNG(0, 6),
-    FLD_RF_R_LL_IRQ_MASK = BIT(7),
+    FLD_RF_R_TX_PRE_EN = BIT(7), // modify by BLE SDK
 };
 
 #define reg_rf_irq_status    REG_ADDR16(REG_BB_LL_BASE_ADDR + 0x20)
@@ -2209,6 +2209,16 @@ enum
     FLD_RF_LOCD_WAIT_L = BIT(7),
 };
 
+#define reg_rf_ldo1_1       REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x141)
+enum
+{
+    FLD_RF_LDO_PLL_BOOST   = BIT(0),
+    FLD_RF_LDO_VCO_BYPASS  = BIT(1),
+    FLD_RF_LDO_VCO_BOOST   = BIT(2),
+    FLD_RF_LDO_CAL_BYPASS  = BIT(3),
+    FLD_RF_LDO_CAL_BOOST   = BIT(4),
+    FLD_RF_LDO_ANT_BYPASS  = BIT(5),
+};
 #define reg_rf_lnm_pa_0      REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x14c)
 enum
 {

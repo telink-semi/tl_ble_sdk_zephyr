@@ -4,9 +4,9 @@
  * @brief   This is the source file for tl322x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@
 #include "uart.h"
 #include "dma.h"
 
-#define PID_CHECKSUM_OUTPUT_EN 0
-
 enum
 {
     LIN_RX_MODE = 0,
@@ -35,97 +33,91 @@ enum
 
 static lin_handle_t s_lin_hw_ctb[LIN_NUM] = {{0}, {0}};
 
-static dma_config_t lin_tx_dma_config[LIN_NUM] = {
+static dma_config_t lin_tx_dma_config[LIN_NUM] =
+{
     {
-     .dst_req_sel    = DMA_REQ_LIN0_TX, // tx req
+        .dst_req_sel    = DMA_REQ_LIN0_TX,    // tx req
         .src_req_sel    = 0,
-     .dst_addr_ctrl  = DMA_ADDR_FIX,
-     .src_addr_ctrl  = DMA_ADDR_INCREMENT, // increment
+        .dst_addr_ctrl  = DMA_ADDR_FIX,
+        .src_addr_ctrl  = DMA_ADDR_INCREMENT, // increment
         .dstmode        = DMA_HANDSHAKE_MODE, // handshake
         .srcmode        = DMA_NORMAL_MODE,
-     .dstwidth       = DMA_CTR_WORD_WIDTH,                                                                                        // must be word
+        .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
         .srcwidth       = DMA_CTR_WORD_WIDTH, // must be word
-        .src_burst_size = 0, // must be 0
+        .src_burst_size = 0,                  // must be 0
         .read_num_en    = 0,
-     .priority       = 0,
-     .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+        .priority       = 0,
+        .write_num_en   = 0,
+        .auto_en        = 0,                  // must be 0
     },
 
     {
-     .dst_req_sel    = DMA_REQ_LIN1_TX,                                  // tx req
+        .dst_req_sel    = DMA_REQ_LIN1_TX,    // tx req
         .src_req_sel    = 0,
-     .dst_addr_ctrl  = DMA_ADDR_FIX,
-     .src_addr_ctrl  = DMA_ADDR_INCREMENT,       // increment
-        .dstmode        = DMA_HANDSHAKE_MODE,                                              // handshake
+        .dst_addr_ctrl  = DMA_ADDR_FIX,
+        .src_addr_ctrl  = DMA_ADDR_INCREMENT, // increment
+        .dstmode        = DMA_HANDSHAKE_MODE, // handshake
         .srcmode        = DMA_NORMAL_MODE,
-     .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
-        .srcwidth       = DMA_CTR_WORD_WIDTH,                                              // must be word
-        .src_burst_size = 0,                             // must be 0
+        .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH, // must be word
+        .src_burst_size = 0,                  // must be 0
         .read_num_en    = 0,
-     .priority       = 0,
-     .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+        .priority       = 0,
+        .write_num_en   = 0,
+        .auto_en        = 0,                  // must be 0
     },
 };
 
-static dma_config_t lin_rx_dma_config[LIN_NUM] = {
+static dma_config_t lin_rx_dma_config[LIN_NUM] =
+{
     {
-     .dst_req_sel    = 0, // tx req
-        .src_req_sel    = DMA_REQ_LIN0_RX,
-     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl  = DMA_ADDR_FIX,
-     .dstmode        = DMA_NORMAL_MODE,
-     .srcmode        = DMA_HANDSHAKE_MODE,
-     .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
-        .srcwidth       = DMA_CTR_WORD_WIDTH, ////must be word
+        .dst_req_sel    = 0,
+        .src_req_sel    = DMA_REQ_LIN0_RX,    // rx req
+        .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+        .src_addr_ctrl  = DMA_ADDR_FIX,
+        .dstmode        = DMA_NORMAL_MODE,
+        .srcmode        = DMA_HANDSHAKE_MODE,
+        .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH, // must be word
         .src_burst_size = 0,
-     .read_num_en    = 0,
-     .priority       = 0,
-     .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+        .read_num_en    = 0,
+        .priority       = 0,
+        .write_num_en   = 0,
+        .auto_en        = 0,                  // must be 0
     },
 
     {
-     .dst_req_sel    = 0,                    // tx req
-        .src_req_sel    = DMA_REQ_LIN1_RX,
-     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl  = DMA_ADDR_FIX,
-     .dstmode        = DMA_NORMAL_MODE,
-     .srcmode        = DMA_HANDSHAKE_MODE,
-     .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
-        .srcwidth       = DMA_CTR_WORD_WIDTH,                                              ////must be word
+        .dst_req_sel    = 0,
+        .src_req_sel    = DMA_REQ_LIN1_RX,   // rx req
+        .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+        .src_addr_ctrl  = DMA_ADDR_FIX,
+        .dstmode        = DMA_NORMAL_MODE,
+        .srcmode        = DMA_HANDSHAKE_MODE,
+        .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH, // must be word
         .src_burst_size = 0,
-     .read_num_en    = 0,
-     .priority       = 0,
-     .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+        .read_num_en    = 0,
+        .priority       = 0,
+        .write_num_en   = 0,
+        .auto_en        = 0,                  // must be 0
     }
 };
 
 /**********************************************************************************************************************
  *                                           local function                                                           *
  *********************************************************************************************************************/
-
 /**
- * @brief      This function serves to generate checksum.
+ * @brief      This function serves to calculate protect id.
  * @param[in]  id - ID value of LIN frame.
- * @param[in]  data - data of LIN frame.
- * @param[in]  len - data length of LIN frame.
- * @param[in]  type - checksum type of LIN frame.
- * @return     none
+ * @return     pid
  */
-_attribute_ram_code_sec_noinline_ static unsigned char lin_software_sum(unsigned char id, unsigned char *data, unsigned char len, lin_checksum_type_e type)
-{
-    unsigned short ret = ((type == LIN_CHECKSUM_TYPE_CLASSIC) ? 0 : id);
-    for (unsigned char i = 0; i < len; i++) {
-        ret += data[i];
-        if (ret & 0x100) {
-            ret = (ret & 0xff) + 1;
-        }
-    }
+static unsigned char lin_software_pid(unsigned char id) {
+    unsigned char pid = 0;
 
-    return ((~ret) & 0xff);
+    pid = (LIN_GET_ID_BIT(id,0) ^ LIN_GET_ID_BIT(id,1) ^LIN_GET_ID_BIT(id,2) ^ LIN_GET_ID_BIT(id,4)) << 6;
+    pid |= (~(LIN_GET_ID_BIT(id,1) ^ LIN_GET_ID_BIT(id,3) ^LIN_GET_ID_BIT(id,4) ^ LIN_GET_ID_BIT(id,5)) << 7);
+    pid |= (0x3F & id);
+    return pid;
 }
 
 /**
@@ -133,25 +125,26 @@ _attribute_ram_code_sec_noinline_ static unsigned char lin_software_sum(unsigned
  * @param[in]  lin_num - LIN0/LIN1.
  * @return     none
  */
-static inline void lin_reset(lin_num_e lin_num)
+static void lin_reset(lin_num_e lin_num)
 {
     switch (lin_num) {
     case LIN0:
+        BM_CLR(reg_clk_en6, FLD_CLK6_LIN0_EN);
         BM_CLR(reg_rst6, FLD_RST6_LIN0);
         BM_SET(reg_rst6, FLD_RST6_LIN0);
+        BM_SET(reg_clk_en6, FLD_CLK6_LIN0_EN);
         break;
     case LIN1:
+        BM_CLR(reg_clk_en6, FLD_CLK6_LIN1_EN);
         BM_CLR(reg_rst6, FLD_RST6_LIN1);
         BM_SET(reg_rst6, FLD_RST6_LIN1);
+        BM_SET(reg_clk_en6, FLD_CLK6_LIN1_EN);
         break;
     default:
         break;
     }
-
-#if 1 //The flowing setting will be default.
     reg_lin_uart_ctrl1(lin_num) = 0;
     reg_lin_uart_ctrl2(lin_num) = 0;
-#endif
 }
 
 /**
@@ -159,12 +152,11 @@ static inline void lin_reset(lin_num_e lin_num)
  * @param[in]  lin_num - LIN0/LIN1.
  * @return     none
  */
-static inline void lin_uart_init(lin_num_e lin_num)
+static void lin_uart_init(lin_num_e lin_num)
 {
     reg_lin_uart_ctrl0(lin_num)   = ((reg_lin_uart_ctrl0(lin_num) & (~FLD_LIN_UART_BPWC_O)) | s_lin_hw_ctb[lin_num].bwpc); // set bwpc
     reg_lin_uart_clk_div(lin_num) = (s_lin_hw_ctb[lin_num].div | FLD_LIN_UART_CLK_DIV_EN);                                 // set div_clock
 
-#if 1                                                                                                                      //TODO: to be confirmed
     reg_lin_uart_ctrl1(lin_num) = ((reg_lin_uart_ctrl1(lin_num) & (~FLD_UART_STOP_SEL)) | 0);
     reg_lin_uart_ctrl1(lin_num) &= ~FLD_LIN_UART_RXTIMEOUT_RTS_EN;
     reg_uart_ctrl4(lin_num) &= ~FLD_LIN_UART_RXDONE_RTS_EN;
@@ -173,7 +165,6 @@ static inline void lin_uart_init(lin_num_e lin_num)
     reg_lin_uart_rx_timeout0(lin_num)     = (s_lin_hw_ctb[lin_num].bwpc + 1) * 10; //1 start + 8 data + 1 stop
     reg_lin_uart_rx_timeout1(lin_num)     = (((reg_lin_uart_rx_timeout1(lin_num)) & (~FLD_LIN_UART_TIMEOUT_MUL)) | 1);
     reg_lin_uart_rxtimeout_o_exp(lin_num) = 0;
-#endif
 }
 
 /**
@@ -183,7 +174,7 @@ static inline void lin_uart_init(lin_num_e lin_num)
  * @param[in]  rx_pin - GPIO pin set as RXD of LIN controller.
  * @return     none
  */
-static inline void lin_set_pin(lin_num_e lin_num, gpio_func_pin_e tx_pin, gpio_func_pin_e rx_pin)
+static void lin_set_pin(lin_num_e lin_num, gpio_func_pin_e tx_pin, gpio_func_pin_e rx_pin)
 {
     // When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
     // otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
@@ -192,7 +183,7 @@ static inline void lin_set_pin(lin_num_e lin_num, gpio_func_pin_e tx_pin, gpio_f
         return;
     }
 
-    gpio_input_en((gpio_pin_e)tx_pin);
+    gpio_output_en((gpio_pin_e)tx_pin);
     gpio_input_en((gpio_pin_e)rx_pin);
     gpio_set_up_down_res((gpio_pin_e)tx_pin, GPIO_PIN_PULLUP_10K);
     gpio_set_up_down_res((gpio_pin_e)rx_pin, GPIO_PIN_PULLUP_10K);
@@ -218,7 +209,7 @@ static inline void lin_set_pin(lin_num_e lin_num, gpio_func_pin_e tx_pin, gpio_f
  * @param[in]  val - LIN_TIME_BASE_5MS/LIN_TIME_BASE_10MS.
  * @return     none
  */
-static inline void lin_set_time_base(lin_num_e lin_num, lin_time_base_e val)
+static void lin_set_time_base(lin_num_e lin_num, lin_time_base_e val)
 {
     unsigned short cnt     = s_lin_hw_ctb[lin_num].uart_clk / 200 - 1;
     reg_lin_ctrl1(lin_num) = (reg_lin_ctrl1(lin_num) & ~FLD_LIN_T_BASE_SEL_RW) | MASK_VAL(FLD_LIN_T_BASE_SEL_RW, val);
@@ -232,23 +223,11 @@ static inline void lin_set_time_base(lin_num_e lin_num, lin_time_base_e val)
  * @param[in]  bits - bit number to send or receive.
  * @return     none
  */
-static inline void lin_set_timeout(lin_num_e lin_num, unsigned short bits)
+static void lin_set_timeout(lin_num_e lin_num, unsigned short bits)
 {
     unsigned short cnt     = bits * (s_lin_hw_ctb[lin_num].bwpc + 1) * 14 / 10;
     reg_lin_ctrl3(lin_num) = (reg_lin_ctrl3(lin_num) & ~FLD_LIN_TIMEOUT_CNT_H_RW) | MASK_VAL(FLD_LIN_TIMEOUT_CNT_H_RW, (cnt >> 8) & 0xff);
     reg_lin_ctrl4(lin_num) = (reg_lin_ctrl4(lin_num) & ~FLD_LIN_TIMEOUT_CNT_L_RW) | MASK_VAL(FLD_LIN_TIMEOUT_CNT_L_RW, cnt & 0xff);
-}
-
-/**
- * @brief      This function serves to set state of LIN controller.
- * @param[in]  lin_num - LIN0/LIN1.
- * @param[in]  state - state of LIN controller, LIN_STATE_INIT/LIN_STATE_RUN.
- * @note       The sleep state is invalid.
- * @return     none
- */
-static inline void lin_set_state(lin_num_e lin_num, lin_state_e state)
-{
-    reg_lin_cmd(lin_num) = (reg_lin_cmd(lin_num) & ~FLD_LIN_ST_CMD_RW) | MASK_VAL(FLD_LIN_ST_CMD_RW, state);
 }
 
 /**
@@ -258,7 +237,7 @@ static inline void lin_set_state(lin_num_e lin_num, lin_state_e state)
  * @note       The maximum value of TX waiting is 30us.
  * @return     none
  */
-static inline void lin_master_set_tx_wait(lin_num_e lin_num, unsigned char time_us)
+static void lin_master_set_tx_wait(lin_num_e lin_num, unsigned char time_us)
 {
     if (time_us > 30) {
         time_us = 30;
@@ -274,7 +253,7 @@ static inline void lin_master_set_tx_wait(lin_num_e lin_num, unsigned char time_
  * @note       The maximum value of the wake-up signal is 500us.
  * @return     none
  */
-static inline void lin_set_tx_wakeup_time(lin_num_e lin_num, unsigned short time_us)
+static void lin_set_tx_wakeup_time(lin_num_e lin_num, unsigned short time_us)
 {
     if (time_us > 500) {
         time_us = 500;
@@ -290,7 +269,7 @@ static inline void lin_set_tx_wakeup_time(lin_num_e lin_num, unsigned short time
  * @note       The maximum value of the monitoring time is 10000ms.
  * @return     none
  */
-static inline void lin_set_bus_inactive_time(lin_num_e lin_num, unsigned short time_ms)
+static void lin_set_bus_inactive_time(lin_num_e lin_num, unsigned short time_ms)
 {
     if (time_ms > 10000) {
         time_ms = 10000;
@@ -307,7 +286,7 @@ static inline void lin_set_bus_inactive_time(lin_num_e lin_num, unsigned short t
  * @param[in]  pos - the sample position of LIN controller.
  * @return     none
  */
-static inline void lin_set_rx_sample_position(lin_num_e lin_num, lin_rx_smp_pos_e pos)
+static void lin_set_rx_sample_position(lin_num_e lin_num, lin_rx_smp_pos_e pos)
 {
     reg_lin_resp1(lin_num) = (reg_lin_resp1(lin_num) & ~FLD_LIN_UART_RX_SMP_POSITION_ADJ_RW) | MASK_VAL(FLD_LIN_UART_RX_SMP_POSITION_ADJ_RW, pos);
 }
@@ -318,7 +297,7 @@ static inline void lin_set_rx_sample_position(lin_num_e lin_num, lin_rx_smp_pos_
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_comm_en(lin_num_e lin_num, bool val)
+static void lin_set_comm_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl0(lin_num) |= FLD_LIN_COMM_EN_RW;
@@ -333,7 +312,7 @@ static inline void lin_set_comm_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_resp_en(lin_num_e lin_num, bool val)
+static void lin_set_resp_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl0(lin_num) |= FLD_LIN_RESP_EN_RW;
@@ -348,7 +327,7 @@ static inline void lin_set_resp_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_hw_set_auto_baud(lin_num_e lin_num, bool val)
+static void lin_hw_set_auto_baud(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl0(lin_num) |= FLD_LIN_RATE_AUTO_RW;
@@ -363,7 +342,7 @@ static inline void lin_hw_set_auto_baud(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_pid_reg_en(lin_num_e lin_num, bool val)
+static void lin_set_pid_reg_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl0(lin_num) |= FLD_LIN_PID_REG_EN_RW;
@@ -378,7 +357,7 @@ static inline void lin_set_pid_reg_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_txback_check_en(lin_num_e lin_num, bool val)
+static void lin_set_txback_check_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl0(lin_num) |= FLD_LIN_TXBK_CHECK_EN_RW;
@@ -393,7 +372,7 @@ static inline void lin_set_txback_check_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_comm_tx_loop_en(lin_num_e lin_num, bool val)
+static void lin_set_comm_tx_loop_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl1(lin_num) |= FLD_LIN_COMM_TX_LOOP_RW;
@@ -408,7 +387,7 @@ static inline void lin_set_comm_tx_loop_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_schedule_flt_pid_en(lin_num_e lin_num, bool val)
+static void lin_set_schedule_flt_pid_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl1(lin_num) |= FLD_LIN_SCHEDULE_FLT_PID_EN_RW;
@@ -423,7 +402,7 @@ static inline void lin_set_schedule_flt_pid_en(lin_num_e lin_num, bool val)
  * @param[in]  val - the enable state.
  * @return     none
  */
-static inline void lin_set_schedule_dly_table_en(lin_num_e lin_num, bool val)
+static void lin_set_schedule_dly_table_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_ctrl1(lin_num) |= FLD_LIN_SCHEDULE_DLY_TABLE_EN_RW;
@@ -469,7 +448,7 @@ static void lin_set_tx_dma_config(lin_num_e lin_num)
  * @param[in]  lin_num  - LIN0/LIN1.
  * @return     none
  */
-static inline void lin_set_rx_dma_config(lin_num_e lin_num)
+static void lin_set_rx_dma_config(lin_num_e lin_num)
 {
     // no_dma mode: rxdone(timeout) function switch; 1:enable,0:disable;dma mode must disable.
     reg_lin_uart_ctrl0(lin_num) &= ~FLD_UART_NDMA_RXDONE_EN;
@@ -494,7 +473,6 @@ static inline void lin_clr_all_flt_pid_en(lin_num_e lin_num)
  */
 static inline void lin_set_schedule_start_idx(lin_num_e lin_num, unsigned char index)
 {
-    index &= 0x0f;
     reg_lin_comm1(lin_num) = (reg_lin_comm1(lin_num) & ~FLD_LIN_SCHEDULE_LOOP_START_IDX_RW) | MASK_VAL(FLD_LIN_SCHEDULE_LOOP_START_IDX_RW, index);
 }
 
@@ -506,19 +484,8 @@ static inline void lin_set_schedule_start_idx(lin_num_e lin_num, unsigned char i
  */
 static inline void lin_set_schedule_end_idx(lin_num_e lin_num, unsigned char index)
 {
-    index &= 0x0f;
     reg_lin_comm1(lin_num) = (reg_lin_comm1(lin_num) & ~FLD_LIN_SCHEDULE_LOOP_END_IDX_RW) | MASK_VAL(FLD_LIN_SCHEDULE_LOOP_END_IDX_RW, index);
 }
-
-/**
- * @brief      This function serves to get the end index of the schedule table.
- * @param[in]  lin_num - LIN0/LIN1.
- * @return     The end index value.
- */
-//static inline unsigned char lin_get_schedule_end_idx(lin_num_e lin_num)
-//{
-//  return (reg_lin_comm1(lin_num) & FLD_LIN_SCHEDULE_LOOP_END_IDX) >> 4;
-//}
 
 /**
  * @brief      This function serves to set the enable state of configuring the filter PID.
@@ -526,9 +493,8 @@ static inline void lin_set_schedule_end_idx(lin_num_e lin_num, unsigned char ind
  * @param[in]  val - enable state.
  * @return     none
  */
-static inline void lin_set_flt_pid_buf_wr_en(lin_num_e lin_num, bool val)
+static void lin_set_flt_pid_buf_wr_en(lin_num_e lin_num, bool val)
 {
-#if 1
     if (val) {
         reg_lin_flt_pid_ctrl(lin_num) = (reg_lin_flt_pid_ctrl(lin_num) & ~(FLD_LIN_FLT_PID_BUF_CLR_W | FLD_LIN_FLT_PID_BUF_WR_EN_RW | FLD_LIN_SCHEDULE_CLR_W | FLD_LIN_COMM_SCHEDULE_IDX_RST_W)) |
                                         FLD_LIN_FLT_PID_BUF_WR_EN_RW;
@@ -536,13 +502,6 @@ static inline void lin_set_flt_pid_buf_wr_en(lin_num_e lin_num, bool val)
         reg_lin_flt_pid_ctrl(lin_num) = (reg_lin_flt_pid_ctrl(lin_num) & ~(FLD_LIN_FLT_PID_BUF_CLR_W | FLD_LIN_FLT_PID_BUF_WR_EN_RW | FLD_LIN_SCHEDULE_CLR_W | FLD_LIN_COMM_SCHEDULE_IDX_RST_W)) &
                                         (~FLD_LIN_FLT_PID_BUF_WR_EN_RW);
     }
-#else
-    if (val) {
-        reg_lin_flt_pid_ctrl(lin_num) |= FLD_LIN_FLT_PID_BUF_WR_EN_RW;
-    } else {
-        reg_lin_flt_pid_ctrl(lin_num) &= (~FLD_LIN_FLT_PID_BUF_WR_EN_RW);
-    }
-#endif
 }
 
 /**
@@ -565,7 +524,7 @@ static inline void lin_set_schedule_group_sel(lin_num_e lin_num, unsigned char g
  * @param[in]  slot_cnt - the period of each frame, count of t-base.
  * @return     none
  */
-static inline void lin_set_schedule_header(lin_num_e lin_num, unsigned char index, unsigned char id, unsigned char slot_cnt)
+static void lin_set_schedule_header(lin_num_e lin_num, unsigned char index, unsigned char id, unsigned char slot_cnt)
 {
     reg_lin_pid_filter(lin_num, index) = (id & FLD_LIN_FILTERED_FRAME_ID_RW);
     reg_lin_schedule(lin_num, index)   = (slot_cnt - 1) & FLD_LIN_COMM_SCHEDULE_DLY_BUF_RW;
@@ -580,7 +539,7 @@ static inline void lin_set_schedule_header(lin_num_e lin_num, unsigned char inde
  * @param[in]  tx_en - the enable state of TX.
  * @return     none
  */
-static inline void lin_set_filter_pid(lin_num_e lin_num, unsigned char index, unsigned char id, unsigned char data_len, bool tx_enable)
+static void lin_set_filter_pid(lin_num_e lin_num, unsigned char index, unsigned char id, unsigned char data_len, bool tx_enable)
 {
     reg_lin_pid_filter(lin_num, index) = (id & FLD_LIN_FILTERED_FRAME_ID_RW) | MASK_VAL(FLD_LIN_FILTERED_PID_TX_RW, tx_enable);
     reg_lin_fit_pid_len(lin_num)       = (reg_lin_fit_pid_len(lin_num) & (~(7 << (4 * index)))) | (((data_len - 1) & 7) << (4 * index));
@@ -735,36 +694,6 @@ static inline unsigned char lin_get_pid(lin_num_e lin_num)
 }
 
 /**
- * @brief      This function serves to set the enable state of the function to put PID in RX-FIFO.
- * @param[in]  lin_num - LIN0/LIN1.
- * @param[in]  val - the enable state.
- * @return     none.
- */
-static inline void lin_set_pid_put_fifo_en(lin_num_e lin_num, bool val)
-{
-    if (val) {
-        reg_lin_ctrl0(lin_num) |= FLD_LIN_PID_PUT_FIFO_RW;
-    } else {
-        reg_lin_ctrl0(lin_num) &= ~FLD_LIN_PID_PUT_FIFO_RW;
-    }
-}
-
-/**
- * @brief      This function serves to set the enable state of the function to put checksum value into RX-FIFO.
- * @param[in]  lin_num - LIN0/LIN1.
- * @param[in]  val - the enable state.
- * @return     none.
- */
-static inline void lin_set_checksum_put_fifo_en(lin_num_e lin_num, bool val)
-{
-    if (val) {
-        reg_lin_ctrl0(lin_num) |= FLD_LIN_CHECKSUM_PUT_FIFO_RW;
-    } else {
-        reg_lin_ctrl0(lin_num) &= ~FLD_LIN_CHECKSUM_PUT_FIFO_RW;
-    }
-}
-
-/**
  * @brief      This function serves to set the enable state of the function to put checksum value into RX-FIFO.
  * @param[in]  lin_num - LIN0/LIN1.
  * @param[in]  val - the enable state.
@@ -788,7 +717,7 @@ static inline void lin_set_checksum_sw_en(lin_num_e lin_num, bool val)
  */
 static inline void lin_set_checksum(lin_num_e lin_num, unsigned char checksum)
 {
-    reg_lin_frame2(lin_num) = (reg_lin_frame0(lin_num) & ~FLD_LIN_CHECKSUM_VOL) | MASK_VAL(FLD_LIN_CHECKSUM_VOL, checksum);
+    reg_lin_frame2(lin_num) = (reg_lin_frame2(lin_num) & ~FLD_LIN_CHECKSUM_VOL) | MASK_VAL(FLD_LIN_CHECKSUM_VOL, checksum);
 }
 
 /**
@@ -798,7 +727,7 @@ static inline void lin_set_checksum(lin_num_e lin_num, unsigned char checksum)
  */
 static inline unsigned char lin_get_checksum(lin_num_e lin_num)
 {
-    return reg_lin_frame1(lin_num) & FLD_LIN_CHECKSUM_VOL;
+    return reg_lin_frame2(lin_num) & FLD_LIN_CHECKSUM_VOL;
 }
 
 /**
@@ -806,7 +735,7 @@ static inline unsigned char lin_get_checksum(lin_num_e lin_num)
  * @param[in]  lin_num - LIN0/LIN1.
  * @return     none.
  */
-static inline void lin_set_pid_discard_en(lin_num_e lin_num, bool val)
+static void lin_set_pid_discard_en(lin_num_e lin_num, bool val)
 {
     if (val) {
         reg_lin_resp1(lin_num) |= FLD_LIN_NONFLT_PID_DISCARD_EN_RW;
@@ -959,6 +888,47 @@ static unsigned char lin_receive_ndma(lin_num_e lin_num, unsigned char *data, un
  *********************************************************************************************************************/
 
 /**
+ * @brief      This function serves to set EN PIN of LIN controller.
+ * @param[in]  lin_num - LIN0/LIN1.
+ * @param[in]  val - 1:enable LIN PHY; 0:disable LIN PHY
+ * @return     none
+ */
+void lin_set_hw_en(lin_num_e lin_num, bool val)
+{
+    gpio_pin_e pin = (gpio_pin_e) s_lin_hw_ctb[lin_num].en_pin;
+    gpio_function_en(pin);
+    gpio_output_en(pin); //enable output
+    gpio_input_dis(pin); //disable input
+    if (val) {
+        gpio_set_high_level(pin);
+    } else {
+        gpio_set_low_level(pin);
+    }
+}
+
+/**
+ * @brief      This function serves to generate checksum by software.
+ * @param[in]  id - ID value of LIN frame.
+ * @param[in]  data - data of LIN frame.
+ * @param[in]  len - data length of LIN frame.
+ * @param[in]  type - checksum type of LIN frame.
+ * @return     none
+ */
+unsigned char lin_software_checksum(unsigned char id, unsigned char *data, unsigned char len, lin_checksum_type_e type)
+{
+    unsigned short ret = ((type == LIN_CHECKSUM_TYPE_CLASSIC) ? 0 : lin_software_pid(id));
+
+    for (unsigned char i = 0; i < len; i++) {
+        ret += data[i];
+        if (ret & 0x100) {
+            ret = (ret & 0xff) + 1;
+        }
+    }
+
+    return ((~ret) & 0xff);
+}
+
+/**
  * @brief      This function serves to get the id of frame.
  * @param[in]  handle - operation handle.
  * @return     PID value.
@@ -984,7 +954,7 @@ bool lin_master_send_header(lin_handle_t_ptr handle, unsigned char id)
     bool ret = false;
     if (handle->init_flag) {
         lin_set_timeout(handle->lin_num, handle->header_bits);
-        lin_set_id(handle->lin_num, id, true); //TODO:pid_reg_en
+        lin_set_id(handle->lin_num, id, true);
         lin_comm_send_header_act(handle->lin_num);
         ret = true;
     }
@@ -1162,7 +1132,7 @@ bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned ch
         return ret;
     }
     if (handle->init_flag) {
-        lin_set_timeout(handle->lin_num, (data_len + 1) * 10); //TODO
+        lin_set_timeout(handle->lin_num, (data_len + 1) * 10);
         lin_set_frame_data_len(handle->lin_num, data_len);
         lin_set_tx_mode(handle->lin_num);
 
@@ -1173,7 +1143,6 @@ bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned ch
         }
 
         if (handle->dma_mode_enable) {
-#if 1
             unsigned char *dma_buffer = (unsigned char *)(handle->tx_dma_buffer);
             for (unsigned char i = 0; i < data_len; i++) {
                 dma_buffer[i] = data[i];
@@ -1182,10 +1151,6 @@ bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned ch
                 dma_clr_tc_irq_status(BIT(handle->tx_dma_chn));
             }
             lin_start_send_dma(handle->lin_num, handle->tx_dma_buffer, data_len);
-#else
-            (void)s_tx_dma_buffer;
-            (void)lin_start_send_dma;
-#endif
         } else {
             lin_send_ndma(handle->lin_num, data, data_len);
         }
@@ -1221,9 +1186,6 @@ bool lin_start_recv_response(lin_handle_t_ptr handle, unsigned char data_len, li
             if (dma_get_tc_irq_status(BIT(handle->rx_dma_chn))) {
                 dma_clr_tc_irq_status(BIT(handle->rx_dma_chn));
             }
-            if (PID_CHECKSUM_OUTPUT_EN) {
-                data_len += 2;
-            }
             lin_start_receive_dma(handle->lin_num, handle->rx_dma_buffer, data_len);
         }
 
@@ -1241,7 +1203,7 @@ bool lin_start_recv_response(lin_handle_t_ptr handle, unsigned char data_len, li
  * @param[out] result - the structure to save the result data (PID,length,checksum), can be null.
  * @return     The operation result, true:success, false:failed.
  */
-bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_get_response_result_t_ptr result)
+bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_checksum_type_e type, lin_get_response_result_t_ptr result)
 {
     bool ret = false;
     if ((data_len == 0) || !data || (data_len > 8)) {
@@ -1257,19 +1219,11 @@ bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigne
                     dma_clr_tc_irq_status(BIT(handle->rx_dma_chn));
 
                     unsigned char *dma_buffer = (unsigned char *)(handle->rx_dma_buffer);
-                    if (PID_CHECKSUM_OUTPUT_EN) {
-                        for (unsigned char i = 0; i < data_len; i++) {
-                            data[i] = dma_buffer[i + 1];
-                        }
-                        pid      = dma_buffer[0];
-                        checksum = dma_buffer[data_len + 1];
-                    } else {
-                        for (unsigned char i = 0; i < data_len; i++) {
-                            data[i] = dma_buffer[i];
-                        }
-                        pid      = lin_get_pid(handle->lin_num);
-                        checksum = lin_get_checksum(handle->lin_num);
+                    for (unsigned char i = 0; i < data_len; i++) {
+                        data[i] = dma_buffer[i];
                     }
+                    pid      = lin_get_pid(handle->lin_num);
+                    checksum = lin_software_checksum(pid, data, data_len, type); // must use software checksum here
                     len = data_len;
                 } else {
                     break;
@@ -1278,7 +1232,7 @@ bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigne
                 len = lin_receive_ndma(handle->lin_num, data, data_len);
                 if (len == data_len) {
                     pid      = lin_get_pid(handle->lin_num);
-                    checksum = lin_get_checksum(handle->lin_num);
+                    checksum = lin_software_checksum(pid, data, data_len, type); // must use software checksum here
                 } else {
                     break;
                 }
@@ -1380,6 +1334,10 @@ bool lin_slave_enable_pid_filter_table(lin_handle_t_ptr handle)
  * @param[in]  handle - operation handle.
  * @param[in]  time_us - the signal duration.
  * @return     The operation result, true:success, false:failed.
+ * @note       Master node: The duration of the pull-down signal will be slightly shorter than the configuration time(20k baud rate,150us->147us),
+ *             due to the internal signal triggering mechanism. So, the value should be set slightly larger than expected.
+ *             Slave node:  The duration of the pull-down signal will be slightly longer  than the configuration time(20k baud rate,150us->155us),
+ *             due to the internal signal triggering mechanism. So, the value should be set slightly smaller than expected.
  */
 bool lin_send_wakeup_signal(lin_handle_t_ptr handle, unsigned short time_us)
 {
@@ -1436,81 +1394,75 @@ lin_handle_t_ptr lin_hw_init(lin_hw_init_para_t *para)
 {
     lin_handle_t_ptr ret = 0;
 
-    do {
-        if (para->lin_num >= LIN_NUM) {
-            break;
-        }
+    if (para->lin_num >= LIN_NUM) {
+        return ret;
+    }
 
-        s_lin_hw_ctb[para->lin_num].init_flag = false;
-        s_lin_hw_ctb[para->lin_num].lin_num   = para->lin_num;
+    s_lin_hw_ctb[para->lin_num].init_flag = false;
+    s_lin_hw_ctb[para->lin_num].lin_num   = para->lin_num;
 
-        //DMA initialize
-        s_lin_hw_ctb[para->lin_num].dma_mode_enable = para->dma_cfg.dma_mode_enable;
-        s_lin_hw_ctb[para->lin_num].tx_dma_chn      = para->dma_cfg.tx_dma_chn;
-        s_lin_hw_ctb[para->lin_num].rx_dma_chn      = para->dma_cfg.rx_dma_chn;
+    //DMA initialize
+    s_lin_hw_ctb[para->lin_num].dma_mode_enable = para->dma_cfg.dma_mode_enable;
+    s_lin_hw_ctb[para->lin_num].tx_dma_chn      = para->dma_cfg.tx_dma_chn;
+    s_lin_hw_ctb[para->lin_num].rx_dma_chn      = para->dma_cfg.rx_dma_chn;
 
-        //Checksum initialize
-        s_lin_hw_ctb[para->lin_num].checksum_sw_enable = para->checksum_cfg.checksum_sw_enable;
-        s_lin_hw_ctb[para->lin_num].sum_func           = ((para->checksum_cfg.sum_func) ? para->checksum_cfg.sum_func : lin_software_sum);
+    //Checksum initialize
+    s_lin_hw_ctb[para->lin_num].checksum_sw_enable = para->checksum_cfg.checksum_sw_enable;
+    s_lin_hw_ctb[para->lin_num].sum_func           = ((para->checksum_cfg.sum_func) ? para->checksum_cfg.sum_func : lin_software_checksum);
 
-        if (para->dma_cfg.dma_mode_enable) {
-            lin_set_tx_dma_config(para->lin_num);
-            lin_set_rx_dma_config(para->lin_num);
-        }
+    if (para->dma_cfg.dma_mode_enable) {
+        lin_set_tx_dma_config(para->lin_num);
+        lin_set_rx_dma_config(para->lin_num);
+    }
 
-        //reset hardware
-        lin_reset(para->lin_num);
+    //reset hardware
+    lin_reset(para->lin_num);
 
-        //hardware initialize
-        s_lin_hw_ctb[para->lin_num].tx_pin = para->tx_pin;
-        s_lin_hw_ctb[para->lin_num].rx_pin = para->rx_pin;
-        lin_set_pin(para->lin_num, para->tx_pin, para->rx_pin);
+    //hardware initialize
+    s_lin_hw_ctb[para->lin_num].en_pin = para->en_pin;
+    s_lin_hw_ctb[para->lin_num].tx_pin = para->tx_pin;
+    s_lin_hw_ctb[para->lin_num].rx_pin = para->rx_pin;
 
-        s_lin_hw_ctb[para->lin_num].baudrate = para->baudrate;
-        s_lin_hw_ctb[para->lin_num].pclk     = para->pclk;
-        uart_cal_div_and_bwpc(para->baudrate, para->pclk, &(s_lin_hw_ctb[para->lin_num].div), &(s_lin_hw_ctb[para->lin_num].bwpc));
-        s_lin_hw_ctb[para->lin_num].uart_clk = para->pclk / (s_lin_hw_ctb[para->lin_num].div + 1);
+    lin_set_hw_en(para->lin_num, 1);
+    lin_set_pin(para->lin_num, para->tx_pin, para->rx_pin);
 
-        lin_uart_init(para->lin_num);
+    s_lin_hw_ctb[para->lin_num].baudrate = para->baudrate;
+    para->pclk = sys_clk.pclk * 1000 * 1000;
+    s_lin_hw_ctb[para->lin_num].pclk     = para->pclk;
+    uart_cal_div_and_bwpc(para->baudrate, para->pclk, &(s_lin_hw_ctb[para->lin_num].div), &(s_lin_hw_ctb[para->lin_num].bwpc));
+    s_lin_hw_ctb[para->lin_num].uart_clk = para->pclk / (s_lin_hw_ctb[para->lin_num].div + 1);
 
-        if (para->role == LIN_MASTER_NODE) {
-            lin_set_comm_en(para->lin_num, true);
-            lin_set_resp_en(para->lin_num, true);
-            lin_hw_set_auto_baud(para->lin_num, false);
-            lin_set_comm_tx_loop_en(para->lin_num, false);
-            lin_set_break_len(para->lin_num, para->hw_cfg.break_len);
-            lin_set_break1_len(para->lin_num, para->hw_cfg.break1_len);
-        } else if (para->role == LIN_SLAVE_NODE) {
-            lin_set_comm_en(para->lin_num, false);
-            lin_set_resp_en(para->lin_num, true);
-            lin_hw_set_auto_baud(para->lin_num, true); //TODO: auto-rate function not ready(with problem checksum error)
-        } else {
-            break;
-        }
+    lin_uart_init(para->lin_num);
 
-        s_lin_hw_ctb[para->lin_num].header_bits = (13 + para->hw_cfg.break_len) + (1 + para->hw_cfg.break1_len) + 10 + 10;
-        s_lin_hw_ctb[para->lin_num].role        = para->role;
+    if (para->role == LIN_MASTER_NODE) {
+        lin_set_comm_en(para->lin_num, true);
+        lin_set_resp_en(para->lin_num, true);
+        lin_hw_set_auto_baud(para->lin_num, false);//auto baud rate is not supported in this version
+        lin_set_comm_tx_loop_en(para->lin_num, false);
+        lin_set_break_len(para->lin_num, para->hw_cfg.break_len);
+        lin_set_break1_len(para->lin_num, para->hw_cfg.break1_len);
+    } else if (para->role == LIN_SLAVE_NODE) {
+        lin_set_comm_en(para->lin_num, false);
+        lin_set_resp_en(para->lin_num, true);
+        lin_hw_set_auto_baud(para->lin_num, false);//auto baud rate is not supported in this version
+    } else {
+        return ret;
+    }
 
-        lin_set_time_base(para->lin_num, para->hw_cfg.time_base);
-        lin_master_set_tx_wait(para->lin_num, para->hw_cfg.jitter_us);
-        lin_set_txback_check_en(para->lin_num, false);
-        lin_set_bus_inactive_time(para->lin_num, para->hw_cfg.inactive_timeout_ms);
-        if (1) {
-            lin_set_rx_sample_position(para->lin_num, para->hw_cfg.rx_smp_pos);
-        }
+    s_lin_hw_ctb[para->lin_num].header_bits = (13 + para->hw_cfg.break_len) + (1 + para->hw_cfg.break1_len) + 10 + 10;
+    s_lin_hw_ctb[para->lin_num].role        = para->role;
 
-        if (PID_CHECKSUM_OUTPUT_EN) {
-            lin_set_pid_put_fifo_en(para->lin_num, para->dma_cfg.dma_mode_enable);
-            lin_set_checksum_put_fifo_en(para->lin_num, para->dma_cfg.dma_mode_enable);
-        }
+    lin_set_time_base(para->lin_num, para->hw_cfg.time_base);
+    lin_master_set_tx_wait(para->lin_num, para->hw_cfg.jitter_us);
+    lin_set_txback_check_en(para->lin_num, false);
+    lin_set_bus_inactive_time(para->lin_num, para->hw_cfg.inactive_timeout_ms);
+    lin_set_rx_sample_position(para->lin_num, para->hw_cfg.rx_smp_pos);
 
-        lin_set_state(para->lin_num, LIN_STATE_RUN);
+    lin_set_state(para->lin_num, LIN_STATE_RUN);
 
-        s_lin_hw_ctb[para->lin_num].init_flag = true;
+    s_lin_hw_ctb[para->lin_num].init_flag = true;
 
-        ret = &(s_lin_hw_ctb[para->lin_num]);
-
-    } while (0);
+    ret = &(s_lin_hw_ctb[para->lin_num]);
 
     return ret;
 }

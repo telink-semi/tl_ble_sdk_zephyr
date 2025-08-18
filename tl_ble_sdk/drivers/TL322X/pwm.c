@@ -45,6 +45,7 @@ dma_config_t pwm_tx_dma_config = {
  * @param[in]  pin      - the pin needs to set.
  * @param[in]  function - the function need to set.
  * @return     none.
+ * @note       reference gpio.h GPIO function mux types
  */
 void pwm_set_pin(gpio_func_pin_e pin, gpio_func_e func)
 {

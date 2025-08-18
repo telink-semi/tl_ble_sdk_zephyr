@@ -51,41 +51,42 @@
 
 /**
  *  @brief      KEYSCAN pin value
+ *  @note       Any one can be chosen between the two. It should be noted that if the IO of the second group is used, the IO of the first group can only be in GPIO function.
  */
 typedef enum
 {
-    KS_PD3 = 0,
-    KS_PD4,
-    KS_PD5,
-    KS_PD6,
-    KS_PD7,
-    KS_PE0,
-    KS_PE1,
-    KS_PE2,
-    KS_PC3,
-    KS_PC4,
-    KS_PC5,
-    KS_PC6,
-    KS_PC7,
-    KS_PD0,
-    KS_PD1,
-    KS_PD2,
-    KS_PB3,
-    KS_PB4,
-    KS_PB5,
-    KS_PB6,
-    KS_PB7,
-    KS_PC0,
-    KS_PC1,
-    KS_PC2,
-    KS_PA0,
-    KS_PA1,
-    KS_PA2,
-    KS_PA3,
-    KS_PA4,
-    KS_PB0,
-    KS_PB1,
-    KS_PB2,
+    KS_PD3 = 0,       KS_PH3 =BIT(5)|0,
+    KS_PD4 = 1,       KS_PH4 =BIT(5)|1,
+    KS_PD5 = 2,       KS_PH5 =BIT(5)|2,
+    KS_PD6 = 3,       KS_PH6 =BIT(5)|3,
+    KS_PD7 = 4,       KS_PH7 =BIT(5)|4,
+    KS_PE0 = 5,
+    KS_PE1 = 6,
+    KS_PE2 = 7,
+    KS_PC3 = 8,        KS_PG3 =BIT(5)|8,
+    KS_PC4 = 9,        KS_PG4 =BIT(5)|9,
+    KS_PC5 = 10,       KS_PG5 =BIT(5)|10,
+    KS_PC6 = 11,       KS_PG6 =BIT(5)|11,
+    KS_PC7 = 12,       KS_PG7 =BIT(5)|12,
+    KS_PD0 = 13,       KS_PH0 =BIT(5)|13,
+    KS_PD1 = 14,       KS_PH1 =BIT(5)|14,
+    KS_PD2 = 15,       KS_PH2 =BIT(5)|15,
+    KS_PB3 = 16,       KS_PF3 =BIT(5)|16,
+   /*KS_PB4 = 17,*/    KS_PF4 =BIT(5)|17,
+   /*KS_PB5 = 18,*/    KS_PF5 =BIT(5)|18,
+   /*KS_PB6 = 19,*/    KS_PF6 =BIT(5)|19,
+    KS_PB7 = 20,       KS_PF7 =BIT(5)|20,
+    KS_PC0 = 21,       KS_PG0 =BIT(5)|21,
+    KS_PC1 = 22,       KS_PG1 =BIT(5)|22,
+    KS_PC2 = 23,       KS_PG2 =BIT(5)|23,
+    KS_PA0 = 24,       KS_PE3 =BIT(5)|24,
+    KS_PA1 = 25,       KS_PE4 =BIT(5)|25,
+    KS_PA2 = 26,       KS_PE5 =BIT(5)|26,
+    KS_PA3 = 27,       KS_PE6 =BIT(5)|27,
+    KS_PA4 = 28,       KS_PE7 =BIT(5)|28,
+    KS_PB0 = 29,       KS_PF0 =BIT(5)|29,
+    KS_PB1 = 30,       KS_PF1 =BIT(5)|30,
+   /*KS_PB2 = 31,       KS_PF2 =BIT(5)|31,*/
 } ks_value_e;
 
 /**
@@ -125,6 +126,15 @@ typedef enum
     KS_INT_PIN_PULLDOWN = (0x02 << 4) | GPIO_PIN_PULLDOWN_100K, /**< Internal pull-down.When the column of the keyscan is configured as pull-down, when the column is detected as high level, it means that the button is pressed */
 } ks_col_pull_type_e;
 
+
+typedef enum{
+    KEYSCAN_8K = 8,
+} ks_baud_rate_e;
+
+typedef enum{
+    KS_24MRC =1,
+    KS_24MXTAL=2,
+} ks_clk_src_e;
 /**
  * @brief         This function servers to clear irq status.
  *                 After the hardware writes the key value into the fifo in each debounce period, an interrupt is triggered until it enters the idle state.
@@ -135,6 +145,10 @@ static inline void keyscan_clr_irq_status(void)
     reg_ks_irq |= FLD_KS_FRM_END;
 }
 
+static inline void keyscan_clr_rxdone_irq_status(void)
+{
+     reg_ks_gated = FLD_KS_RXDONE_IRQ;
+}
 /**
  * @brief         This function servers to get write pointer.
  * @return      the value of the write pointer.
@@ -145,6 +159,10 @@ static inline unsigned char keyscan_get_irq_status(void)
     return reg_ks_irq & FLD_KS_FRM_END;
 }
 
+static inline unsigned char keyscan_get_rxdone_irq_status(void)
+{
+    return reg_ks_gated &FLD_KS_RXDONE_IRQ;
+}
 /**
  * @brief       This function servers to get read pointer.
  * @return      the value of the read pointer.
@@ -189,24 +207,48 @@ static inline void keyscan_disable(void)
  */
 static inline void keyscan_dma_enable(void)
 {
-    BM_SET(reg_ks_a_en0, FLD_KS_RXDMA_EN | FLD_KS_CAPTURE_SEL | 0x40); //keyscan dma enable
+    BM_SET(reg_ks_a_en0, FLD_KS_RXDMA_EN); //keyscan dma enable
 }
 
 /**
  * @brief      This function serves to configure keyscan DMA.
  * @param[in]  chn       - DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
  * @param[in]  size_byte - DMA buffer size
  * @return     none
  */
-void keyscan_dma_config(dma_chn_e chn, unsigned char size_byte);
+void keyscan_dma_config(dma_chn_e chn, unsigned int *data_buffer, unsigned char size_byte);
+
+/**
+ * @brief     This function serves to configure adc_dma_chn channel llp.
+ * @param[in] chn          - the DMA channel
+ * @param[in] data_buffer  - the DMA data_buffer address
+ * @param[in] config       - the DMA config
+ * @param[in] head_of_list - the DMA linked list head
+ * @param[in] size_byte    - the DMA buffer size
+ * @return    none
+ */
+void keyscan_dma_config_llp_list(dma_chn_e chn, unsigned int *data_buffer, unsigned int size_byte, dma_chain_config_t *head_of_list);
+
+/**
+ * @brief      This function serves to configure adc_dma_chn channel list element.
+ * @param[in]  chn          - the DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
+ * @param[in]  node         - the list node
+ * @param[in]  llpointer    - the linked list pointer
+ * @param[in]  size_byte    - the DMA buffer size
+ * @return     none
+ */
+void keyscan_dma_add_list_element(dma_chn_e chn, unsigned int *data_buffer, dma_chain_config_t *node, dma_chain_config_t *llpointer, unsigned int size_byte);
 
 /**
  * @brief      This function serves to configure keyscan DMA LLP.
  * @param[in]  chn       - DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
  * @param[in]  size_byte - DMA buffer size
  * @return     none
  */
-void keyscan_dma_config_llp(dma_chn_e chn, unsigned char size_byte);
+void keyscan_dma_config_llp(dma_chn_e chn, unsigned int *data_buffer, unsigned char size_byte);
 
 /**
  * @brief      This function serves to set the rows and columns of the keyscan .
@@ -243,10 +285,14 @@ void keyscan_init(ks_debounce_period_e debounce_period, unsigned char enter_idle
 
 /**
  * @brief      This function serves to set keyscan configuration.
- * @param[in]  ks_col       - The array element must be a member of the enumeration type ks_value_e.
- * @param[in]  col_cnt      - Count of columns. Range is 1-31.
- * @param[in]  col_data     - the meta col data
- * @return     int         - the col value
+ * @param[in]  baud_rate                - ks_baud_rate_e.
+ * @param[in]  clk_src                  - ks_clk_src_e.
+ * @param[in]  enter_idle_period_num    - Set how many debounce cycles to enter the idle state without detecting a button.
+ *                                        The value setting range is 1-32.
+ *                                        The idle state will stop scanning and reduce power consumption.
+ *                                        Press again to exit the idle state.
+ * @return     none
  */
-int keyscan_get_col_from_meta_data(unsigned char *ks_col, unsigned char col_cnt, unsigned int col_data);
+void keyscan_init_clk_24m(ks_baud_rate_e baud_rate, ks_clk_src_e clk_src, unsigned char enter_idle_period_num);
+
 #endif /* KEYSCAN_H_ */

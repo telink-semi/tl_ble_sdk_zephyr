@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    sar_adc_reg.h
  *
- * @brief   This is the header file for tl322x
+ * @brief   This is the header file for TL322X
  *
  * @author  Driver Group
  * @date    2024
@@ -21,268 +21,246 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef SAR_ADC_REG_H
-#define SAR_ADC_REG_H
+#ifndef ADC_REG_H
+#define ADC_REG_H
 #include "soc.h"
 
-/*******************************      sar_adc0 registers: 0x101400      ******************************/
-/*******************************      sar_adc1 registers: 0x104400      ******************************/
-
-#define REG_SAR_ADC_BASE(i)         (0x101400 + 0x3000 * i)
-
-#define reg_sar_adc_m_config(i)     REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x00)
-
-#define reg_sar_adc_oversampling(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x01)
+/**********************************************************************************************************************
+ *                                         Analog  registers are as follows                                           *
+ **********************************************************************************************************************/
+#define areg_adc_rng_mode(num) ((((num) == 0) ? 0 : 0x100) + 0x264)
 
 enum
 {
-    FLD_SAR_ADC_OVRSMPL_MAX_CNT = BIT_RNG(0, 3),
-    FLD_SAR_ADC_OVRSMPL_EN      = BIT(4),
-    FLD_SAR_ADC_PAD_AUTO_MUX_EN = BIT(5),
+    FLD_ADC_RNG_MODE      = BIT_RNG(0, 4),
+    FLD_ADC_RNG_RD_ENABLE = BIT(5),
+    FLD_ADC_BIT_SEL       = BIT(6),
 };
 
-#define reg_sar_adc_tsamp1(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x03)
+#define areg_adc_res_m(num) ((((num) == 0) ? 0 : 0x100) + 0x26c)
 
 enum
 {
-    FLD_SAR_ADC_R_TSAMPM = BIT_RNG(0, 3),
-    FLD_SAR_ADC_R_TSAMPL = BIT_RNG(4, 7),
+    FLD_ADC_RES_M         = BIT_RNG(0, 1),
+    FLD_ADC_EN_DIFF_CHN_M = BIT(6),
 };
 
-#define reg_sar_adc_tsamp2(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x04)
+#define areg_adc_data_transfer_control(num) ((((num) == 0) ? 0 : 0x100) + 0x272)
 
 enum
 {
-    FLD_SAR_ADC_R_TSAMPR = BIT_RNG(0, 3),
+    FLD_AUTO_NOT_EN = BIT(3),
 };
 
-#define reg_sar_adc_vbat_div(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x05)
+#define areg_adc_data_sample_control(num) ((((num) == 0) ? 0 : 0x100) + 0x273)
 
 enum
 {
-    FLD_SAR_ADC_MISC_CHANNEL_VBAT_DIV = BIT_RNG(0, 1),
-    FLD_SAR_ADC_L_CHANNEL_VBAT_DIV    = BIT_RNG(2, 3),
-    FLD_SAR_ADC_R_CHANNEL_VBAT_DIV    = BIT_RNG(4, 5),
+    FLD_NOT_SAMPLE_ADC_DATA = BIT(0), //hold mode
+    FLD_DWA_EN_O            = BIT(1),
+    FLD_ANA_RD_EN           = BIT(2),
 };
 
-#define reg_sar_adc_m_channel_set_state(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x06)
+#define areg_adc_sample_clk_div(num) ((((num) == 0) ? 0 : 0x100) + 0x274)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_S_M              = BIT_RNG(0, 3),
-    FLD_SAR_ADC_M_CHANNEL_SEL_AI_SCALE = BIT_RNG(4, 5),
-    FLD_SAR_ADC_M_CHANNEL_SEL_VREF     = BIT_RNG(6, 7),
+    FLD_ADC_SAMPLE_CLK_DIV = BIT_RNG(0, 3),
 };
 
-#define reg_sar_adc_l_channel_set_state(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x07)
+
+#define areg_m_chn_data_valid_status(num) ((((num) == 0) ? 0 : 0x100) + 0x276)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_S_L              = BIT_RNG(0, 3),
-    FLD_SAR_ADC_L_CHANNEL_SEL_AI_SCALE = BIT_RNG(4, 5),
-    FLD_SAR_ADC_L_CHANNEL_SEL_VREF     = BIT_RNG(6, 7),
+    FLD_M_CHN_DATA_VALID_STATUS = BIT(0),
 };
 
-#define reg_sar_adc_r_channel_set_state(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x08)
+/** The areg_adc_misc register stores only the data for the M channel
+ *  and will not store the data for the L and R channels.
+ */
+#define areg_adc_misc_l(num) ((((num) == 0) ? 0 : 0x100) + 0x277)
+#define areg_adc_misc_h(num) ((((num) == 0) ? 0 : 0x100) + 0x278)
+
+
+#define areg_ain_scale(num)  ((((num) == 0) ? 0 : 0x100) + 0x27a)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_S_R              = BIT_RNG(0, 3),
-    FLD_SAR_ADC_R_CHANNEL_SEL_AI_SCALE = BIT_RNG(4, 5),
-    FLD_SAR_ADC_R_CHANNEL_SEL_VREF     = BIT_RNG(6, 7),
+    FLD_ADC_ITRIM_PREAMP  = BIT_RNG(0, 1),
+    FLD_ADC_ITRIM_VREFBUF = BIT_RNG(2, 3),
+    FLD_ADC_ITRIM_VCMBUF  = BIT_RNG(4, 5),
 };
 
-#define reg_sar_adc_rng_set_state(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x09)
+#define areg_adc_pga_ctrl(num) ((((num) == 0) ? 0 : 0x100) + 0x27c)
 
 enum
 {
-    FLD_SAR_ADC_RNG_SET_CNT      = BIT_RNG(0, 3),
-    FLD_SAR_ADC_RNG_SEL_AI_SCALE = BIT_RNG(4, 5),
-    FLD_SAR_ADC_RNG_SEL_VREF     = BIT_RNG(6, 7),
+    FLD_SAR_ADC_POWER_DOWN = BIT(5),
 };
-
-#define reg_sar_adc_m_channel_capture_state(i)   REG_ADDR16(REG_SAR_ADC_BASE(i) + 0x0a)
-#define reg_sar_adc_m_channel_capture_state_l(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0a)
+#define areg_adc_vref_fast_startup_sampled_inuput(num) ((((num) == 0) ? 0 : 0x100) + 0x27d)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_M_L = BIT_RNG(0, 7),
+    FLD_VREF_FAST_STARTUP            = BIT(0),
+    FLD_SAMPLED_INPUT_MODEBAR        = BIT(1),
 };
 
-#define reg_sar_adc_m_channel_capture_state_h(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0b)
+
+#define areg_temp_sensor_ctrl 0x06
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_M_H = BIT_RNG(0, 7),
+    FLD_TEMP_SENSOR_POWER_DOWN = BIT(2),
 };
 
-#define reg_sar_adc_l_channel_capture_state(i)   REG_ADDR16(REG_SAR_ADC_BASE(i) + 0x0c)
-#define reg_sar_adc_l_channel_capture_state_l(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0c)
+/**********************************************************************************************************************
+ *                                         Digital registers are as follow                                            *
+ **********************************************************************************************************************/
+
+#define ADC_BASE_ADDR(i)     (((i) == 0) ? 0x101400 : 0x104400)
+#define reg_m_config(num)    REG_ADDR8(ADC_BASE_ADDR(num) + 0x00)
+
+#define reg_adc_oversample(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x01)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_L_L = BIT_RNG(0, 7),
+    FLD_MAX_OVERSAMPLE_CNT = BIT_RNG(0, 3),
+    FLD_OVERSAMPLE_ENABLE  = BIT(4),
+    FLD_PAD_AUTO_MUX_EN = BIT(5),  //keyscan mode enable 
 };
 
-#define reg_sar_adc_l_channel_capture_state_h(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0d)
+#define reg_adc_tsamp(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x03)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_L_H = BIT_RNG(0, 7),
+    FLD_M_TSAMP = BIT_RNG(0, 3),
+    FLD_L_TSAMP = BIT_RNG(4, 7),
 };
 
-#define reg_sar_adc_r_channel_capture_state(i)   REG_ADDR16(REG_SAR_ADC_BASE(i) + 0x0e)
-#define reg_sar_adc_r_channel_capture_state_l(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0e)
+#define reg_adc_r_tsamp(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x04)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_R_L = BIT_RNG(0, 7),
+    FLD_R_TSAMP = BIT_RNG(0, 3),
 };
 
-#define reg_sar_adc_r_channel_capture_state_h(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x0f)
+#define reg_adc_vabt_div(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x05)
 
 enum
 {
-    FLD_SAR_ADC_R_MAX_C_R_H = BIT_RNG(0, 7),
+    FLD_M_VBAT_DIV = BIT_RNG(0, 1),
+    FLD_L_VBAT_DIV = BIT_RNG(2, 3),
+    FLD_R_VBAT_DIV = BIT_RNG(4, 5),
 };
 
-#define reg_sar_adc_rng_cap_state(i)   REG_ADDR16(REG_SAR_ADC_BASE(i) + 0x0e)
-#define reg_sar_adc_rng_cap_state_l(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x10)
+#define reg_adc_channel_set_state(num, i) REG_ADDR8(ADC_BASE_ADDR(num) + 0x06 + (i))
 
 enum
 {
-    FLD_SAR_ADC_RNG_CAP_CNT_L = BIT_RNG(0, 7),
+    FLD_R_MAX_S      = BIT_RNG(0, 3),
+    FLD_SEL_AI_SCALE = BIT_RNG(4, 5),
+    FLD_SEL_VREF     = BIT_RNG(6, 7),
 };
 
-#define reg_sar_adc_rng_cap_state_h(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x11)
+#define reg_adc_rng_set_state(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x09)
 
 enum
 {
-    FLD_SAR_ADC_RNG_CAP_CNT_H = BIT_RNG(0, 1),
+    FLD_RNG_SET_CNT      = BIT_RNG(0, 3),
+    FLD_RNG_SEL_AI_SCALE = BIT_RNG(4, 5),
+    FLD_RNG_SEL_VREF     = BIT_RNG(6, 7),
 };
 
-#define reg_sar_adc_rng_config(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x13)
+#define reg_adc_capture_state(num, i) REG_ADDR16(ADC_BASE_ADDR(num) + 0x0a + (i) * 0x02)
 
 enum
 {
-    FLD_SAR_ADC_RNG_TSAMP    = BIT_RNG(0, 3),
-    FLD_SAR_ADC_RNG_VBAT_DIV = BIT_RNG(4, 5),
+    FLD_R_MAX_C_L = BIT_RNG(0, 7),
+    FLD_R_MAX_C_H = BIT_RNG(8, 9),
 };
 
-#define reg_sar_adc_config0(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x28)
+#define reg_adc_rng_config(num)        REG_ADDR8(ADC_BASE_ADDR(num) + 0x13)
+
+#define reg_adc_rng_capture_state(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x10)
+
+#define reg_adc_config0(num)           REG_ADDR8(ADC_BASE_ADDR(num) + 0x28)
 
 enum
 {
-    FLD_SAR_ADC_SCNT_MAX = BIT_RNG(4, 6),
+    FLD_SCANT_MAX = BIT_RNG(4, 6),
 };
 
-#define reg_sar_adc_config1(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x29)
+#define reg_adc_config1(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x29)
 
 enum
 {
-    FLD_SAR_ADC_CLK_DIV  = BIT_RNG(0, 3),
-    FLD_SAR_ADC_RNG_MODE = BIT(4),
-    FLD_SAR_ADC_ADC_MODE = BIT(5),
+    FLD_ADC_CLK_DIV = BIT_RNG(0, 3),
+    FLD_ADC_MODE    = BIT(5),
 };
 
-#define reg_sar_adc_config2(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2a)
+#define reg_adc_config2(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x2a)
 
 enum
 {
-    FLD_SAR_ADC_M_CHANNEL_ENABLE        = BIT(0),
-    FLD_SAR_ADC_L_CHANNEL_ENABLE        = BIT(1),
-    FLD_SAR_ADC_R_CHANNEL_ENABLE        = BIT(2),
-    FLD_SAR_ADC_RNG_ENABLE              = BIT(3),
-    FLD_SAR_ADC_SAR_RX_DMA_ENABLE       = BIT(4),
-    FLD_SAR_ADC_CLK_ENABLE              = BIT(5),
-    FLD_SAR_ADC_SAR_RX_INTERRUPT_ENABLE = BIT(6),
-    FLD_SAR_ADC_SAR_TRIG_MODE           = BIT(7),
+    FLD_M_CHANNEL_EN            = BIT(0),
+    FLD_L_CHANNEL_EN            = BIT(1),
+    FLD_R_CHANNEL_EN            = BIT(2),
+    FLD_RX_DMA_ENABLE           = BIT(4),
+    FLD_CLK_EN                  = BIT(5),
+    FLD_SAR_RX_INTERRUPT_ENABLE = BIT(6),
+    FLD_TRIG_MODE               = BIT(7),
 };
 
-#define reg_sar_adc_rxfifo_trig_num(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2b)
+#define reg_adc_rxfifo_trig_num(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x2b)
 
 enum
 {
-    FLD_SAR_ADC_RXFIFO_TRIG_NUM = BIT_RNG(0, 2),
-    FLD_SAR_ADC_BUFCNT          = BIT_RNG(4, 7),
+    FLD_RXFIFO_TRIG_NUM = BIT_RNG(0, 2),
+    FLD_BUF_CNT         = BIT_RNG(4, 7),
 };
 
-#define reg_sar_adc_rxfifo_data(i)  REG_ADDR32(REG_SAR_ADC_BASE(i) + 0x2c)
-#define reg_sar_adc_rxfifo_data0(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2c)
-#define reg_sar_adc_rxfifo_data1(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2d)
-#define reg_sar_adc_rxfifo_data2(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2e)
-#define reg_sar_adc_rxfifo_data3(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x2f)
+#define reg_adc_rxfifo_dat(num, i) REG_ADDR16(ADC_BASE_ADDR(num) + 0x2c + 2 * (i))
+#define SAR_ADC_FIFO(num)          (ADC_BASE_ADDR(num) + 0x2c)
 
-#define reg_sar_adc_soft_control(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x30)
+#define reg_soft_control(num)      REG_ADDR8(ADC_BASE_ADDR(num) + 0x30)
 
 enum
 {
-    FLD_SAR_ADC_RX_STATUS  = BIT(0),
-    FLD_SAR_ADC_FIFO_CLR   = BIT(1),
-    FLD_SAR_ADC_TRIG_START = BIT(2),
-    FLD_SAR_ADC_SOFT_START = BIT(7),
+    FLD_SAR_IRQ_RX_STATUS = BIT(0),
+    FLD_FIFO_CLR          = BIT(1),
+    FLD_TRIG_START        = BIT(2),
+    FLD_SOFT_START        = BIT(7),
 };
 
-#define reg_sar_adc_sample_times(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x31)
+#define reg_sample_times(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x31)
 
-#define reg_sar_adc_pem_enable(i)   REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x32)
+#define reg_pem_enable(num)   REG_ADDR8(ADC_BASE_ADDR(num) + 0x32)
 
 enum
 {
-    FLD_SAR_ADC_PEM_TASK_ENABLE   = BIT(0),
-    FLD_SAR_ADC_PEM_EVENT0_ENABLE = BIT(1),
-    FLD_SAR_ADC_PEM_EVENT1_ENABLE = BIT(2),
+    FLD_PEM_TASK_ENABLE   = BIT(4),
+    FLD_PEM_EVENT0_ENABLE = BIT(5),
+    FLD_PEM_EVENT1_ENABLE = BIT(6),
 };
 
-#define reg_sar_adc_fifo_status(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x33)
+#define reg_adc_r_mux(num, i) (REG_ADDR8((ADC_BASE_ADDR(num) + 0x34 + (i))))
 
 enum
 {
-    FLD_SAR_ADC_FIFO_OVERRUN  = BIT(0),
-    FLD_SAR_ADC_FIFO_UNDERRUN = BIT(1),
+    FLD_P_INPUT_PIN = BIT_RNG(0, 3),
+    FLD_N_INPUT_PIN = BIT_RNG(4, 7),
 };
 
-#define reg_sar_adc_r_muxm_pos_neg(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x34)
+#define reg_sel_ain_pos_neg(num) REG_ADDR8(ADC_BASE_ADDR(num) + 0x37)
 
 enum
 {
-    FLD_SAR_ADC_R_MUXM_POSITIVE_INPUT = BIT_RNG(0, 3),
-    FLD_SAR_ADC_R_MUXM_NEGATIVE_INPUT = BIT_RNG(4, 7),
+    FLD_RNG_SEL_AIN_P = BIT_RNG(0, 3),
+    FLD_RNG_SEL_AIN_N = BIT_RNG(4, 7),
 };
 
-#define reg_sar_adc_r_muxl_pos_neg(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x35)
+#define reg_pad_auto_p(num) REG_ADDR32(ADC_BASE_ADDR(num) + 0x38)
 
-enum
-{
-    FLD_SAR_ADC_R_MUXL_POSITIVE_INPUT = BIT_RNG(0, 3),
-    FLD_SAR_ADC_R_MUXL_NEGATIVE_INPUT = BIT_RNG(4, 7),
-};
-
-#define reg_sar_adc_r_muxr_pos_neg(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x36)
-
-enum
-{
-    FLD_SAR_ADC_R_MUXR_POSITIVE_INPUT = BIT_RNG(0, 3),
-    FLD_SAR_ADC_R_MUXR_NEGATIVE_INPUT = BIT_RNG(4, 7),
-};
-
-#define reg_sar_adc_rng_sel_ain_pos_neg(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x37)
-
-enum
-{
-    FLD_SAR_ADC_RNG_SEL_AIN_P = BIT_RNG(0, 3),
-    FLD_SAR_ADC_RNG_SEL_AIN_N = BIT_RNG(4, 7),
-};
-
-#define reg_sar_adc_pad_auto_p(i)   REG_ADDR32(REG_SAR_ADC_BASE(i) + 0x38)
-#define reg_sar_adc_pad_auto_p_0(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x38)
-#define reg_sar_adc_pad_auto_p_1(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x39)
-#define reg_sar_adc_pad_auto_p_2(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3a)
-#define reg_sar_adc_pad_auto_p_3(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3b)
-
-#define reg_sar_adc_pad_auto_n(i)   REG_ADDR32(REG_SAR_ADC_BASE(i) + 0x3c)
-#define reg_sar_adc_pad_auto_n_0(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3c)
-#define reg_sar_adc_pad_auto_n_1(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3d)
-#define reg_sar_adc_pad_auto_n_2(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3e)
-#define reg_sar_adc_pad_auto_n_3(i) REG_ADDR8(REG_SAR_ADC_BASE(i) + 0x3f)
+#define reg_pad_auto_n(num) REG_ADDR32(ADC_BASE_ADDR(num) + 0x3c)
 #endif

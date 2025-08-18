@@ -144,24 +144,25 @@ _attribute_ram_code_ void adc_bat_detect_init(void)
         #else               //base mode, gpio channel
     adc_gpio_cfg_t adc_gpio_cfg_m =
         {
-            #if (MCU_CORE_TYPE == MCU_CORE_TL721X)
-            .v_ref = ADC_VREF_GPIO_1P2V,
-            .pre_scale = ADC_PRESCALE_1F4,
-            #elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
             .v_ref = ADC_VREF_1P2V,
             .pre_scale = ADC_PRESCALE_1F4,
-            #endif
             .sample_freq = ADC_SAMPLE_FREQ_96K,
             .pin         = ADC_INPUT_PIN_CHN,
         };
     adc_gpio_sample_init(ADC_M_CHANNEL, adc_gpio_cfg_m);
         #endif /*!< END OF VBAT_CHANNEL_EN */
     #elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
-        #error "battery check function is not support for now!"
+    sd_adc_init(SD_ADC_SINGLE_DC_MODE);
+    sd_adc_vbat_sample_init(SD_ADC_SAPMPLE_CLK_2M, SD_ADC_VBAT_DIV_1F4, SD_ADC_DOWNSAMPLE_RATE_128);
     #endif
     /******power on sar adc********/
     //note: this setting must be set after all other settings
+    #if (MCU_CORE_TYPE == MCU_CORE_TL322X)
+    sd_adc_power_on(SD_ADC_SAMPLE_MODE);
+    sd_adc_sample_start();
+    #else
     adc_power_on();
+    #endif
 
     /* wait at least 2 sample cycle(f = 96K, T = 10.4us),
      * Wait >30us after adc_power_on() for ADC to be stable.
@@ -205,6 +206,88 @@ _attribute_ram_code_ static unsigned short adc_sort_and_get_average_code(unsigne
     return adc_code_average;
 }
 
+#if (MCU_CORE_TYPE == MCU_CORE_TL322X)
+#define SD_ADC_GPIO_MODE        1
+#define SD_ADC_VBAT_MODE        2
+#define SD_ADC_TEMP_MODE        3
+#define NDMA_POLLING_MODE       1
+#define DMA_INTERRUPT_MODE      2
+#define SD_ADC_MODE             SD_ADC_VBAT_MODE
+#define SAMPLE_MODE             NDMA_POLLING_MODE
+#define SD_ADC_SAMPLE_CNT       16
+signed int sd_adc_sample_buffer[SD_ADC_SAMPLE_CNT] __attribute__((aligned(4))) = {0};
+
+/**
+ * @brief       This function serves to sort and get average code.
+ * @param[in]   sd_adc_data_buf -Pointer to sd_adc_data_buf
+ * @return      average code
+ * @note        If sd_adc_sort_and_get_average_code() interface is called, SD_ADC_SAMPLE_CNT must be a multiple of 4.
+ */
+signed int sd_adc_sort_and_get_average_code(signed int *sample_buffer)
+{
+    int i, j;
+    signed int sd_adc_code_average = 0;
+    signed int temp;
+
+    /**** insert Sort and get average value ******/
+    for(i = 1 ;i < SD_ADC_SAMPLE_CNT; i++)
+    {
+        if(sample_buffer[i] < sample_buffer[i-1])
+        {
+            temp = sample_buffer[i];
+            sample_buffer[i] = sample_buffer[i-1];
+            for(j=i-1; j>=0 && sample_buffer[j] > temp;j--)
+            {
+                sample_buffer[j+1] = sample_buffer[j];
+            }
+            sample_buffer[j+1] = temp;
+        }
+    }
+
+    //get average value from raw data(abandon 1/4 small and 1/4 big data)
+    for (i = SD_ADC_SAMPLE_CNT>>2; i < (SD_ADC_SAMPLE_CNT - (SD_ADC_SAMPLE_CNT>>2)); i++)
+    {
+        sd_adc_code_average += sample_buffer[i]/(SD_ADC_SAMPLE_CNT>>1);
+    }
+    return sd_adc_code_average;
+}
+
+signed int sd_adc_get_result(sd_adc_result_type_e result_type)
+{
+    signed int code_average;
+    signed int sd_adc_result;
+
+    #if(SAMPLE_MODE == NDMA_POLLING_MODE)
+    int cnt = 0;
+    while (cnt < SD_ADC_SAMPLE_CNT) {
+        int sample_cnt = sd_adc_get_rxfifo_cnt();
+        if (sample_cnt > 0) {
+            sd_adc_sample_buffer[cnt] = sd_adc_get_raw_code();
+            cnt++;
+        }
+    }
+    #endif
+
+    code_average = sd_adc_sort_and_get_average_code(sd_adc_sample_buffer);
+
+    if(result_type == SD_ADC_VOLTAGE_10X_MV)
+    {
+        return sd_adc_result = sd_adc_calculate_voltage(code_average,result_type);
+    }
+    else if(result_type == SD_ADC_VOLTAGE_MV)
+    {
+        return sd_adc_result = sd_adc_calculate_voltage(code_average,result_type);
+    }
+    else if((result_type == TEMP_VALUE))
+    {
+        return sd_adc_result = sd_adc_calculate_temperature(code_average);
+    }
+    else
+    {
+        return 0;
+    }
+}
+#endif
 /**
  * @brief       This is battery check function
  * @param[in]   alarm_vol_mv - input battery calibration
@@ -216,6 +299,7 @@ _attribute_ram_code_ int app_battery_power_check(u16 alarm_vol_mv)
     if (!adc_hw_initialized) {
         adc_hw_initialized = 1;
         adc_bat_detect_init();
+        adc_hw_initialized = 1;
     }
     //Note:25us should be reserved between each reading(wait at least 2 sample cycle(f = 96K, T = 10.4us)).
     //The sdk is only sampled once, and the user can redesign the filtering algorithm according to the actual application.
@@ -283,6 +367,12 @@ _attribute_ram_code_ int app_battery_power_check(u16 alarm_vol_mv)
 
     code_average = adc_sort_and_get_average_code(channel_buffers);
     batt_vol_mv  = adc_calculate_voltage(ADC_M_CHANNEL, code_average);
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
+    (void)adc_misc_data; //clean warning
+    (void)adc_average;   //clean warning
+    sd_adc_sample_start();
+    batt_vol_mv = sd_adc_get_result(SD_ADC_VOLTAGE_MV);
+    sd_adc_sample_stop();
     #endif
 
     if (batt_vol_mv < alarm_vol_mv) {

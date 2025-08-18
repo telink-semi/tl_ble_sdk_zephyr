@@ -47,14 +47,6 @@
 #define PAGE_SIZE     256
 #define PAGE_SIZE_OTP 256
 
-#ifdef MCU_CORE_TL322X_N22
-typedef struct
-{
-    unsigned char preempt_en;
-    unsigned char threshold;
-} preempt_config_t;
-#endif
-
 /**
  * @brief     flash command definition.
  * |   --        |   --        |     --        |    --    |    --    |

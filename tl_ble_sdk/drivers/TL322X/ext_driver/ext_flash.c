@@ -86,7 +86,19 @@ mid166085_lock_block_e flash_get_lock_block_mid166085(void)
     return flash_get_lock_block_mid166085_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
 }
 
+unsigned char flash_lock_mid1460c8(mid1460c8_lock_block_e data)
+{
+    return flash_lock_mid1460c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM,data);
+}
+unsigned char flash_unlock_mid1460c8(void)
+{
+    return flash_unlock_mid1460c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
 
+mid1460c8_lock_block_e flash_get_lock_block_mid1460c8(void)
+{
+    return flash_get_lock_block_mid1460c8_with_device_num(BLE_EXT_DRIVER_SLAVE_NUM);
+}
 
 unsigned char flash_lock_mid1560c8(mid1560c8_lock_block_e data)
 {

@@ -59,17 +59,14 @@ void usb0hw_init(usb0_speed_e speed_sel)
     BM_SET(reg_rst0, FLD_RST0_USB);
     BM_SET(reg_clk_en0, FLD_RST0_USB);
 
-    BM_SET(reg_usb_gahbcfg, FLD_USB_GAHBCFG_GLBLINTRMSK);
-    BM_SET(reg_usb_gahbcfg, FLD_USB_GAHBCFG_DMAEN);
-    BM_SET(reg_usb_dcfg, FLD_USB_DCFG_DESCDMA);
-
+    BM_SET(reg_usb_gahbcfg, FLD_USB_GAHBCFG_GLBLINTRMSK | FLD_USB_GAHBCFG_DMAEN);
     BM_SET(reg_usb_diepmsk, FLD_USB_DIEPMSK_XFERCOMPLMSK);
     BM_SET(reg_usb_doepmsk, FLD_USB_DOEPMSK_XFERCOMPLMSK | FLD_USB_DOEPMSK_SETUPMSK | FLD_USB_DOEPMSK_STSPHSERCVDMSK);
     BM_SET(reg_usb_daintmsk, FLD_USB_DAINTMSK_OUTEPMSK0 | FLD_USB_DAINTMSK_INEPMSK0);
     BM_SET(reg_usb_dctl, FLD_USB_DCTL_IGNRFRMNUM);
     BM_SET(reg_usb_gintmsk, FLD_USB_GINTMSK_USBRSTMSK | FLD_USB_GINTMSK_ENUMDONEMSK | FLD_USB_GINTMSK_IEPINTMSK | FLD_USB_GINTMSK_OEPINTMSK | FLD_USB_GINTMSK_SOFMSK | FLD_USB_GINTMSK_USBSUSPMSK |
                       FLD_USB_GINTMSK_WKUPINTMSK);
-    reg_usb_dcfg = (reg_usb_dcfg & (~FLD_USB_DCFG_DEVSPD)) | MASK_VAL(FLD_USB_DCFG_DEVSPD, speed_sel);
+    reg_usb_dcfg = (reg_usb_dcfg & (~FLD_USB_DCFG_DEVSPD)) | MASK_VAL(FLD_USB_DCFG_DEVSPD, speed_sel, FLD_USB_DCFG_DESCDMA, 1);
     reg_usb_gusbcfg = (reg_usb_gusbcfg & ~FLD_USB_GUSBCFG_USBTRDTIM) | MASK_VAL(FLD_USB_GUSBCFG_USBTRDTIM, 9);
 
     usb0hw_soft_connect();
@@ -369,9 +366,12 @@ void usb0hw_write_ep_data(usb0_ep_e ep_num, unsigned char *buf, unsigned int len
         in_dma_desc[ep_num].non_iso_in.bs     = 0;
         in_dma_desc[ep_num].non_iso_in.tx_sts = 0;
         in_dma_desc[ep_num].non_iso_in.l      = 1;
-        if (len % xfer_status[ep_num][USB0_DIR_IN].max_size == 0)
+        if ((len % xfer_status[ep_num][USB0_DIR_IN].max_size == 0) && (usb0hw_get_epin_type(ep_num) != USB0_EP_TYPE_INTERRUPT))
         {
-            in_dma_desc[ep_num].non_iso_in.sp = 1;
+            if (ep_num != 2)
+                in_dma_desc[ep_num].non_iso_in.sp = 1;
+            else//2.4g used
+                in_dma_desc[ep_num].non_iso_in.sp = 0;
         }
         else
         {

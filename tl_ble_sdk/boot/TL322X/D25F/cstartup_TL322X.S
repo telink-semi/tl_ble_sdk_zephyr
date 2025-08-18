@@ -51,24 +51,58 @@
 #define EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM        320 //25us
 
 
-//D25 ILM, D25 DLM, N22 ILM, N22 DLM made into software sharing, the total size is 384k (32k*12), a total of 12 copies of 32k,
-//which can be divided to d25f/n22, limit: d25f ILM at least 32K
+//D25 ILM, D25 DLM, N22 ILM, N22 DLM made into software sharing, The driver is configured to 384k by default, can choose the corresponding size according to the chip specification.
+//SRAM_384K: the total size is 384k (32k*12), a total of 12 copies of 32k;
+//SRAM_256K: the total size is 256k (32k*8), a total of 8 copies of 32k;
+//which can be divided to d25f/n22, limit: d25f ILM at least 32K.
 //Note: d25f/cstartup_flash.S, d25f/cstartup_ram.S, n22/cstartup_flash.S, n22/cstartup_ram.S configurations are consistent and need to be modified together.
-//    .equ __D25F_IRAM_SIZE,   3 //96KB
-//    .equ __D25F_DRAM_SIZE,   3 //96KB
-//    .equ __N22_IRAM_SIZE,    3 //96KB
-//    .equ __N22_DRAM_SIZE,    3 //96KB
-#ifdef MCU_CORE_D25F_ENABLE
-    .equ __D25F_IRAM_SIZE,   2 //64KB
-    .equ __D25F_DRAM_SIZE,   3 //96KB
-    .equ __N22_IRAM_SIZE,    5 //160KB
-    .equ __N22_DRAM_SIZE,    2 //64KB
+#define SRAM_384K      0 //256K SRAM, all-Retention
+#define SRAM_256K      1 //384K SRAM, all-Retention
+
+#if (defined(__PROJECT_SNIF_SUB_NODE__) || defined(__PROJECT_SNIF_FOB_NODE__))
+    #define SRAM_SIZE  SRAM_256K
 #else
-    .equ __D25F_IRAM_SIZE,   6 //192KB
-    .equ __D25F_DRAM_SIZE,   6 //192KB
-    .equ __N22_IRAM_SIZE,    0
-    .equ __N22_DRAM_SIZE,    0
+    #define SRAM_SIZE  SRAM_384K
 #endif
+
+#if (SRAM_SIZE == SRAM_256K)
+    #ifdef MCU_CORE_D25F_ENABLE
+        .equ __D25F_IRAM_SIZE,   2 //64KB
+        .equ __D25F_DRAM_SIZE,   1 //32KB
+        .equ __N22_IRAM_SIZE,    4 //128KB
+        .equ __N22_DRAM_SIZE,    1 //32KB
+    #else
+        #if defined(__PROJECT_SNIF_SUB_NODE__) && (__PROJECT_SNIF_SUB_NODE__ == 1)
+            .equ __D25F_IRAM_SIZE,   5 //160KB
+            .equ __D25F_DRAM_SIZE,   3 //96KB
+            .equ __N22_IRAM_SIZE,    0
+            .equ __N22_DRAM_SIZE,    0
+        #elif defined(__PROJECT_SNIF_FOB_NODE__) && (__PROJECT_SNIF_FOB_NODE__ == 1)
+            .equ __D25F_IRAM_SIZE,   4 //128KB
+            .equ __D25F_DRAM_SIZE,   4 //128KB
+            .equ __N22_IRAM_SIZE,    0
+            .equ __N22_DRAM_SIZE,    0
+        #else
+            .equ __D25F_IRAM_SIZE,   7 //224KB
+            .equ __D25F_DRAM_SIZE,   1 //32KB
+            .equ __N22_IRAM_SIZE,    0
+            .equ __N22_DRAM_SIZE,    0
+        #endif
+    #endif
+#elif (SRAM_SIZE == SRAM_384K)
+    #ifdef MCU_CORE_D25F_ENABLE
+        .equ __D25F_IRAM_SIZE,   2 //64KB
+        .equ __D25F_DRAM_SIZE,   3 //96KB
+        .equ __N22_IRAM_SIZE,    5 //160KB
+        .equ __N22_DRAM_SIZE,    2 //64KB
+    #else
+        .equ __D25F_IRAM_SIZE,   7 //224KB
+        .equ __D25F_DRAM_SIZE,   5 //160KB
+        .equ __N22_IRAM_SIZE,    0
+        .equ __N22_DRAM_SIZE,    0
+    #endif
+#endif
+
     .equ __D25F_N22_RAM_REG,    ((__N22_DRAM_SIZE+__N22_IRAM_SIZE)<<12)|(__N22_DRAM_SIZE<<8)|(__D25F_DRAM_SIZE)
 
     .section .vectors, "ax"

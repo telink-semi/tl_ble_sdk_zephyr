@@ -25,6 +25,10 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
+#if defined(TLK_ONLY_BLE_HOST)
+#include "stack/pm/pm_sys.h"
+#endif
+
 #if PM_DEEPSLEEP_RETENTION_ENABLE
 /**
  * @brief       this function is used to set deepsleep retention SRAM size for all application project.

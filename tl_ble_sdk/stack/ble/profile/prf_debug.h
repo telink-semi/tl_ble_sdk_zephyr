@@ -176,6 +176,10 @@ extern const unsigned char DBG_PRF_MASK_STORE_LOG;
     #define PRF_DBG_RAS_DATA_EN 0
 #endif
 
+#ifndef PRF_DBG_RAS_MEM_EN
+    #define PRF_DBG_RAS_MEM_EN 0
+#endif
+
 extern const unsigned char DBG_PRF_MASK_RAS_LOG;
 extern const unsigned char DBG_PRF_MASK_RAS_DATA_LOG;
 

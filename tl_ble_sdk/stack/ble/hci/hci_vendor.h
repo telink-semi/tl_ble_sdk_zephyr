@@ -50,6 +50,9 @@ typedef enum
     HCI_TELINK_READ_FREQ_OFFSET  = 0x09,
     HCI_TELINK_SET_SCAN_FILTER   = 0x0a, //MESH
 
+    HCI_TELINK_READ_MAX_TX_FIFI_NUM      = 0x0b,
+    HCI_TELINK_READ_TX_FIFI_NUM          = 0x0c,
+
     HCI_EBQ_TEST_CASE_LOG = 0xE2,        //EBQ log case name and timestamp
     HCI_TELINK_VENDOR_MAX_CBC
 } hci_vendor_cab_e;

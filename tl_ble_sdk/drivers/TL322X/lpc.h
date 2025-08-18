@@ -33,7 +33,7 @@ typedef enum
     LPC_INPUT_PB1 = 1,
     LPC_INPUT_PB2 = 2,
     LPC_INPUT_PB3 = 3,
-    LPC_INPUT_PB4 = 4,
+    LPC_INPUT_PB4 = 4, // BLE Sniffer SDK use
     LPC_INPUT_PB5 = 5,
     LPC_INPUT_PB6 = 6,
     LPC_INPUT_PB7 = 7,

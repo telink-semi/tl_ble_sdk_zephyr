@@ -959,6 +959,19 @@ typedef struct __attribute__((packed))
     pawrRspReportDat_t rspReportDat[0];
 } hci_le_periodicAdvRspReportEvt_t;
 
+/**
+ *  @brief  Event Parameters for "7.7.65.38 LE Read All Remote Features Complete event"
+ */
+typedef struct __attribute__((packed))
+{
+    u8  subEventCode;
+    u8  status;
+    u16 connHandle;
+    u8  max_remote_page;
+    u8  max_valid_page;
+    u8  feature[248];
+} hci_le_readAllRemoteFeaturesCompleteEvt_t;
+
 typedef struct __attribute__((packed))
 {
     u8  Subevent_Code;
@@ -1233,6 +1246,7 @@ int hci_le_connectionUpdateComplete_evt(u8 status, u16 connHandle, u16 connInter
 
 int hci_le_directAdvertisingReport_evt(u8 addr_type, u8 *addr, u8 *direct_addr, s8 rssi);
 int hci_le_readRemoteFeaturesComplete_evt(u8 status, u16 connHandle, u8 *feature);
+int hci_le_readAllRemoteFeaturesComplete_evt(u8 status, u16 connHandle);
 int hci_le_channel_selection_algorithm_evt(u16 connhandle, u8 channel_selection_alg);
 int hci_le_phyUpdateComplete_evt(u16 connhandle, u8 status, u8 new_phy);
 int hci_le_data_len_update_evt(u16 connhandle, u16 effTxOctets, u16 effRxOctets, u16 maxtxtime, u16 maxrxtime);

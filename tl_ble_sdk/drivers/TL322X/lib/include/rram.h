@@ -429,26 +429,27 @@ void rram_write_enable(void);
 
 void rram_write_disable(void);
 
-void rram_ahbread_word(unsigned int addr, unsigned int len, unsigned int *data);
-
-void rram_ahbread_byte(unsigned int addr, unsigned int len, unsigned char *data);
-
-void rram_regread(unsigned int addr, unsigned int len, unsigned int *data);
-
-void rram_regwrite(unsigned int addr, unsigned int len, unsigned int *data);
-
-void rram_otp_regwrite(unsigned int addr, unsigned int len, unsigned int *data);
-
-void rram_regwrite_abort_test(unsigned int addr, unsigned int len, unsigned int *data);
-
 unsigned short rram_read_reg(unsigned char cmd);
 
 void rram_write_reg(unsigned char cmd, unsigned short data);
 
-unsigned char rram_read_state_reg(void);
+_attribute_ram_code_sec_ 
+void rram_ahb0_read_word(unsigned int addr, unsigned int len, unsigned int *data);
 
-void rram_write_state_reg(unsigned char data);
+void rram_ahb0_read_byte(unsigned int addr, unsigned int len, unsigned char *data);
 
+void rram_ahb1_read_word(unsigned int addr, unsigned int len, unsigned int *data);
+
+void rram_ahb1_read_byte(unsigned int addr, unsigned int len, unsigned char *data);
+
+void rram_reg_read(unsigned int addr, unsigned int len, unsigned int *data);
+
+_attribute_ram_code_sec_ 
+void rram_reg_write(unsigned int addr, unsigned int len, unsigned int *data);
+
+void rram_reg_write_abort_test(unsigned int addr, unsigned int len, unsigned int *data);
+
+_attribute_ram_code_sec_ 
 unsigned char rram_read_creg(unsigned char addr);
 
 void rram_write_creg(unsigned char addr, unsigned char data);
@@ -460,19 +461,28 @@ void rram_write_treg(unsigned char addr, unsigned char data);
 void rram_run_mbist(unsigned int *data);
 
 
+void rram_set_tx_dma_config(dma_chn_e chn);
+
+void rram_set_rx_dma_config(dma_chn_e chn);
+
+void rram_reg_write_dma(dma_chn_e chn, unsigned int addr, unsigned int len, unsigned int *src_data);
+
+void rram_reg_read_dma(dma_chn_e chn, unsigned int addr, unsigned int len, unsigned int *dst_data);
+
+
 void rram_spi_enter_otp(void);
 
 void rram_spi_enter_mtp(void);
-
-unsigned char rram_spi_read_state_reg(void);
 
 void rram_spi_write_enable(void);
 
 void rram_spi_write_disable(void);
 
-void rram_spiread(unsigned int addr, unsigned char len, unsigned char *data);
+unsigned char rram_spi_read_state_reg(void);
 
-void rram_spiwrite(unsigned int addr, unsigned char len, unsigned char *data);
+void rram_spi_read(unsigned int addr, unsigned char len, unsigned char *data);
+
+void rram_spi_write(unsigned int addr, unsigned char len, unsigned char *data);
 
 void rram_spi_read_creg(unsigned char addr, unsigned char len, unsigned char *data);
 
@@ -485,16 +495,6 @@ void rram_spi_write_treg(unsigned char addr, unsigned char len, unsigned char *d
 void rram_spi_run_mbist(unsigned char *data);
 
 void rram_spi_write_raw_dword(unsigned int addr, unsigned char *data);
-
-void rram_set_tx_dma_config(dma_chn_e chn);
-
-void rram_set_rx_dma_config(dma_chn_e chn);
-
-void rram_regwrite_dma(dma_chn_e chn, unsigned int addr, unsigned int len, unsigned int *src_data);
-
-void rram_otp_regwrite_dma(dma_chn_e chn, unsigned int addr, unsigned int len, unsigned int *src_data);
-
-void rram_regread_dma(dma_chn_e chn, unsigned int addr, unsigned int len, unsigned int *dst_data);
 
 
 void rram_ex_spi_io_enable(void);

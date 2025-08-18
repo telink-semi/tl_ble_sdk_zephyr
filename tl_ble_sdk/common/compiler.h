@@ -29,7 +29,11 @@
 #define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
 
 #define _attribute_text_sec_                __attribute__((section(".text"))) __attribute__((noinline)) //Inlining happens when __attribute__((noinline)) is not added.
+#ifndef STD_GCC //standard open source risc-V GCC
 #define _attribute_text_sec_optimize_o2_    __attribute__((section(".text"))) __attribute__((optimize("O2"))) __attribute__((noinline)) __attribute__((no_execit))
+#else
+#define _attribute_text_sec_optimize_o2_    __attribute__((section(".text"))) __attribute__((noinline))
+#endif
 
 #ifndef STD_GCC //standard open source risc-V GCC
 #define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((optimize("O2"))) __attribute__((noinline)) __attribute__((no_execit))
@@ -39,7 +43,7 @@
 
 #define _attribute_aes_data_sec_            __attribute__((section(".aes_data")))
 
-// #define _attribute_data_retention_sec_      __attribute__((section(".retention_data")))
+//#define _attribute_data_retention_sec_      __attribute__((section(".retention_data")))
 
 #define _attribute_aligned_(s)              __attribute__((aligned(s)))
 

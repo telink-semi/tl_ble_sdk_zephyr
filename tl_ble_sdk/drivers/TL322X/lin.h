@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -179,6 +179,7 @@ typedef struct
 {
     lin_num_e          lin_num;
     lin_role_e         role;
+    gpio_func_pin_e    en_pin;
     gpio_func_pin_e    tx_pin;
     gpio_func_pin_e    rx_pin;
     unsigned int       baudrate;
@@ -221,6 +222,7 @@ typedef struct
     unsigned int tx_dma_chn  : 8;
     unsigned int rx_dma_chn  : 8;
 
+    unsigned int en_pin : 16;
     unsigned int tx_pin : 16;
     unsigned int rx_pin : 16;
 
@@ -230,6 +232,56 @@ typedef struct
     unsigned int     rx_dma_buffer[3];
 
 } lin_handle_t, *lin_handle_t_ptr;
+
+
+typedef enum
+{
+    LIN_ACTION_TX   = 0,
+    LIN_ACTION_RX   = 1,
+    LIN_ACTION_NONE = 2
+} test_lin_action_type_e;
+
+struct test_lin_frame_item_t;
+typedef struct test_lin_frame_item_t test_lin_frame_item_t, *test_lin_frame_item_t_ptr;
+
+struct test_lin_schedule_t;
+typedef struct test_lin_schedule_t test_lin_schedule_t, *test_lin_schedule_t_ptr;
+
+struct test_lin_schedule_t
+{
+    test_lin_schedule_t_ptr   next_proc_schedule;
+    test_lin_frame_item_t_ptr frame_list;
+    unsigned char             item_cnt;
+    unsigned char             item_index;
+};
+
+typedef void (*LIN_CALLBACK_FUNC)(void *para);
+
+struct test_lin_frame_item_t
+{
+    test_lin_action_type_e  action;
+    unsigned char           id;
+    unsigned char           len;
+    unsigned char           data[10];
+    unsigned char           checksum_type;
+    unsigned char           slot_cnt;
+    test_lin_schedule_t_ptr conflict_proc_schedule;
+    LIN_CALLBACK_FUNC       callback_func;
+};
+
+#define LIN_GET_ID_BIT(x,y) (((x) >> (y)) & 0x01U)
+
+/**
+ * @brief      This function serves to set state of LIN controller.
+ * @param[in]  lin_num - LIN0/LIN1.
+ * @param[in]  state - state of LIN controller, LIN_STATE_INIT/LIN_STATE_RUN.
+ * @note       The sleep state is invalid.
+ * @return     none
+ */
+static inline void lin_set_state(lin_num_e lin_num, lin_state_e state)
+{
+    reg_lin_cmd(lin_num) = (reg_lin_cmd(lin_num) & ~FLD_LIN_ST_CMD_RW) | MASK_VAL(FLD_LIN_ST_CMD_RW, state);
+}
 
 /**
  * @brief      This function serves to set the IRQ mask of LIN controller.
@@ -241,6 +293,19 @@ static inline void lin_set_irq_mask(lin_handle_t_ptr handle, unsigned short mask
 {
     if (handle->init_flag) {
         reg_lin_irq(handle->lin_num) |= mask;
+    }
+}
+
+/**
+ * @brief      This function serves to clear the IRQ mask of LIN controller.
+ * @param[in]  handle - operation handle.
+ * @param[in]  mask - the mask value.
+ * @return     none.
+ */
+static inline void lin_clr_irq_mask(lin_handle_t_ptr handle, unsigned short mask)
+{
+    if (handle->init_flag) {
+        reg_lin_irq(handle->lin_num) &= ~(mask);
     }
 }
 
@@ -297,23 +362,22 @@ static inline unsigned char lin_slave_get_filter_table_match_idx(lin_handle_t_pt
 }
 
 /**
- * @brief      This function serves to check the current index of schedule table.
- * @param[in]  handle - operation handle.
- * @return     none.
+ * @brief      This function serves to set EN PIN of LIN controller.
+ * @param[in]  lin_num - LIN0/LIN1.
+ * @param[in]  val - 1:enable LIN PHY; 0:disable LIN PHY
+ * @return     none
  */
-//static inline bool lin_master_check_schedule_table(lin_handle_t_ptr handle)
-//{
-//  return ((reg_lin_node_table(handle->lin_num) & FLD_LIN_SCHEDULE_CUR_IDX_R) >> 4) == ((handle->table_index + handle->table_size - 1) & 0xf);
-//}
+void lin_set_hw_en(lin_num_e lin_num, bool val);
 
 /**
- * @brief      This function serves to initialize the hardware of LIN controller.
- * @param[in]  handle - operation handle.
- * @param[in]  para - the initialize parameter.
- * @return     The operation handle.
+ * @brief      This function serves to generate checksum by software.
+ * @param[in]  id - ID value of LIN frame.
+ * @param[in]  data - data of LIN frame.
+ * @param[in]  len - data length of LIN frame.
+ * @param[in]  type - checksum type of LIN frame.
+ * @return     none
  */
-lin_handle_t_ptr lin_hw_init(lin_hw_init_para_t *para);
-
+unsigned char lin_software_checksum(unsigned char id, unsigned char *data, unsigned char len, lin_checksum_type_e type);
 
 /**
  * @brief      This function serves to get the id of frame.
@@ -323,42 +387,12 @@ lin_handle_t_ptr lin_hw_init(lin_hw_init_para_t *para);
 unsigned char lin_get_id(lin_handle_t_ptr handle);
 
 /**
- * @brief      This function serves to reset t-base counter.
+ * @brief      This function serves to send header when acting as a LIN-master node.
  * @param[in]  handle - operation handle.
+ * @param[in]  id - the ID of frame.
  * @return     The operation result, true:success, false:failed.
  */
-bool lin_rst_timebase(lin_handle_t_ptr handle);
-
-/**
- * @brief      This function serves to clear PID-filter table.
- * @param[in]  handle - operation handle.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_slave_clr_pid_filter_table(lin_handle_t_ptr handle);
-
-/**
- * @brief      This function serves to add item to PID-filter table.
- * @param[in]  handle - operation handle.
- * @param[in]  id - the ID value of frame.
- * @param[in]  data_len - the data length of frame.
- * @param[in]  tx_enable - the enable state of TX.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_slave_add_2_pid_filter_table(lin_handle_t_ptr handle, unsigned char id, unsigned char data_len, bool tx_enable);
-
-/**
- * @brief      This function serves to enable the PID-filter table.
- * @param[in]  handle - operation handle.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_slave_enable_pid_filter_table(lin_handle_t_ptr handle);
-
-/**
- * @brief      This function serves to initialize the schedule table when acting as a LIN-master node.
- * @param[in]  handle - operation handle.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_master_init_schedule_table(lin_handle_t_ptr handle);
+bool lin_master_send_header(lin_handle_t_ptr handle, unsigned char id);
 
 /**
  * @brief      This function serves to clear the schedule table when acting as a LIN-master node.
@@ -366,6 +400,13 @@ bool lin_master_init_schedule_table(lin_handle_t_ptr handle);
  * @return     The operation result, true:success, false:failed.
  */
 bool lin_master_clr_schedule_table(lin_handle_t_ptr handle);
+
+/**
+ * @brief      This function serves to initialize the schedule table when acting as a LIN-master node.
+ * @param[in]  handle - operation handle.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_master_init_schedule_table(lin_handle_t_ptr handle);
 
 /**
  * @brief      This function serves to add item to schedule table when acting as a LIN-master node.
@@ -400,28 +441,6 @@ bool lin_master_enable_schedule_table(lin_handle_t_ptr handle);
 bool lin_master_stop_schedule_table(lin_handle_t_ptr handle);
 
 /**
- * @brief      This function serves to send header when acting as a LIN-master node.
- * @param[in]  handle - operation handle.
- * @param[in]  id - the ID of frame.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_master_send_header(lin_handle_t_ptr handle, unsigned char id);
-
-/**
- * @brief      This function serves to force re-send frame header.
- * @param[in]  handle - operation handle.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_master_force_resend_header(lin_handle_t_ptr handle);
-
-/**
- * @brief      This function serves to send response.
- * @param[in]  handle - operation handle.
- * @return     The operation result, true:success, false:failed.
- */
-bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_checksum_type_e type);
-
-/**
  * @brief      This function serves to discard response.
  * @param[in]  handle - operation handle.
  * @return     The operation result, true:success, false:failed.
@@ -429,12 +448,11 @@ bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned ch
 bool lin_discard_response(lin_handle_t_ptr handle);
 
 /**
- * @brief      This function serves to send wake-up signal.
+ * @brief      This function serves to send response.
  * @param[in]  handle - operation handle.
- * @param[in]  time_us - the signal duration.
  * @return     The operation result, true:success, false:failed.
  */
-bool lin_send_wakeup_signal(lin_handle_t_ptr handle, unsigned short time_us);
+bool lin_send_response(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_checksum_type_e type);
 
 /**
  * @brief      This function serves to start the action to receive response.
@@ -453,6 +471,60 @@ bool lin_start_recv_response(lin_handle_t_ptr handle, unsigned char data_len, li
  * @param[out] result - the structure to save the result data (PID,length,checksum), can be null.
  * @return     The operation result, true:success, false:failed.
  */
-bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_get_response_result_t_ptr result);
+bool lin_get_response_data(lin_handle_t_ptr handle, unsigned char *data, unsigned char data_len, lin_checksum_type_e type, lin_get_response_result_t_ptr result);
+
+/**
+ * @brief      This function serves to clear PID-filter table.
+ * @param[in]  handle - operation handle.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_slave_clr_pid_filter_table(lin_handle_t_ptr handle);
+
+/**
+ * @brief      This function serves to add item to PID-filter table.
+ * @param[in]  handle - operation handle.
+ * @param[in]  id - the ID value of frame.
+ * @param[in]  data_len - the data length of frame.
+ * @param[in]  tx_enable - the enable state of TX.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_slave_add_2_pid_filter_table(lin_handle_t_ptr handle, unsigned char id, unsigned char data_len, bool tx_enable);
+
+/**
+ * @brief      This function serves to enable the PID-filter table.
+ * @param[in]  handle - operation handle.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_slave_enable_pid_filter_table(lin_handle_t_ptr handle);
+
+/**
+ * @brief      This function serves to send wake-up signal.
+ * @param[in]  handle - operation handle.
+ * @param[in]  time_us - the signal duration.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_send_wakeup_signal(lin_handle_t_ptr handle, unsigned short time_us);
+
+/**
+ * @brief      This function serves to reset t-base counter.
+ * @param[in]  handle - operation handle.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_rst_timebase(lin_handle_t_ptr handle);
+
+/**
+ * @brief      This function serves to force re-send frame header.
+ * @param[in]  handle - operation handle.
+ * @return     The operation result, true:success, false:failed.
+ */
+bool lin_master_force_resend_header(lin_handle_t_ptr handle);
+
+/**
+ * @brief      This function serves to initialize the hardware of LIN controller.
+ * @param[in]  handle - operation handle.
+ * @param[in]  para - the initialize parameter.
+ * @return     The operation handle.
+ */
+lin_handle_t_ptr lin_hw_init(lin_hw_init_para_t *para);
 
 #endif /* DRIVERS_LIN_H_ */
