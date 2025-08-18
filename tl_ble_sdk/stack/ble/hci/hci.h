@@ -26,7 +26,6 @@
 
 
 #include "stack/ble/ble_common.h"
-#include "stack/ble/ble_config.h"
 
 typedef int (*blc_hci_handler_t)(void);
 typedef int (*blc_hci_user_handler_t)(u8 *p, u32 len);
