@@ -28,6 +28,9 @@
     #define abs(a) (((a) > 0) ? ((a)) : (-(a)))
 #endif
 
+/*set parameter unused, remove warning*/
+#define TL_UNUSED(x) (void)sizeof(x)
+
 #define cat2(i, j)    i##j
 #define cat3(i, j, k) i##j##k
 
@@ -56,12 +59,6 @@
 #endif
 
 #define OFFSETOF(type, member)          ((unsigned int)&((type *)0)->member)
-
-#ifndef BLC_ZEPHYR_BLE_INTEGRATION
-#define CONTAINER_OF(ptr, type, member) ({const typeof(((type *)0)->member)*__mptr = (ptr); (type *)((char *)__mptr - OFFSETOF(type, member)); })
-#else
-#include <zephyr/sys/util.h>
-#endif
 
 #define ROUND_INT(x, r)                 (((x) + (r) - 1) / (r) * (r))
 #define ROUND_TO_POW2(x, r)             (((x) + (r) - 1) & ~((r) - 1))
@@ -107,6 +104,11 @@
 #define IS_LITTLE_ENDIAN  (*(unsigned short *)"\0\xff" > 0x100)
 #define IS_4BYTE_ALIGN(x) (!(x & 3))
 
+#define Z_IS_ENABLED3(ignore_this, val, ...) val
+#define Z_IS_ENABLED2(one_or_two_args)       Z_IS_ENABLED3(one_or_two_args 1, 0)
+#define Z_IS_ENABLED1(config_macro)          Z_IS_ENABLED2(_XXXX##config_macro)
+#define IS_ENABLED(config_macro)             Z_IS_ENABLED1(config_macro)
+
 #define IMPLIES(x, y)     (!(x) || (y))
 
 // x > y ? 1 : (x ==y : 0 ? -1)
@@ -130,7 +132,7 @@
 #define foreach_range(i, s, e) for (int i = (s); i < (e); ++i)
 #define foreach_arr(i, arr)    for (unsigned int i = 0; i < ARRAY_SIZE(arr); ++i)
 
-#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+#ifndef STD_GCC
 #define ARRAY_SIZE(a)          (sizeof(a) / sizeof(*a))
 #else
 #include <zephyr/sys/util.h>

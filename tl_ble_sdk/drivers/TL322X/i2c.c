@@ -23,10 +23,11 @@
  *******************************************************************************************************/
 #include "i2c.h"
 
-static unsigned char i2c_dma_tx_chn;
-static unsigned char i2c_dma_rx_chn;
+static unsigned char i2c_dma_tx_chn[2];
+static unsigned char i2c_dma_rx_chn[2];
 
-dma_config_t i2c_tx_dma_config = {
+dma_config_t i2c_tx_dma_config[2] = {
+  {
     .dst_req_sel    = DMA_REQ_I2C_TX,     //tx req
     .src_req_sel    = 0,
     .dst_addr_ctrl  = DMA_ADDR_FIX,
@@ -40,8 +41,27 @@ dma_config_t i2c_tx_dma_config = {
     .priority       = 0,
     .write_num_en   = 0,
     .auto_en        = 0, //must 0
+  },
+  {
+    .dst_req_sel    = DMA_REQ_I2C1_TX,     //tx req
+    .src_req_sel    = 0,
+    .dst_addr_ctrl  = DMA_ADDR_FIX,
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment
+    .dstmode        = DMA_HANDSHAKE_MODE, //handshake
+    .srcmode        = DMA_NORMAL_MODE,
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word
+    .src_burst_size = 0,                  //must 0
+    .read_num_en    = 0,
+    .priority       = 0,
+    .write_num_en   = 0,
+    .auto_en        = 0, //must 0
+
+  },
+
 };
-dma_config_t i2c_rx_dma_config = {
+dma_config_t i2c_rx_dma_config[2] = {
+  {
     .dst_req_sel    = 0,
     .src_req_sel    = DMA_REQ_I2C_RX,
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
@@ -55,23 +75,43 @@ dma_config_t i2c_rx_dma_config = {
     .priority       = 0,
     .write_num_en   = 1,
     .auto_en        = 0, //must 0
+  },
+  {
+      .dst_req_sel    = 0,
+      .src_req_sel    = DMA_REQ_I2C1_RX,
+      .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+      .src_addr_ctrl  = DMA_ADDR_FIX,
+      .dstmode        = DMA_NORMAL_MODE,
+      .srcmode        = DMA_HANDSHAKE_MODE,
+      .dstwidth       = DMA_CTR_WORD_WIDTH, //must word
+      .srcwidth       = DMA_CTR_WORD_WIDTH, ////must word
+      .src_burst_size = 0,
+      .read_num_en    = 0,
+      .priority       = 0,
+      .write_num_en   = 1,
+      .auto_en        = 0, //must 0
+  }
 };
 
-/**
- * record i2c error code, can obtain the value through the i2c_get_error_timeout_code interface.
- */
-volatile i2c_api_error_timeout_code_e g_i2c_error_timeout_code = I2C_API_ERROR_TIMEOUT_NONE;
+i2c_timeout_error_t g_i2c_timeout_error[2] = {
+    {
+     .g_i2c_error_timeout_us   = 0xffffffff,
+     .i2c_timeout_handler      = i2c0_timeout_handler,
+     .g_i2c_error_timeout_code = I2C_API_ERROR_TIMEOUT_NONE,
+     },
+    {
+     .g_i2c_error_timeout_us   = 0xffffffff,
+     .i2c_timeout_handler      = i2c1_timeout_handler,
+     .g_i2c_error_timeout_code = I2C_API_ERROR_TIMEOUT_NONE,
+     },
+};
 
 /**
  * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
-unsigned char g_i2c_stop_en = 0x20;
+unsigned char g_i2c_stop_en[2] = {0x20,0x20};
 
-/**
- * i2c error timeout(us),a large value is set by default,can set it by i2c_set_error_timeout().
- */
-unsigned int g_i2c_error_timeout_us = 0xffffffff;
 
 /**
  * @brief     This function serves to set the i2c timeout(us).
@@ -88,18 +128,18 @@ unsigned int g_i2c_error_timeout_us = 0xffffffff;
  *            1.reset master,reset slave(i2c_hw_fsm_reset);
  *            2.ensure that the clk/data is high(gpio_get_level);
  */
-void i2c_set_error_timeout(unsigned int timeout_us)
+void i2c_set_error_timeout(i2c_chn_e chn,unsigned int timeout_us)
 {
-    g_i2c_error_timeout_us = timeout_us;
+    g_i2c_timeout_error[chn].g_i2c_error_timeout_us = timeout_us;
 }
 
 /**
  * @brief     This function serves to return the i2c api error code.
  * @return    none.
  */
-i2c_api_error_timeout_code_e i2c_get_error_timeout_code(void)
+i2c_api_error_timeout_code_e i2c_get_error_timeout_code(i2c_chn_e chn)
 {
-    return g_i2c_error_timeout_code;
+    return g_i2c_timeout_error[chn].g_i2c_error_timeout_code;
 }
 
 /**
@@ -108,14 +148,14 @@ i2c_api_error_timeout_code_e i2c_get_error_timeout_code(void)
  * @param[in]  en - Input parameters.Decide whether to disable the stop function after each write or read interface
  * @return     none
  */
-void i2c_master_send_stop(unsigned char en)
+void i2c_master_send_stop(i2c_chn_e chn,unsigned char en)
 {
     //this function uses the en parameter to determine whether i2c master is configured with stop,
     //if it is configured with stop, then master needs to send stop again after the stop signal is sent, needs to manually configure i2c stop again.
     if (en == 1) {
-        g_i2c_stop_en = 0x20;
+        g_i2c_stop_en[chn] = 0x20;
     } else {
-        g_i2c_stop_en = 0x00;
+        g_i2c_stop_en[chn] = 0x00;
     }
 }
 
@@ -125,7 +165,7 @@ void i2c_master_send_stop(unsigned char en)
  * @param[in]  scl_pin - the pin port selected as I2C scl pin port.
  * @return     none
  */
-void i2c_set_pin(gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin)
+void i2c_set_pin(i2c_chn_e chn,gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin)
 {
     //When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
     //otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
@@ -133,9 +173,13 @@ void i2c_set_pin(gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin)
     gpio_input_en((gpio_pin_e)scl_pin); //enable scl input
     gpio_set_up_down_res((gpio_pin_e)sda_pin, GPIO_PIN_PULLUP_10K);
     gpio_set_up_down_res((gpio_pin_e)scl_pin, GPIO_PIN_PULLUP_10K);
-
-    gpio_set_mux_function(scl_pin, I2C_SCL_IO);
-    gpio_set_mux_function(sda_pin, I2C_SDA_IO);
+    if(chn == I2C0){
+       gpio_set_mux_function(scl_pin, I2C_SCL_IO);
+       gpio_set_mux_function(sda_pin, I2C_SDA_IO);
+    }else if(chn == I2C1){
+        gpio_set_mux_function(scl_pin, I2C1_SCL_IO);
+        gpio_set_mux_function(sda_pin, I2C1_SDA_IO);
+    }
     //disable sda_pin and scl_pin gpio function.
     gpio_function_dis((gpio_pin_e)scl_pin);
     gpio_function_dis((gpio_pin_e)sda_pin);
@@ -145,13 +189,19 @@ void i2c_set_pin(gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin)
  * @brief      This function serves to enable i2c master function.
  * @return     none.
  */
-void i2c_master_init(void)
+void i2c_master_init(i2c_chn_e chn)
 {
-    BM_SET(reg_rst0, FLD_RST0_I2C);
-    BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
-    reg_i2c_ctrl2 |= FLD_I2C_MASTER; //i2c master enable.
-    i2c_master_detect_nack_en();
-    i2c_master_stretch_en();
+    if(chn == I2C0){
+         BM_SET(reg_rst0, FLD_RST0_I2C);
+         BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
+    }else if(chn == I2C1){
+         BM_SET(reg_rst2, FLD_RST2_I2C1);
+         BM_SET(reg_clk_en2, FLD_CLK2_I2C1_EN);
+    }
+
+    reg_i2c_ctrl2(chn) |= FLD_I2C_MASTER; //i2c master enable.
+    i2c_master_detect_nack_en(chn);
+    i2c_master_stretch_en(chn);
 }
 
 /**
@@ -160,13 +210,10 @@ void i2c_master_init(void)
  *             I2C frequency = pclk/ (4*DivClock).
  * @return     none
  */
-void i2c_set_master_clk(unsigned char clock)
+void i2c_set_master_clk(i2c_chn_e chn,unsigned char clock)
 {
     //i2c frequency = pclk/(4*clock)
-    reg_i2c_sp = clock;
-
-    //set enable flag.
-    reg_clk_en0 |= FLD_CLK0_I2C_EN;
+    reg_i2c_sp(chn) = clock;
 }
 
 /**
@@ -175,12 +222,18 @@ void i2c_set_master_clk(unsigned char clock)
  *                       ID|0x01 indicate read. ID&0xfe indicate write.
  * @return     none
  */
-void i2c_slave_init(unsigned char id)
+void i2c_slave_init(i2c_chn_e chn,unsigned char id)
 {
-    BM_SET(reg_rst0, FLD_RST0_I2C);
-    BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
-    reg_i2c_ctrl2 &= (~FLD_I2C_MASTER); //enable slave mode.
-    reg_i2c_id = id;
+    if(chn == I2C0){
+         BM_SET(reg_rst0, FLD_RST0_I2C);
+         BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
+    }else if(chn == I2C1){
+        BM_SET(reg_rst2, FLD_RST2_I2C1);
+        BM_SET(reg_clk_en2, FLD_CLK2_I2C1_EN);
+    }
+
+    reg_i2c_ctrl2(chn) &= (~FLD_I2C_MASTER); //enable slave mode.
+    reg_i2c_id(chn) = id;
 }
 
 /**
@@ -190,26 +243,36 @@ void i2c_slave_init(unsigned char id)
  * @note      This function can be rewritten according to the application scenario,can by g_i2c_error_timeout_code to obtain details about the timeout reason,
  *            for the solution, refer to the i2c_set_error_timeout note.
  */
-__attribute__((weak)) void i2c_timeout_handler(unsigned int i2c_error_timeout_code)
+__attribute__((weak)) void i2c0_timeout_handler(unsigned int i2c_error_timeout_code)
 {
-    g_i2c_error_timeout_code = i2c_error_timeout_code;
+    g_i2c_timeout_error[I2C0].g_i2c_error_timeout_code = i2c_error_timeout_code;
+}/**
+ * @brief     This function serves to record the api status.
+ * @param[in] i2c_error_timeout_code - i2c_api_error_code_e.
+ * @return    none.
+ * @note      This function can be rewritten according to the application scenario,can by g_i2c_error_timeout_code to obtain details about the timeout reason,
+ *            for the solution, refer to the i2c_set_error_timeout note.
+ */
+__attribute__((weak)) void i2c1_timeout_handler(unsigned int i2c_error_timeout_code)
+{
+    g_i2c_timeout_error[I2C1].g_i2c_error_timeout_code = i2c_error_timeout_code;
 }
 
 //I2c timeout wait
-#define I2C_WAIT(i2c_api_error_code) wait_condition_fails_or_timeout(i2c_master_busy, g_i2c_error_timeout_us, i2c_timeout_handler, (unsigned int)i2c_api_error_code)
+#define I2C_WAIT(i2c_num, g_i2c_error_timeout_us, i2c_timeout_handler, i2c_api_error_code) wait_condition_fails_or_timeout_with_param(i2c_master_busy, (unsigned int)i2c_num, g_i2c_error_timeout_us, i2c_timeout_handler, (unsigned int)i2c_api_error_code)
 
 /**
  *@brief   in no_dma master,check whether the master ID phase receives nack that slave returns,if nack is received, launch stop cycle.
  *@return  0:no detect nack, 1: detect nack in id phase.
  */
-static inline unsigned char i2c_master_id_nack_detect(void)
+static inline unsigned char i2c_master_id_nack_detect(i2c_chn_e chn)
 {
     //After enabling master nack, I2C_MASTER_NAK_IRQ interrupt will be activated if master receives nack returned by slave.
-    if (i2c_get_irq_status(I2C_MASTER_NAK_STATUS)) {
-        i2c_clr_irq_status(I2C_MASTER_NAK_STATUS);
-        reg_i2c_sct1 = (FLD_I2C_LS_STOP);
+    if (i2c_get_irq_status(chn,I2C_MASTER_NAK_STATUS)) {
+        i2c_clr_irq_status(chn,I2C_MASTER_NAK_STATUS);
+        reg_i2c_sct1(chn) = (FLD_I2C_LS_STOP);
         //wait for the STOP signal to finish sending.
-        if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_STOP)) {
+        if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_STOP)) {
             return DRV_API_TIMEOUT;
         }
         return 1;
@@ -223,25 +286,25 @@ static inline unsigned char i2c_master_id_nack_detect(void)
  *         1: detect nack in data phase;
  *         DRV_API_TIMEOUT:timeout exit;
  */
-static unsigned char i2c_master_data_nack_detect(void)
+static unsigned char i2c_master_data_nack_detect(i2c_chn_e chn)
 {
-    if (i2c_get_irq_status(I2C_MASTER_NAK_STATUS)) {
-        i2c_clr_irq_status(I2C_MASTER_NAK_STATUS);
-        reg_i2c_sct1 = (FLD_I2C_LS_STOP);
+    if (i2c_get_irq_status(chn,I2C_MASTER_NAK_STATUS)) {
+        i2c_clr_irq_status(chn,I2C_MASTER_NAK_STATUS);
+        reg_i2c_sct1(chn) = (FLD_I2C_LS_STOP);
         //If configure stop once more, will no longer be busy as long as the current stop is sent.
-        if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_STOP)) {
+        if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_STOP)) {
             return DRV_API_TIMEOUT;
         }
-        i2c_clr_irq_status(I2C_TX_BUF_STATUS);
+        i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
         return 1;
     }
     return 0;
 }
 
 //nack detect status
-#define I2C_NACK_DETECT(detect_func)         \
+#define I2C_NACK_DETECT(detect_func,chn)         \
     do {                                     \
-        int err = detect_func();             \
+        int err = detect_func(chn);             \
         if (err == 1) {                      \
             return 0;                        \
         } else if (err == DRV_API_TIMEOUT) { \
@@ -265,45 +328,45 @@ static unsigned char i2c_master_data_nack_detect(void)
  *             1: write successfully;
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len)
+unsigned char i2c_master_write(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_TX_BUF_STATUS);
-    reg_i2c_id   = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
-    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
-    if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_ID)) {
+    i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
+    reg_i2c_id(chn)   = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
+    reg_i2c_sct1(chn) = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
+    if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_ID)) {
         return DRV_API_TIMEOUT;
     }
 
-    I2C_NACK_DETECT(i2c_master_id_nack_detect);
-    i2c_master_set_len(len);
+    I2C_NACK_DETECT(i2c_master_id_nack_detect,chn);
+    i2c_master_set_len(chn,len);
     unsigned int       cnt         = 0;
     unsigned long long start_cycle = rdmcycle();
     while (cnt < len) {
-        I2C_NACK_DETECT(i2c_master_data_nack_detect);
-        if (i2c_get_tx_buf_cnt() < 8) {
+        I2C_NACK_DETECT(i2c_master_data_nack_detect,chn);
+        if (i2c_get_tx_buf_cnt(chn) < 8) {
             start_cycle               = rdmcycle();
-            reg_i2c_data_buf(cnt % 4) = data[cnt]; //write data
+            reg_i2c_data_buf(chn,cnt % 4) = data[cnt]; //write data
             cnt++;
             if (cnt == 1) {
                 //If stop is configured in the data phase, when nack is received in the data phase, stop will also be configured in the exception handling,
                 //which may result in one more stop configured. therefore, the next time you read or write, stop needs to be cleared to avoid sending stop by mistake.
-                reg_i2c_sct1 &= ~FLD_I2C_LS_STOP;
-                reg_i2c_sct1 = (FLD_I2C_LS_DATAW | g_i2c_stop_en); //launch stop cycle
+                reg_i2c_sct1(chn) &= ~FLD_I2C_LS_STOP;
+                reg_i2c_sct1(chn) = (FLD_I2C_LS_DATAW | g_i2c_stop_en[chn]); //launch stop cycle
             }
         }
-        if (core_cclk_time_exceed(start_cycle, g_i2c_error_timeout_us)) {
-            i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_WRITE_DATA);
+        if (core_cclk_time_exceed(start_cycle, g_i2c_timeout_error[chn].g_i2c_error_timeout_us)) {
+            g_i2c_timeout_error[chn].i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_WRITE_DATA);
             return DRV_API_TIMEOUT;
         }
     }
-    while (i2c_get_tx_buf_cnt()) {
-        if (core_cclk_time_exceed(start_cycle, g_i2c_error_timeout_us)) {
-            i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_WRITE_DATA);
+    while (i2c_get_tx_buf_cnt(chn)) {
+        if (core_cclk_time_exceed(start_cycle, g_i2c_timeout_error[chn].g_i2c_error_timeout_us)) {
+            g_i2c_timeout_error[chn].i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_WRITE_DATA);
             return DRV_API_TIMEOUT;
         }
-        I2C_NACK_DETECT(i2c_master_data_nack_detect);
+        I2C_NACK_DETECT(i2c_master_data_nack_detect,chn);
     }
-    if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_STOP)) {
+    if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_STOP)) {
         return DRV_API_TIMEOUT;
     }
 
@@ -325,34 +388,34 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
  *             1: the master receive the data successfully;
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_read(unsigned char id, unsigned char *data, unsigned int len)
+unsigned char i2c_master_read(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_RX_BUF_STATUS);
-    reg_i2c_id = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
-    reg_i2c_ctrl3 |= FLD_I2C_RNCK_EN;         //i2c rnck enable.
-    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
-    if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_ID)) {
+    i2c_clr_irq_status(chn,I2C_RX_BUF_STATUS);
+    reg_i2c_id(chn) = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
+    reg_i2c_ctrl3(chn) |= FLD_I2C_RNCK_EN;         //i2c rnck enable.
+    reg_i2c_sct1(chn) = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
+    if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_ID)) {
         return DRV_API_TIMEOUT;
     }
-    I2C_NACK_DETECT(i2c_master_id_nack_detect);
-    i2c_master_set_len(len);
-    reg_i2c_sct1 &= ~FLD_I2C_LS_STOP;
-    reg_i2c_sct1 = (FLD_I2C_LS_ID_R | FLD_I2C_LS_DATAR | g_i2c_stop_en);
+    I2C_NACK_DETECT(i2c_master_id_nack_detect,chn);
+    i2c_master_set_len(chn,len);
+    reg_i2c_sct1(chn) &= ~FLD_I2C_LS_STOP;
+    reg_i2c_sct1(chn) = (FLD_I2C_LS_ID_R | FLD_I2C_LS_DATAR | g_i2c_stop_en[chn]);
 
     unsigned int       cnt         = 0;
     unsigned long long start_cycle = rdmcycle();
     while (cnt < len) {
-        if (i2c_get_rx_buf_cnt() > 0) {
-            data[cnt] = reg_i2c_data_buf(cnt % 4);
+        if (i2c_get_rx_buf_cnt(chn) > 0) {
+            data[cnt] = reg_i2c_data_buf(chn,cnt % 4);
             cnt++;
             start_cycle = rdmcycle();
         }
-        if (core_cclk_time_exceed(start_cycle, g_i2c_error_timeout_us)) {
-            i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_READ_DATA);
+        if (core_cclk_time_exceed(start_cycle, g_i2c_timeout_error[chn].g_i2c_error_timeout_us)) {
+            g_i2c_timeout_error[chn].i2c_timeout_handler(I2C_API_ERROR_TIMEOUT_WRITE_DATA);
             return DRV_API_TIMEOUT;
         }
     }
-    if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_STOP)) {
+    if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_STOP)) {
         return DRV_API_TIMEOUT;
     }
     return 1;
@@ -376,29 +439,29 @@ unsigned char i2c_master_read(unsigned char id, unsigned char *data, unsigned in
  *             1: the master receive the data successfully.
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, unsigned int wr_len, unsigned char *rd_data, unsigned int rd_len)
+unsigned char i2c_master_write_read(i2c_chn_e chn,unsigned char id, unsigned char *wr_data, unsigned int wr_len, unsigned char *rd_data, unsigned int rd_len)
 {
     //set i2c master write.
-    if (!i2c_master_write(id, wr_data, wr_len)) {
+    if (!i2c_master_write(chn,id, wr_data, wr_len)) {
         return 0;
     }
     //i2c_master_write_read: the master between writing and reading,it will be a restart signal,and after reading and writing, a stop signal is sent,
     //in order to after write and read, a stop signal is sent,so need to enable stop during read.
-    unsigned char i2c_stop_en = g_i2c_stop_en;
+    unsigned char i2c_stop_en = g_i2c_stop_en[chn];
     if (0x00 == i2c_stop_en) {
-        i2c_master_send_stop(1);
+        i2c_master_send_stop(chn,1);
     }
     //set i2c master read.
-    if (!i2c_master_read(id, rd_data, rd_len)) {
+    if (!i2c_master_read(chn,id, rd_data, rd_len)) {
         if (0x00 == i2c_stop_en) {
-            i2c_master_send_stop(0);
+            i2c_master_send_stop(chn,0);
         }
         return 0;
     }
     //since the configuration state of stop is changed in this interface,
     //the previous configuration needs to be restored either after the function reads or when an exception occurs during the read process.
     if (0x00 == i2c_stop_en) {
-        i2c_master_send_stop(0);
+        i2c_master_send_stop(chn,0);
     }
     return 1;
 }
@@ -414,18 +477,18 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  * @return     none.
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
-void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int len)
+void i2c_master_write_dma(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_TX_BUF_STATUS);
-    reg_i2c_id = (id & (~FLD_I2C_WRITE_READ_BIT)); //BIT(0):R:High  W:Low
+    i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
+    reg_i2c_id(chn)= (id & (~FLD_I2C_WRITE_READ_BIT)); //BIT(0):R:High  W:Low
 
-    dma_set_size(i2c_dma_tx_chn, len, DMA_WORD_WIDTH);
-    dma_set_address(i2c_dma_tx_chn, (unsigned int)(data), reg_i2c_data_buf0_addr);
-    dma_chn_en(i2c_dma_tx_chn);
+    dma_set_size(i2c_dma_tx_chn[chn], len, DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_tx_chn[chn], (unsigned int)(data), reg_i2c_data_buf0_addr(chn));
+    dma_chn_en(i2c_dma_tx_chn[chn]);
 
-    i2c_master_set_len(len);
-    reg_i2c_sct1 &= ~FLD_I2C_LS_STOP;
-    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START | FLD_I2C_LS_DATAW | g_i2c_stop_en);
+    i2c_master_set_len(chn,len);
+    reg_i2c_sct1(chn) &= ~FLD_I2C_LS_STOP;
+    reg_i2c_sct1(chn) = (FLD_I2C_LS_ID | FLD_I2C_LS_START | FLD_I2C_LS_DATAW | g_i2c_stop_en[chn]);
 }
 
 /**
@@ -438,20 +501,20 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
  * @return     none
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to read the next batch of data.
  */
-void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int len)
+void i2c_master_read_dma(i2c_chn_e chn,unsigned char id, unsigned char *rx_data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_RX_BUF_STATUS);
-    reg_i2c_id = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
-    reg_i2c_ctrl3 |= FLD_I2C_RNCK_EN;         //i2c rnck enable.
+    i2c_clr_irq_status(chn,I2C_RX_BUF_STATUS);
+    reg_i2c_id(chn) = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
+    reg_i2c_ctrl3(chn) |= FLD_I2C_RNCK_EN;         //i2c rnck enable.
 
-    dma_set_wnum_dis(i2c_dma_rx_chn);         //The data received by the master is the same length as the data sent, so there is no need for a writer_num.
-    dma_set_size(i2c_dma_rx_chn, len, DMA_WORD_WIDTH);
-    dma_set_address(i2c_dma_rx_chn, reg_i2c_data_buf0_addr, (unsigned int)(rx_data));
-    dma_chn_en(i2c_dma_rx_chn);
+    dma_set_wnum_dis(i2c_dma_rx_chn[chn]);         //The data received by the master is the same length as the data sent, so there is no need for a writer_num.
+    dma_set_size(i2c_dma_rx_chn[chn], len, DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_rx_chn[chn], reg_i2c_data_buf0_addr(chn), (unsigned int)(rx_data));
+    dma_chn_en(i2c_dma_rx_chn[chn]);
 
-    i2c_master_set_len(len);
-    reg_i2c_sct1 &= ~FLD_I2C_LS_STOP;
-    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_DATAR | FLD_I2C_LS_START | FLD_I2C_LS_ID_R | g_i2c_stop_en);
+    i2c_master_set_len(chn,len);
+    reg_i2c_sct1(chn) &= ~FLD_I2C_LS_STOP;
+    reg_i2c_sct1(chn) = (FLD_I2C_LS_ID | FLD_I2C_LS_DATAR | FLD_I2C_LS_START | FLD_I2C_LS_ID_R | g_i2c_stop_en[chn]);
 }
 
 /**
@@ -461,12 +524,12 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
  * @return     none.
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
-void i2c_slave_set_tx_dma(unsigned char *data, unsigned int len)
+void i2c_slave_set_tx_dma(i2c_chn_e chn,unsigned char *data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_TX_BUF_STATUS);
-    dma_set_address(i2c_dma_tx_chn, (unsigned int)(data), reg_i2c_data_buf0_addr);
-    dma_set_size(i2c_dma_tx_chn, len, DMA_WORD_WIDTH);
-    dma_chn_en(i2c_dma_tx_chn);
+    i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
+    dma_set_address(i2c_dma_tx_chn[chn], (unsigned int)(data), reg_i2c_data_buf0_addr(chn));
+    dma_set_size(i2c_dma_tx_chn[chn], len, DMA_WORD_WIDTH);
+    dma_chn_en(i2c_dma_tx_chn[chn]);
 }
 
 /**
@@ -482,16 +545,16 @@ void i2c_slave_set_tx_dma(unsigned char *data, unsigned int len)
                   for example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
                 -# After DMA transfer completion, the interface needs to be invoked again to read the next batch of data.
 */
-void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len)
+void i2c_slave_set_rx_dma(i2c_chn_e chn,unsigned char *data, unsigned int len)
 {
-    dma_chn_dis(i2c_dma_rx_chn);
-    i2c_clr_irq_status(I2C_RX_BUF_STATUS);
-    dma_set_address(i2c_dma_rx_chn, reg_i2c_data_buf0_addr, (unsigned int)(data));
-    dma_set_size(i2c_dma_rx_chn, len, DMA_WORD_WIDTH);
-    dma_chn_en(i2c_dma_rx_chn);
+    dma_chn_dis(i2c_dma_rx_chn[chn]);
+    i2c_clr_irq_status(chn,I2C_RX_BUF_STATUS);
+    dma_set_address(i2c_dma_rx_chn[chn], reg_i2c_data_buf0_addr(chn), (unsigned int)(data));
+    dma_set_size(i2c_dma_rx_chn[chn], len, DMA_WORD_WIDTH);
+    dma_chn_en(i2c_dma_rx_chn[chn]);
 }
 
-unsigned char i2c_slave_rx_index = 0; //logs the current read position in the fifo.
+unsigned char i2c_slave_rx_index[2] = {0}; //logs the current read position in the fifo.
 
 /**
  * @brief     This function serves to receive data .
@@ -499,14 +562,14 @@ unsigned char i2c_slave_rx_index = 0; //logs the current read position in the fi
  * @param[in]  len - The total length of the data
  * @return    none
  */
-void i2c_slave_read(unsigned char *data, unsigned int len)
+void i2c_slave_read(i2c_chn_e chn,unsigned char *data, unsigned int len)
 {
     unsigned int cnt = 0;
     while (cnt < len) {
-        if (i2c_get_rx_buf_cnt() > 0) {
-            data[cnt] = reg_i2c_data_buf(i2c_slave_rx_index);
-            i2c_slave_rx_index++;
-            i2c_slave_rx_index &= 0x03;
+        if (i2c_get_rx_buf_cnt(chn) > 0) {
+            data[cnt] = reg_i2c_data_buf(chn,i2c_slave_rx_index[chn]);
+            i2c_slave_rx_index[chn]++;
+            i2c_slave_rx_index[chn] &= 0x03;
             cnt++;
         }
     }
@@ -518,13 +581,13 @@ void i2c_slave_read(unsigned char *data, unsigned int len)
  * @param[in]  len - The total length of the data.
  * @return    none
  */
-void i2c_slave_write(unsigned char *data, unsigned int len)
+void i2c_slave_write(i2c_chn_e chn,unsigned char *data, unsigned int len)
 {
-    i2c_clr_irq_status(I2C_TX_BUF_STATUS);
+    i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
     unsigned int cnt = 0;
     while (cnt < len) {
-        if (i2c_get_tx_buf_cnt() < 8) {
-            reg_i2c_data_buf(cnt % 4) = data[cnt];
+        if (i2c_get_tx_buf_cnt(chn) < 8) {
+            reg_i2c_data_buf(chn,cnt % 4) = data[cnt];
             cnt++;
         }
     }
@@ -535,10 +598,10 @@ void i2c_slave_write(unsigned char *data, unsigned int len)
  * @param[in] chn: dma channel.
  * @return    none
  */
-void i2c_set_tx_dma_config(dma_chn_e chn)
+void i2c_set_tx_dma_config(i2c_chn_e chn,dma_chn_e dma_chn)
 {
-    i2c_dma_tx_chn = chn;
-    dma_config(chn, &i2c_tx_dma_config);
+    i2c_dma_tx_chn[chn] = dma_chn;
+    dma_config(dma_chn, &i2c_tx_dma_config[chn]);
 }
 
 /**
@@ -546,10 +609,10 @@ void i2c_set_tx_dma_config(dma_chn_e chn)
  * @param[in] chn: dma channel.
  * @return    none
  */
-void i2c_set_rx_dma_config(dma_chn_e chn)
+void i2c_set_rx_dma_config(i2c_chn_e chn,dma_chn_e dma_chn)
 {
-    i2c_dma_rx_chn = chn;
-    dma_config(chn, &i2c_rx_dma_config);
+    i2c_dma_rx_chn[chn] = dma_chn;
+    dma_config(dma_chn, &i2c_rx_dma_config[chn]);
 }
 
 /**
@@ -557,11 +620,11 @@ void i2c_set_rx_dma_config(dma_chn_e chn)
  * @param[in] len - the maximum transmission length of i2c is 0xffffff bytes, so dont'n over this length.
  * @return    none
  */
-void i2c_master_set_len(unsigned int len)
+void i2c_master_set_len(i2c_chn_e chn,unsigned int len)
 {
-    reg_i2c_len(0) = len & 0xff;
-    reg_i2c_len(1) = (len >> 8) & 0xff;
-    reg_i2c_len(2) = (len >> 16) & 0xff;
+    reg_i2c_len(chn,0) = len & 0xff;
+    reg_i2c_len(chn,1) = (len >> 8) & 0xff;
+    reg_i2c_len(chn,2) = (len >> 16) & 0xff;
 }
 
 /**
@@ -569,9 +632,9 @@ void i2c_master_set_len(unsigned int len)
  *@return    1:if return 1,it means that the slave is to get master read cmd.
  *           0:if return 0,it means that the slave is to get master write cmd.
  */
-i2c_slave_wr_e i2c_slave_get_cmd(void)
+i2c_slave_wr_e i2c_slave_get_cmd(i2c_chn_e chn)
 {
-    return (i2c_slave_status1 & FLD_I2C_SLAVE_READ);
+    return (i2c_slave_status1(chn) & FLD_I2C_SLAVE_READ);
 }
 
 /**
@@ -579,293 +642,7 @@ i2c_slave_wr_e i2c_slave_get_cmd(void)
  * @return    1:if return 1,it means that the state of the master is read status.
  *            0:if return 0,it means that the state of the master is not read status.
  */
-i2c_master_wr_e i2c_get_master_wr_status(void)
+i2c_master_wr_e i2c_get_master_wr_status(i2c_chn_e chn)
 {
-    return (reg_i2c_sct1 & FLD_I2C_LS_ID_R);
-}
-
-/********************************************************************************************
- *****|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|*****
- *****|                             i2c1_m.c                                           |*****
- *****|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|*****
- ********************************************************************************************/
-/**
- * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
- * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
- */
-unsigned char g_i2c1_m_stop_en = 0x20;
-
-/**
- * record i2c1_m error code, can obtain the value through the i2c1_m_get_error_timeout_code() interface.
- */
-volatile i2c1_m_api_error_timeout_code_e g_i2c1_m_error_timeout_code = I2C1_M_API_ERROR_TIMEOUT_NONE;
-
-/**
- * i2c1_m error timeout(us),a large value is set by default,can set it by i2c1_m_set_error_timeout().
- */
-unsigned int g_i2c1_m_error_timeout_us = 0xffffffff;
-
-/**
- * @brief     This function serves to set the i2c1_m timeout(us).
- * @param[in] timeout_us - the timeout(us).
- * @return    none.
- * @note      i2c1_m_master_init add i2c1_m_master_stretch_en(), the master will be stuck if the slave pulls the Master abnormally,
- *            the default timeout (g_i2c1_m_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
- *            g_i2c1_m_error_timeout_us can be changed to a smaller value via this interface, depending on the application.
- *            g_i2c1_m_error_timeout_us the minimum time must meet the following conditions:
- *            1. two i2c data;
- *            2. maximum interrupt processing time;
- *            3. maximum normal stretch time of the slave;(the stretch description: if the slave end cannot process in time, the clk will be stretch,the master will hold,
- *               when the slave is processed, the clk will be released and the master will continue working.)
- *            when timeout exits, solution:
- *            1.reset master,reset slave(i2c1_m_hw_fsm_reset);
- *            2.ensure that the clk/data is high(gpio_get_level);;
- */
-void i2c1_m_set_error_timeout(unsigned int timeout_us)
-{
-    g_i2c1_m_error_timeout_us = timeout_us;
-}
-
-/**
- * @brief     This function serves to return the i2c1_m api error code.
- * @return    none.
- */
-i2c1_m_api_error_timeout_code_e i2c1_m_get_error_timeout_code(void)
-{
-    return g_i2c1_m_error_timeout_code;
-}
-
-/**
- * @brief      The function of this interface is equivalent to that after the user finishes calling the write or read interface, the stop signal is not sent,
- *             and then the write or read command is executed again. The driver defaults that every write or read API will send a stop command at the end
- * @param[in]  en - Input parameters.Decide whether to disable the stop function after each write or read interface
- * @return     none
- */
-void i2c1_m_master_send_stop(unsigned char en)
-{
-    //this function uses the en parameter to determine whether i2c master is configured with stop,
-    //if it is configured with stop, then master needs to send stop again after the stop signal is sent, needs to manually configure i2c stop again.
-    if (en == 1) {
-        g_i2c1_m_stop_en = 0x20;
-    } else {
-        g_i2c1_m_stop_en = 0x00;
-    }
-}
-
-/**
- * @brief      This function selects a pin port for I2C interface.
- * @param[in]  sda_pin - the pin port selected as I2C sda pin port.
- * @param[in]  scl_pin - the pin port selected as I2C scl pin port.
- * @return     none
- */
-void i2c1_m_set_pin(gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin)
-{
-    //When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
-    //otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-    gpio_input_en((gpio_pin_e)sda_pin); //enable sda input
-    gpio_input_en((gpio_pin_e)scl_pin); //enable scl input
-    gpio_set_up_down_res((gpio_pin_e)sda_pin, GPIO_PIN_PULLUP_10K);
-    gpio_set_up_down_res((gpio_pin_e)scl_pin, GPIO_PIN_PULLUP_10K);
-    //disable sda_pin and scl_pin gpio function.
-    gpio_function_dis((gpio_pin_e)scl_pin);
-    gpio_function_dis((gpio_pin_e)sda_pin);
-    gpio_set_mux_function(scl_pin, I2C1_SCL_IO);
-    gpio_set_mux_function(sda_pin, I2C1_SDA_IO);
-}
-
-/**
- * @brief      This function serves to enable i2c1_m master function.
- * @return     none.
- */
-void i2c1_m_master_init(void)
-{
-    BM_SET(reg_rst2, FLD_RST2_I2C1);
-    BM_SET(reg_clk_en2, FLD_CLK2_I2C1_EN);
-    reg_i2c1_m_sct0 |= FLD_I2C1_M_MASTER; //i2c master enable.
-    i2c1_m_master_stretch_en();
-}
-
-/**
- * @brief      This function serves to set the i2c1_m clock frequency.The i2c1_m clock is consistent with the pclk.
- * @param[in]  clock - the division factor of i2c1_m clock,
- *             i2c1_m frequency = pclk / (4*clock).
- * @return     none
- */
-void i2c1_m_set_master_clk(unsigned char clock)
-{
-    //i2c1_m frequency = system_clock/(4*clock)
-    reg_i2c1_m_sp = clock;
-
-    //set enable flag.
-    reg_clk_en0 |= FLD_CLK0_I2C_EN;
-}
-
-/**
- * @brief     This function serves to record the api status.
- * @param[in] i2c1_m_error_timeout_code - i2c1_m_api_error_code_e.
- * @return    none.
- * @note      This function can be rewritten according to the application scenario,can by g_i2c1_m_error_timeout_code to obtain details about the timeout reason,
- *            for the solution, refer to the i2c1_m_set_error_timeout note.
- */
-__attribute__((weak)) void i2c1_m_timeout_handler(unsigned int i2c1_m_error_timeout_code)
-{
-    g_i2c1_m_error_timeout_code = i2c1_m_error_timeout_code;
-}
-
-#define I2C1_M_WAIT(i2c1_m_api_error_code) wait_condition_fails_or_timeout(i2c1_m_master_busy, g_i2c1_m_error_timeout_us, i2c1_m_timeout_handler, (unsigned int)i2c1_m_api_error_code)
-
-/**
- *@brief   check whether receives nack that slave return.
- *@return  DRV_API_SUCCESS: detect nack;
- *         DRV_API_FAILURE: no detect nack in data phase;
- *         DRV_API_TIMEOUT: timeout exit;
- */
-static drv_api_status_e i2c1_m_nack_detect(void)
-{
-    if (reg_i2c1_m_mst & FLD_I2C1_M_MAT_ACK_IN) {
-        reg_i2c1_m_ctrl = FLD_I2C1_M_LS_STOP;
-        if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_STOP)) {
-            return DRV_API_TIMEOUT;
-        }
-        return DRV_API_SUCCESS;
-    }
-    return DRV_API_FAILURE;
-}
-
-//nack detect status
-#define I2C1_M_NACK_DETECT(detect_func)      \
-    do {                                     \
-        int err = detect_func();             \
-        if (err == DRV_API_SUCCESS) {        \
-            return 0;                        \
-        } else if (err == DRV_API_TIMEOUT) { \
-            return DRV_API_TIMEOUT;          \
-        }                                    \
-    } while (0)
-
-/**
- *  @brief      This function serves to write a packet of data to the specified address of slave device
- *  @param[in]  id      - to set the slave ID.
- *  @param[in]  data_buf - the first SRAM buffer address to write data to slave in.
- *  @param[in]  data_len - the length of data master write to slave.
- *  @return     0:During sending id or data, the master receives the nack returned by the slave, and stops sending.
- *                - check whether the id is correct;
- *                - if sometimes ack and sometimes nack, check the io driver capability, and use the oscilloscope to check compliance with the i2c spec;
- *                - check whether the slave is abnormal;
- *              1:Master sent data successfully.
- *              DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c1_m_set_error_timeout);
- */
-unsigned char i2c1_m_master_write(unsigned char id, unsigned char *data_buf, unsigned int data_len)
-{
-    //start + id
-    reg_i2c1_m_id   = (id & (~FLD_I2C1_M_WRITE_READ_BIT)); //BIT(0):R:High  W:Low
-    reg_i2c1_m_ctrl = (FLD_I2C1_M_LS_ID | FLD_I2C1_M_LS_START);
-    if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_ID)) {
-        return DRV_API_TIMEOUT;
-    }
-    I2C1_M_NACK_DETECT(i2c1_m_nack_detect);
-    //write data
-    unsigned int cnt = 0;
-    for (cnt = 0; cnt < data_len; cnt++) {
-        reg_i2c1_m_dr   = data_buf[cnt];
-        reg_i2c1_m_ctrl = FLD_I2C1_M_LS_DATAR; //launch data read cycle
-        if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_WRITE_DATA)) {
-            return DRV_API_TIMEOUT;
-        }
-        I2C1_M_NACK_DETECT(i2c1_m_nack_detect);
-    }
-    //stop
-    reg_i2c1_m_ctrl = g_i2c1_m_stop_en; //launch stop cycle
-    if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_STOP)) {
-        return DRV_API_TIMEOUT;
-    }
-    return 1;
-}
-
-/**
- * @brief      This function serves to read a packet of data.
- * @param[in]  id      - to set the slave ID.
- * @param[in]  data_buf - the first address of SRAM buffer master store data in.
- * @param[in]  data_len - the length of data master read from slave.
- * @return     0:During sending id, the master receives the nack returned by the slave, and stops sending.
- *             - check whether the id is correct;
- *             - if sometimes ack and sometimes nack, check the io driver capability, and use the oscilloscope to check compliance with the i2c spec;
- *             - check whether the slave is abnormal;
- *             1:Master receive data successfully.
- *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c1_m_set_error_timeout);
- */
-unsigned char i2c1_m_master_read(unsigned char id, unsigned char *data_buf, unsigned int data_len)
-{
-    //start + id(Read)
-    reg_i2c1_m_id   = id | FLD_I2C1_M_WRITE_READ_BIT; //BIT(0):R:High  W:Low
-    reg_i2c1_m_ctrl = (FLD_I2C1_M_LS_ID | FLD_I2C1_M_LS_START);
-    if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_ID)) {
-        return DRV_API_TIMEOUT;
-    }
-    I2C1_M_NACK_DETECT(i2c1_m_nack_detect);
-    //read data
-    unsigned int cnt = 0;
-    while (--data_len) {
-        reg_i2c1_m_ctrl = (FLD_I2C1_M_LS_DATAR | FLD_I2C1_M_LS_ID_R);
-        if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_READ_DATA)) {
-            return DRV_API_TIMEOUT;
-        }
-        data_buf[cnt] = reg_i2c1_m_dr;
-        cnt++;
-    }
-    //when the last byte, master will ACK to slave
-    reg_i2c1_m_ctrl = (FLD_I2C1_M_LS_DATAR | FLD_I2C1_M_LS_ID_R | FLD_I2C1_M_LS_ACK);
-    if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_READ_DATA)) {
-        return DRV_API_TIMEOUT;
-    }
-    data_buf[cnt] = reg_i2c1_m_dr;
-    //launch stop cycle
-    reg_i2c1_m_ctrl = g_i2c1_m_stop_en;
-    if (I2C1_M_WAIT(I2C1_M_API_ERROR_TIMEOUT_STOP)) {
-        return DRV_API_TIMEOUT;
-    }
-    return 1;
-}
-
-/**
- * @brief      This function serves to read a packet of data from the specified address of slave device.
- *             the master between writing and reading, it will be a restart signal,and after reading and writing, a stop signal is sent,
- *             but the stop configure,stays in its original state,when a nack exception signal is received, during exception handling, a stop signal will be sent.
- * @param[in]  id      - to set the slave ID.
- * @param[in]  wr_data - specifies the SRAM address of the slave to send data.
- * @param[in]  wr_len - the length of register. enum 0 or 1 or 2 or 3 based on the demand of i2c slave.
- * @param[in]  rd_data - the first address of SRAM buffer master store data in.
- * @param[in]  rd_len - the length of data master read from slave.
- * @return     0:During sending id+address, the master receives the nack returned by the slave, and stops sending.
- *             - check whether the id is correct;
- *             - if sometimes ack and sometimes nack, check the io driver capability, and use the oscilloscope to check compliance with the i2c spec;
- *             - check whether the slave is abnormal;
- *             1:Master receive data successfully.
- *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c1_m_set_error_timeout);
- */
-unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data, unsigned int wr_len, unsigned char *rd_data, unsigned int rd_len)
-{
-    //set i2c master write.
-    if (!i2c1_m_master_write(id, wr_data, wr_len)) {
-        return 0;
-    }
-    //i2c_master_write_read: the master between writing and reading,it will be a restart signal,and after reading and writing, a stop signal is sent,
-    //in order to after write and read, a stop signal is sent,so need to enable stop during read.
-    unsigned char i2c1_m_stop_en = g_i2c1_m_stop_en;
-    if (0x00 == i2c1_m_stop_en) {
-        i2c1_m_master_send_stop(1);
-    }
-    //set i2c master read.
-    if (!i2c1_m_master_read(id, rd_data, rd_len)) {
-        if (0x00 == i2c1_m_stop_en) {
-            i2c1_m_master_send_stop(0);
-        }
-        return 0;
-    }
-    //since the configuration state of stop is changed in this interface,
-    //the previous configuration needs to be restored either after the function reads or when an exception occurs during the read process.
-    if (0x00 == i2c1_m_stop_en) {
-        i2c1_m_master_send_stop(0);
-    }
-    return 1;
+    return (reg_i2c_sct1(chn) & FLD_I2C_LS_ID_R);
 }

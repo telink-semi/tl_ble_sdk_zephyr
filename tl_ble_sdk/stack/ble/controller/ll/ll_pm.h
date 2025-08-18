@@ -26,6 +26,7 @@
 
 #include "types.h"
 
+#if !defined(TLK_ONLY_BLE_HOST)
 /**
  *  @brief
  */
@@ -188,4 +189,8 @@ void blc_ll_enOsPowerManagement_module(void);
  *@return     none
  */
 void blc_ll_appAllowMCUstall(u8 en);
+
+
+#endif //#if !defined(TLK_ONLY_BLE_HOST)
+
 #endif /* LL_PM_H_ */

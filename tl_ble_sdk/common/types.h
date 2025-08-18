@@ -33,40 +33,38 @@ typedef unsigned int       u32;
 typedef long long          s64;
 typedef unsigned long long u64;
 
-
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
-
-#ifdef HOST_V2_ENABLE
 typedef unsigned long      uint32_t;
 typedef unsigned long long uint64_t;
-#endif
+#endif // BLC_ZEPHYR_BLE_INTEGRATION
 
 typedef unsigned char      uint08;
 typedef unsigned short     uint16;
 typedef unsigned int       uint32;
 typedef unsigned long long uint64;
 
-#ifdef HOST_V2_ENABLE
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
 typedef signed char        int8_t;
 typedef signed short       int16_t;
 typedef signed long        int32_t;
 typedef signed long long   int64_t;
+#endif // BLC_ZEPHYR_BLE_INTEGRATION
 
 typedef unsigned char uchar;
 typedef unsigned int  uint;
 typedef unsigned long ulong;
-#endif
 
 #ifndef NULL
     #define NULL 0
 #endif
 
-#ifdef HOST_V2_ENABLE
+
     #ifndef nullptr
         #define nullptr 0
     #endif
-#endif
+
 
 #ifndef __cplusplus
 

@@ -41,8 +41,10 @@ typedef struct __attribute__((packed))  {
     prf_read_cb_t databaseHashReadCb;
 } blc_gatts_client_t;
 
+
 typedef struct __attribute__((packed))  blc_gatts_client_ctrl{
     blc_prf_proc_t process;
+
     blc_gatts_client_t* pGattsClient[STACK_PRF_ACL_CONN_MAX_NUM];
 } blc_gatts_client_ctrl_t;
 

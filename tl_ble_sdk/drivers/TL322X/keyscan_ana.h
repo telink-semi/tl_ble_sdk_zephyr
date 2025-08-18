@@ -31,7 +31,8 @@
 #define KS_EVK_KEYBOARD             0 //2*16
 #define KS_FULL_KEYBOARD            1 //8*16
 
-#define KS_BOARD_TYPE               KS_EVK_KEYBOARD
+//2.4g used
+#define KS_BOARD_TYPE               KS_FULL_KEYBOARD
 
 /**
  * @brief keyscan mode

@@ -415,7 +415,8 @@ void can_init(can_chn_e chn,can_timing_config_t* timing_config,can_mb_cfg_t* mb_
 
 }
 
-static unsigned int canfd_get_mailbox_offset(can_mb_data_size_e data_size,unsigned char mb_index){
+_attribute_ram_code_sec_ //BLE SDK USE
+unsigned int canfd_get_mailbox_offset(can_mb_data_size_e data_size,unsigned char mb_index){
     unsigned int offset=0;
     if(data_size == CAN_8BYTE_PERMB){
         offset = (((unsigned int)mb_index / 32) * 512 + ((unsigned int)mb_index % 32) * 16);
@@ -932,7 +933,11 @@ void can_set_rx_dma_config(can_chn_e chn, dma_chn_e dma_chn){
  * @param[in]   addr     - pointer to the buffer receive data.
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
+ * @note        When it is CAN_ENHANCED_RXFIFO, for example, the number of triggers set by can_set_enhanced_rxfifo_watermark is n.
+ *              When the number of packets in rxfifo reaches n, dma is triggered to carry n packets, and if the consecutively received packets are larger than 2n,
+ *              and do not have the time to configure dma, then, after configuring the dma to carry n, and then configuring the next dma, the dma will not work.
  */
+_attribute_ram_code_sec_ //BLE SDK USE
 void can_receive_dma(can_chn_e chn,dma_chn_e dma_chn,can_rxfifo_mode_e rx_mode, unsigned char *addr, unsigned int rev_size)
 {
     if(rx_mode == CAN_LEGACY_RXFIFO){
@@ -1030,6 +1035,7 @@ void can_set_pn_config(can_chn_e chn, can_pn_config_t* pn_cfg){
  * @param[in] frame -TxFrame Pointer to CAN message frame to be sent.
  * @param[in] is_rtr_response - can_remote_received_type_e
  * @return 0 - Write Tx Message Buffer Successfully.1 - Tx Message Buffer is currently in use.
+ * @note  1. Sends data in big-end mode by default; 2. the length is sent according to the configured length, but the data is fetched in word units;
  */
 unsigned char can_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_frame_t* frame,unsigned char is_rtr_response){
     if(can_is_mb_occupied(chn,mb_index)){
@@ -1068,6 +1074,7 @@ unsigned char can_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_frame_t* 
  * @param[in] mb_index - The CAN Message Buffer index.
  * @param[in] frame -TxFrame Pointer to CAN FD message frame to be sent.
  * @return  - none
+ * @note  1. Sends data in big-end mode by default; 2. the length is sent according to the configured length, but the data is fetched in word units;
  */
 void canfd_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_fd_frame_t* frame){
     unsigned int cs_temp=0;
@@ -1176,6 +1183,7 @@ unsigned char can_read_rx_mb(can_chn_e chn,unsigned char mb_index,can_frame_t* f
  * @return    1           - Rx Message Buffer is full and has been read successfully.
  *            0           - Rx Message Buffer is already overflowed and has been read successfully.
  */
+_attribute_ram_code_sec_ //BLE SDK USE
 unsigned char canfd_read_rx_mb(can_chn_e chn,unsigned char mb_index,can_fd_frame_t* frame){
     unsigned char status;
     unsigned int cs_temp;
@@ -1297,10 +1305,11 @@ void can_read_enhanced_rxfifo(can_chn_e chn, can_fd_frame_t *frame)
  * @param[in] frame  - pRxFrame Pointer to CAN FD message frame structure for reception.
  * @return  none
  */
+_attribute_ram_code_sec_ //BLE SDK USE
 void can_enhanced_rxfifo_dma_reset_idhit(can_chn_e chn,can_fd_frame_t* frame){
     unsigned int id_hit_off;
     /* Enhanced Rx FIFO ID HIT offset is changed dynamically according to data length code (DLC) . */
-    id_hit_off = (frame->length + 3) / 4 + 3;
+    id_hit_off = ((DLC_LENGTH_DECODE(frame->length)) + 3) / 4 + 3;
     frame->idhit =frame->data_word[id_hit_off - 3];
     if(!(reg_can_ctrl2_0(chn)|(FLD_CAN_TIME_STAMP_CAP_POINT))){
          frame->hr_time_stamp= frame->data_word[id_hit_off-3+1];

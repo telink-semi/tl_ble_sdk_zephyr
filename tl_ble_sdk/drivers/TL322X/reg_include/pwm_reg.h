@@ -38,203 +38,9 @@
 
 
 /**
- * This register is used to enable PWM0~PWM5.
+ * PWM data fifo.0x140e00~0x140e02.
  */
-#define reg_pwm_enable REG_ADDR16(REG_PWM_BASE + 0x1f)
-
-typedef enum
-{
-    FLD_PWM1_EN = BIT(1),
-    FLD_PWM2_EN = BIT(2),
-    FLD_PWM3_EN = BIT(3),
-    FLD_PWM4_EN = BIT(4),
-    FLD_PWM5_EN = BIT(5),
-    FLD_PWM0_EN = BIT(8),
-} pwm_en_e;
-
-/**
- * This register is used to set the division factor of the PWM clock.
- */
-#define reg_pwm_clkdiv REG_ADDR8(REG_PWM_BASE + 0x10)
-
-
-/**
- * BIT[3:0] of this register is used to set the working mode of PWM0.Only PWM0 supports 5 modes.
- */
-#define reg_pwm0_mode REG_ADDR8(REG_PWM_BASE + 0x11)
-
-
-/**
- * This register is used to set the inversion of the output state of PWM5 ~ PWM0.
- * PWM and PWM_N can be inverted independently
- */
-#define reg_pwm_invert REG_ADDR8(REG_PWM_BASE + 0x04)
-
-enum
-{
-    FLD_PWM0_OUT_INVERT = BIT(0),
-    FLD_PWM1_OUT_INVERT = BIT(1),
-    FLD_PWM2_OUT_INVERT = BIT(2),
-    FLD_PWM3_OUT_INVERT = BIT(3),
-    FLD_PWM4_OUT_INVERT = BIT(4),
-    FLD_PWM5_OUT_INVERT = BIT(5),
-};
-
-/**
- * This register is used to set the inversion of the output state of PWM5_N ~ PWM0_N.
- * PWM and PWM_N can be inverted independently
- */
-#define reg_pwm_n_invert REG_ADDR8(REG_PWM_BASE + 0x05)
-
-enum
-{
-    FLD_PWM0_INV_OUT_INVERT = BIT(0),
-    FLD_PWM1_INV_OUT_INVERT = BIT(1),
-    FLD_PWM2_INV_OUT_INVERT = BIT(2),
-    FLD_PWM3_INV_OUT_INVERT = BIT(3),
-    FLD_PWM4_INV_OUT_INVERT = BIT(4),
-    FLD_PWM5_INV_OUT_INVERT = BIT(5),
-};
-
-/*
- * This register represents Signal frame polarity of PWM5~PWM0.By default, PWM outputs high level under Count status and low level under Remaining status.
- * If the corresponding bit is set to 1, the high and low levels in different states will be reversed.
- * BIT(0):pwm0 out low level first. ~BIT(0):pwm0 out high level first.
- * BIT(1):pwm1 out low level first. ~BIT(1):pwm1 out high level first.
- * BIT(2):pwm2 out low level first. ~BIT(2):pwm2 out high level first.
- * BIT(3):pwm3 out low level first. ~BIT(3):pwm3 out high level first.
- * BIT(4):pwm4 out low level first. ~BIT(4):pwm4 out high level first.
- * BIT(5):pwm5 out low level first. ~BIT(5):pwm5 out high level first.
- */
-#define reg_pwm_pol REG_ADDR8(REG_PWM_BASE + 0x06)
-
-enum
-{
-    FLD_PWM0_FIRST_OUT_LEVEL = BIT(0),
-    FLD_PWM1_FIRST_OUT_LEVEL = BIT(1),
-    FLD_PWM2_FIRST_OUT_LEVEL = BIT(2),
-    FLD_PWM3_FIRST_OUT_LEVEL = BIT(3),
-    FLD_PWM4_FIRST_OUT_LEVEL = BIT(4),
-    FLD_PWM5_FIRST_OUT_LEVEL = BIT(5),
-};
-
-/*
- * This register represents 32K clock source with PWM5 ~ PWM0 enabled
- * If the system has a 32K clock source, whether it is 32K_RC or 32K_Crystal, as long as the corresponding
- * BIT of 0x140407 is configured, the corresponding PWM Channel can get 32K clock source.
- */
-#define reg_pwm_mode32k REG_ADDR8(REG_PWM_BASE + 0x07)
-
-enum
-{
-    FLD_PWM0_32K_ENABLE = BIT(0),
-    FLD_PWM1_32K_ENABLE = BIT(1),
-    FLD_PWM2_32K_ENABLE = BIT(2),
-    FLD_PWM3_32K_ENABLE = BIT(3),
-    FLD_PWM4_32K_ENABLE = BIT(4),
-    FLD_PWM5_32K_ENABLE = BIT(5),
-};
-
-/*
- * this register configure pwm5~pwm0 phase
- */
-#define reg_pwm_phase(i) REG_ADDR16(REG_PWM_BASE + 0x08 + (i * 2))
-
-
-/**
- * This register configures the length of the capture segment of PWM6 ~ PWM0.
- * This value has a total of 16 bits, divided into lower 8 bits and higher 8 bits.
- */
-#define reg_pwm_cmp(i)   REG_ADDR16(REG_PWM_BASE+0x20 +(i * 0x10))
-
-
-/**
- * This register is used to configure the period of the PWM waveform. There are 32 bits in total.
- * The lower 16 bits indicate the length of the CMP segment. The higher 16 bits indicate the length of the MAX segment.
- */
-#define reg_pwm_cycle(i) REG_ADDR32(REG_PWM_BASE + 0x06 + (i << 2))
-//enum{
-//  FLD_PWM_CMP  =              BIT_RNG(0,15),
-//  FLD_PWM_MAX  =              BIT_RNG(16,31),
-//};
-// in C99 FLD_PWM_MAX  = BIT_RNG(16,31) is error
-#define FLD_PWM_CMP = BIT_RNG(0, 15),
-#define FLD_PWM_MAX = BIT_RNG(16, 31),
-/**
- * This register configures the length of the max segment of PWM6 ~ PWM0.
- * This value has a total of 16 bits, divided into lower 8 bits and higher 8 bits.
- */
-#define reg_pwm_max(i)   REG_ADDR16(REG_PWM_BASE+0x22 + (i * 0x10))
-
-
-/**
- * When PWM0 is in count mode or ir mode, the total number of pulse_number is set by the following two registers.
- */
-#define reg_pwm0_pulse_num REG_ADDR16(REG_PWM_BASE + 0x2c) //0x2c[7:0] 0x2d[5:0]
-
-
-/*
- * this register configure pwm align
- */
-#define reg_pwm_align REG_ADDR8(REG_PWM_BASE + 0x2e)
-
-
-/**
- * This register is used to configure the PWM interrupt function.
- */
-#define reg_pwm_irq_mask   REG_ADDR8(REG_PWM_BASE + 0x12)
-enum{
-     FLD_IRQ_PWM_NUM_MASK       = BIT(0),
-     FLD_IRQ_FIFO_MASK          = BIT(1),
-     FLD_IRQ_LVL_MASK           = BIT(2),
-};
-
-
-/**
- * The bits in this register are used to indicate the various interrupt states of the PWM.
- * BIT[0]:This bit is usually used with BIT[0] of 0x140430. If this bit is set to 1, it means that a pulse group of PWM has been sent.An interrupt was also generated. You can manually write 1 to clear the interrupt flag.
- * BIT[1]:In ir dma fifo mode. If this is set 1 Indicates that a set of pulse of group has been sent. You can manually write 1 to clear the interrupt flag.
- * BIT[2]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[3]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[4]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[5]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[6]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[7]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
- * BIT[8]:When the FIFO value is less than the set value, an interrupt is generated(The premise is that this interrupt has been enabled by register 0x140432 previous).
- *         The user can know whether this interrupt is generated by reading the status of this register.If BIT(8):1 Indicates that this interrupt has been generated.
- */
-#define reg_pwm_irq_sta REG_ADDR16(REG_PWM_BASE + 0x32)
-
-typedef enum
-{
-    FLD_PWM0_PNUM_IRQ        = BIT(0),
-    FLD_PWM0_IR_DMA_FIFO_IRQ = BIT(1),
-    FLD_PWM0_FRAME_DONE_IRQ  = BIT(2),
-    FLD_PWM1_FRAME_DONE_IRQ  = BIT(3),
-    FLD_PWM2_FRAME_DONE_IRQ  = BIT(4),
-    FLD_PWM3_FRAME_DONE_IRQ  = BIT(5),
-    FLD_PWM4_FRAME_DONE_IRQ  = BIT(6),
-    FLD_PWM5_FRAME_DONE_IRQ  = BIT(7),
-    FLD_PWM0_IR_FIFO_IRQ     = BIT(8),
-
-} pwm_irq_e;
-
-/**
- * PWM0~PWM5, counting from 0 at the beginning of each cycle, and adding 1 for each system clock.
- */
-#define reg_pwm_cnt(i) REG_ADDR16(REG_PWM_BASE + 0x34 + (i << 1))
-
-
-/**
- * In count mode, each period is incremented by one.
- */
-#define reg_pwm_ncnt REG_ADDR16(REG_PWM_BASE + 0x40)
-
-
-/**
- * For a 32K clock source, to change the duty cycle, write bit[0] to 1.
- */
-#define reg_pwm_ctrl_32k REG_ADDR8(REG_PWM_BASE + 0x42)
+#define reg_pwm_ir_fifo_dat(i)  REG_ADDR16(REG_PWM_BASE+0x00+i*2)
 
 /**
  * [7:0] bits 7-0 of PWM0's high time or low time(if pola[0]=1),if shadow bit(fifo data[14]) is 1 in ir fifo mode or dma fifo mode.
@@ -249,21 +55,54 @@ typedef enum
 
 
 /**
- * PWM data fifo.0x140448~0x14044b.
+ * When PWM0 is in count mode or ir mode, the total number of pulse_number is set by the following two registers.
  */
-#define reg_pwm_ir_fifo_dat(i) REG_ADDR16(REG_PWM_BASE + 0x48 + i * 2)
+#define reg_pwm0_pulse_num      REG_ADDR16(REG_PWM_BASE+0x0a)//0x32[7:0] 0x33[5:0]
 
+
+/**
+ * In count mode, each period is incremented by one.
+ */
+#define reg_pwm_ncnt            REG_ADDR16(REG_PWM_BASE+0x0c)
+
+
+/**
+ * This register is used to set the division factor of the PWM clock.
+ */
+#define reg_pwm_clkdiv          REG_ADDR8(REG_PWM_BASE+0x10)
+
+/**
+ * BIT[3:0] of this register is used to set the working mode of PWM0.Only PWM0 supports 5 modes.
+ */
+#define reg_pwm0_mode           REG_ADDR8(REG_PWM_BASE+0x11)
+enum{
+
+   /**
+    * FLD_OUT2ANA_EN_O -> 1 : The Pwm0 signal is output to the chip's internal analog circuitry.
+    * FLD_OUT2ANA_EN_O -> 0(default) : The Pwm0 signal is not output to the chip's internal analog circuitry.
+    */
+    FLD_OUT2ANA_EN_O     = BIT(4),
+};
 
 /**
  * This register BIT[3:0] indicates the interrupt trigger level in ir_fifo mode.
  * When fifo numbers is less than this value.It's will take effect.
  */
-#define reg_pwm_ir_fifo_irq_trig_level REG_ADDR8(REG_PWM_BASE + 0x4c)
-
-enum
-{
-    FLD_PWM0_FIFO_NUM_OF_TRIGGER_LEVEL = BIT_RNG(0, 3),
+#define reg_pwm_ctrl_b2         REG_ADDR8(REG_PWM_BASE + 0x12)
+enum{
+     FLD_IRQ_PWM_NUM_MASK = BIT(0),
+     FLD_IRQ_FIFO_MASK    = BIT(1),
+     FLD_IRQ_LVL_MASK     = BIT(2),
+     FLD_PWM0_FIFO_NUM_OF_TRIGGER_LEVEL  = BIT_RNG(4,7),
 };
+
+#define reg_pwm_ctrl_b3           REG_ADDR8(REG_PWM_BASE+0x13)
+enum{
+
+    FLD_RESOL_UP_MODE    = BIT(5),
+    FLD_DITH_MODE        = BIT(6),
+};
+
 
 /**
  * This register indicates the fifo data status in.
@@ -271,26 +110,180 @@ enum
  * BIT[4]:if BIT[4]=1,Indicates the data fifo is empty.
  * BIT[5]:if BIT[5]=1,Indicates the data fifo is full.
  */
-#define reg_pwm_ir_fifo_data_status REG_ADDR8(0x14044d)
-
-enum
-{
-    FLD_PWM0_IR_FIFO_DATA_NUM = BIT_RNG(0, 3),
-    FLD_PWM0_IR_FIFO_EMPTY    = BIT(4),
-    FLD_PWM0_IR_FIFO_FULL     = BIT(5),
+#define reg_pwm_ir_fifo_data_status     REG_ADDR8(REG_PWM_BASE+0x14)
+enum{
+    FLD_PWM0_IR_FIFO_DATA_NUM   =       BIT_RNG(0,3),
+    FLD_PWM0_IR_FIFO_EMPTY      =       BIT(4),
+    FLD_PWM0_IR_FIFO_FULL       =       BIT(5),
 };
 
 /**
  * This register can be configured to clear the data FIFO.
  * BIT[0]:if BIT[0]=1,Indicates the data FIFO is clear.
  */
-#define reg_pwm_ir_clr_fifo_data REG_ADDR8(0x14044e)
-
-enum
-{
-    FLD_PWM0_IR_FIFO_CLR_DATA = BIT(0),
-
+#define reg_pwm_ir_clr_fifo_data        REG_ADDR8(REG_PWM_BASE+0x15)
+enum{
+    FLD_PWM0_IR_FIFO_CLR_DATA   =       BIT(0),
 };
+
+
+/**
+ * The bits in this register are used to indicate the various interrupt states of the PWM.
+ * BIT[0]:This bit is usually used with BIT[0] of 0x140430. If this bit is set to 1, it means that a pulse group of PWM has been sent.An interrupt was also generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[1]:In ir dma fifo mode. If this is set 1 Indicates that a set of pulse of group has been sent. You can manually write 1 to clear the interrupt flag.
+ * BIT[2]:When the FIFO value is less than the set value, an interrupt is generated(The premise is that this interrupt has been enabled by register 0x140432 previous).
+ *        The user can know whether this interrupt is generated by reading the status of this register.If BIT(8):1 Indicates that this interrupt has been generated.
+ */
+#define reg_pwm_int        REG_ADDR16(REG_PWM_BASE+0x16)
+
+
+/**
+ * The bits in this register are used to indicate the various interrupt states of the PWM.
+ * BIT[0]:This bit is usually used with BIT[0] of 0x140430. If this bit is set to 1, it means that a pulse group of PWM has been sent.An interrupt was also generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[1]:In ir dma fifo mode. If this is set 1 Indicates that a set of pulse of group has been sent. You can manually write 1 to clear the interrupt flag.
+ * BIT[8]:When the FIFO value is less than the set value, an interrupt is generated(The premise is that this interrupt has been enabled by register 0x140432 previous).
+ *        The user can know whether this interrupt is generated by reading the status of this register.If BIT(8):1 Indicates that this interrupt has been generated.
+ * BIT[9]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[10]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[11]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[12]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[13]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[14]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ * BIT[15]:If this is set 1 Indicates that a signal frame interrupt has been generated. You can manually write 1 to clear the interrupt flag.
+ */
+#define reg_pwm_irq_sta        REG_ADDR32(REG_PWM_BASE+0x18)
+typedef enum{
+    FLD_PWM0_PNUM_IRQ           =    BIT(0),    FLD_PWM0_FRAME_DONE_IRQ    =    BIT(0),
+    FLD_PWM0_IR_DMA_FIFO_IRQ    =    BIT(1),    FLD_PWM1_FRAME_DONE_IRQ    =    BIT(1),
+    FLD_PWM0_IR_FIFO_IRQ        =    BIT(2),    FLD_PWM2_FRAME_DONE_IRQ    =    BIT(2),
+    FLD_PWM_IRQ_CYCDONE_MASK    =    BIT(6),    FLD_PWM6_FRAME_DONE_IRQ    =    BIT(6),
+    FLD_PWM3_FRAME_DONE_IRQ              =      BIT(3),
+    FLD_PWM4_FRAME_DONE_IRQ              =      BIT(4),
+    FLD_PWM5_FRAME_DONE_IRQ              =      BIT(5),
+    FLD_PWM7_FRAME_DONE_IRQ              =      BIT(7),
+    FLD_PWM8_FRAME_DONE_IRQ              =      BIT(8),
+    FLD_PWM9_FRAME_DONE_IRQ              =      BIT(9),
+    FLD_PWM10_FRAME_DONE_IRQ              =      BIT(10),
+    FLD_PWM11_FRAME_DONE_IRQ              =      BIT(11),
+    FLD_PWM12_FRAME_DONE_IRQ              =      BIT(12),
+    FLD_PWM13_FRAME_DONE_IRQ              =      BIT(13),
+    FLD_PWM14_FRAME_DONE_IRQ              =      BIT(14),
+    FLD_PWM15_FRAME_DONE_IRQ              =      BIT(15),
+    FLD_PWM16_FRAME_DONE_IRQ              =      BIT(16),
+    FLD_PWM17_FRAME_DONE_IRQ              =      BIT(17),
+    FLD_PWM18_FRAME_DONE_IRQ              =      BIT(18),
+    FLD_PWM19_FRAME_DONE_IRQ              =      BIT(19),
+    FLD_PWM20_FRAME_DONE_IRQ              =      BIT(20),
+    FLD_PWM21_FRAME_DONE_IRQ              =      BIT(21),
+    FLD_PWM22_FRAME_DONE_IRQ              =      BIT(22),
+    FLD_PWM23_FRAME_DONE_IRQ              =      BIT(23),
+}pwm_irq_e;
+
+
+/**
+ * This register is used to enable PWM0~PWM23.
+ */
+#define reg_pwm_enable          REG_ADDR32(REG_PWM_BASE+0x1c)
+typedef enum{
+    FLD_PWM1_EN = BIT(1),
+    FLD_PWM2_EN = BIT(2),
+    FLD_PWM3_EN = BIT(3),
+    FLD_PWM4_EN = BIT(4),
+    FLD_PWM5_EN = BIT(5),
+    FLD_PWM6_EN = BIT(6),
+    FLD_PWM7_EN = BIT(7),
+
+    FLD_PWM8_EN = BIT(8),
+    FLD_PWM9_EN = BIT(9),
+    FLD_PWM10_EN = BIT(10),
+    FLD_PWM11_EN = BIT(11),
+    FLD_PWM12_EN = BIT(12),
+    FLD_PWM13_EN = BIT(13),
+    FLD_PWM14_EN = BIT(14),
+    FLD_PWM15_EN = BIT(15),
+
+    FLD_PWM16_EN = BIT(16),
+    FLD_PWM17_EN = BIT(17),
+    FLD_PWM18_EN = BIT(18),
+    FLD_PWM19_EN = BIT(19),
+    FLD_PWM20_EN = BIT(20),
+    FLD_PWM21_EN = BIT(21),
+    FLD_PWM22_EN = BIT(22),
+    FLD_PWM23_EN = BIT(23),
+
+    FLD_PWM0_EN = BIT(24),
+}pwm_en_e;
+
+
+/**
+ * This register is used to configure the period of the PWM waveform. There are 32 bits in total.
+ * The lower 16 bits indicate the length of the CMP segment. The higher 16 bits indicate the length of the MAX segment.
+ */
+#define reg_pwm_cycle(i)        REG_ADDR32(REG_PWM_BASE+0x20 + (i * 0x10))
+//enum{
+//  FLD_PWM_CMP  =              BIT_RNG(0,15),
+//  FLD_PWM_MAX  =              BIT_RNG(16,31),
+//};
+// in C99 FLD_PWM_MAX  = BIT_RNG(16,31) is error
+#define FLD_PWM_CMP  =          BIT_RNG(0,15),
+#define FLD_PWM_MAX  =          BIT_RNG(16,31),
+
+/**
+ * This register configures the length of the capture segment of PWM6 ~ PWM0.
+ * This value has a total of 16 bits, divided into lower 8 bits and higher 8 bits.
+ */
+#define reg_pwm_cmp(i)          REG_ADDR16(REG_PWM_BASE+0x20 +(i * 0x10))
+
+
+/**
+ * This register configures the length of the max segment of PWM6 ~ PWM0.
+ * This value has a total of 16 bits, divided into lower 8 bits and higher 8 bits.
+ */
+#define reg_pwm_max(i)          REG_ADDR16(REG_PWM_BASE+0x22 + (i * 0x10))
+
+
+/**
+ * this register configure pwm6~pwm0 phase
+ */
+#define reg_pwm_phase(i)        REG_ADDR16(REG_PWM_BASE+0x24 + (i * 0x10))
+
+
+#define reg_pwm_cfg_b6(i)       REG_ADDR8(REG_PWM_BASE + 0x26 + (i * 0x10))
+enum{
+     FLD_PWM_OUT_INVERT         = BIT(1),
+     FLD_PWM_INV_OUT_INVERT     = BIT(2),
+     FLD_PWM_FIRST_OUT_LEVEL    = BIT(3),
+     FLD_PWM_32K_ENABLE         = BIT(4),
+     FLD_PWM_CENTER_ALIGN       = BIT(5),
+};
+
+/**
+ * BIT[6:0] of this register is used to set the phase mode of PWM0-6.
+ * phase_mode_o[#] ==1: phase is in every cycle.
+ * phase_mode_o[#] ==0: phase is in first cycle.
+ */
+#define reg_pwm_cfg_b7(i)        REG_ADDR8(REG_PWM_BASE+0x27 + (i * 0x10))
+enum{
+    FLD_PWM_SYNC_EN              =      BIT(0),
+    FLD_PWM_SYNC_EDGE            =      BIT(1),
+    FLD_PWM_PHASE_MODE           =      BIT(2),
+};
+
+/**
+ * this register configure pwm6~pwm0 resol.
+ */
+#define reg_pwm_resol(i)        REG_ADDR8(REG_PWM_BASE+0x28 + (i * 0x10))
+
+/**
+ * this register configure pwm6~pwm0 dead time.
+ */
+#define reg_pwm_dead(i)         REG_ADDR8(REG_PWM_BASE+0x29 + (i * 0x10))
+
+
+/**
+ * PWM0~PWM6, counting from 0 at the beginning of each cycle, and adding 1 for each system clock.
+ */
+#define reg_pwm_cnt(i)          REG_ADDR16(REG_PWM_BASE+0x2a + (i * 0x10))
 
 
 #endif

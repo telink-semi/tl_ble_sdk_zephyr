@@ -188,7 +188,7 @@ enum
 
 enum
 {
-    FLD_LIN_BREAK_LEN_RW             = BIT_RNG(0, 1), /* 0:14 1:15 2:16 3:17 */
+    FLD_LIN_BREAK_LEN_RW             = BIT_RNG(0, 1), /* 0:13 1:14 2:15 3:16 */
     FLD_LIN_BREAK_1_LEN_RW           = BIT_RNG(2, 3), /* Hold high level after break, 0:1 1:2 2:3 */
     FLD_LIN_T_BASE_SEL_RW            = BIT(4),        /* 1:10ms  0:5ms */
     FLD_LIN_COMM_TX_LOOP_RW          = BIT(5),        /* 1:comm tx loop, 0:comm tx once */
@@ -393,7 +393,7 @@ enum
 
 enum
 {
-    FLD_LIN_COMM_SCHEDULE_DLY_BUF_RW = BIT_RNG(0, 5)
+    FLD_LIN_COMM_SCHEDULE_DLY_BUF_RW = BIT_RNG(0, 4)
 };
 
 #define reg_lin_flt_pid_ctrl(i) REG_ADDR8(lin_base_addr(i) + 0x30)

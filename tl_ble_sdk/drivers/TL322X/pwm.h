@@ -30,15 +30,32 @@
 /**
  * @brief  enum variable, the number of PWM channels supported
  */
-typedef enum
-{
-    PWM0_ID = 0,
+typedef enum {
+    PWM0_ID=0,
     PWM1_ID,
     PWM2_ID,
     PWM3_ID,
     PWM4_ID,
     PWM5_ID,
-} pwm_id_e;
+    PWM6_ID,
+    PWM7_ID,
+    PWM8_ID,
+    PWM9_ID,
+    PWM10_ID,
+    PWM11_ID,
+    PWM12_ID,
+    PWM13_ID,
+    PWM14_ID,
+    PWM15_ID,
+    PWM16_ID,
+    PWM17_ID,
+    PWM18_ID,
+    PWM19_ID,
+    PWM20_ID,
+    PWM21_ID,
+    PWM22_ID,
+    PWM23_ID,
+}pwm_id_e;
 
 /**
  * @brief  enum variable, represents the PWM mode.
@@ -52,18 +69,6 @@ typedef enum
     PWM_IR_DMA_FIFO_MODE = 0x0F,
 } pwm_mode_e;
 
-/**
- * @brief  Select the 32K clock source of pwm.
- */
-typedef enum
-{
-    PWM_CLOCK_32K_CHN_PWM0 = 0x01,
-    PWM_CLOCK_32K_CHN_PWM1 = 0x02,
-    PWM_CLOCK_32K_CHN_PWM2 = 0x04,
-    PWM_CLOCK_32K_CHN_PWM3 = 0x08,
-    PWM_CLOCK_32K_CHN_PWM4 = 0x10,
-    PWM_CLOCK_32K_CHN_PWM5 = 0x20
-} pwm_clk_32k_en_chn_e;
 
 /**
  * @brief     This function servers to set pwm clock frequency, when pwm clock source is pclk.
@@ -84,9 +89,9 @@ static inline void pwm_set_clk(unsigned char pwm_clk_div)
  * @return    none.
  */
 
-static inline void pwm_32k_chn_en(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
-{
-    reg_pwm_mode32k |= pwm_32K_en_chn;
+static inline void pwm_32k_chn_en(pwm_id_e id){
+
+    reg_pwm_cfg_b6(id) |= FLD_PWM_32K_ENABLE;
 }
 
 /**
@@ -99,7 +104,7 @@ void pwm_set_pin(gpio_func_pin_e pin, gpio_func_e func);
 
 /**
  * @brief     This function servers to set pwm count status(CMP) time.
- * @param[in] id   - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id   - variable of enum to select the pwm number,Value range 0~23.
  * @param[in] tcmp - variable of the CMP.
  * @return    none.
  * @note      When pwm is in the process of sending and the pwm_set_tcmp() interface is called,
@@ -112,7 +117,7 @@ static inline void pwm_set_tcmp(pwm_id_e id, unsigned short tcmp)
 
 /**
  * @brief     This function servers to set pwm cycle time.
- * @param[in] id   - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id   - variable of enum to select the pwm number,Value range 0~23.
  * @param[in] tmax - variable of the cycle time.
  * @return    none.
  * @note      When pwm is in the process of sending and the pwm_set_tmax() interface is called,
@@ -146,72 +151,73 @@ static inline void pwm_stop(pwm_en_e en)
 
 /**
  * @brief     This function servers to revert the PWMx.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_invert_en(pwm_id_e id)
-{
-    reg_pwm_invert |= BIT(id);
+static inline void pwm_invert_en(pwm_id_e id){
+    BM_SET(reg_pwm_cfg_b6(id), FLD_PWM_OUT_INVERT);
 }
 
 /**
  * @brief     This function servers to disable the PWM revert function.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_invert_dis(pwm_id_e id)
-{
-    BM_CLR(reg_pwm_invert, BIT(id));
+static inline void pwm_invert_dis(pwm_id_e id){
+    BM_CLR(reg_pwm_cfg_b6(id), FLD_PWM_OUT_INVERT);
 }
 
 /**
  * @brief     This function servers to revert the PWMx_N.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_n_invert_en(pwm_id_e id)
-{
-    reg_pwm_n_invert |= BIT(id);
+static inline void pwm_n_invert_en(pwm_id_e id){
+    BM_SET(reg_pwm_cfg_b6(id), FLD_PWM_INV_OUT_INVERT);
 }
 
 /**
  * @brief     This function servers to disable the PWM revert function.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_n_invert_dis(pwm_id_e id)
-{
-    BM_CLR(reg_pwm_n_invert, BIT(id));
+static inline void pwm_n_invert_dis(pwm_id_e id){
+    BM_CLR(reg_pwm_cfg_b6(id), FLD_PWM_INV_OUT_INVERT);
 }
 
 /**
  * @brief     This function servers to enable the pwm polarity.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_set_polarity_en(pwm_id_e id)
-{
-    BM_SET(reg_pwm_pol, BIT(id));
+static inline void pwm_set_polarity_en(pwm_id_e id){
+     BM_SET(reg_pwm_cfg_b6(id), FLD_PWM_FIRST_OUT_LEVEL);
 }
 
 /**
  * @brief     This function servers to disable the pwm polarity.
- * @param[in] id - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_set_polarity_dis(pwm_id_e id)
-{
-    BM_CLR(reg_pwm_pol, BIT(id));
+static inline void pwm_set_polarity_dis(pwm_id_e id){
+        BM_CLR(reg_pwm_cfg_b6(id), FLD_PWM_FIRST_OUT_LEVEL);
 }
 
 /**
  * @brief     This function servers to enable the pwm interrupt.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
  * @param[in] mask - variable of enum to select the pwm interrupt source.
  * @return    none.
  */
-static inline void pwm_set_irq_mask(pwm_irq_e mask)
-{
-    reg_pwm_irq_mask |= mask;
+static inline void pwm_set_irq_mask(pwm_id_e id, pwm_irq_e mask){
+
+    if (mask == FLD_PWM_IRQ_CYCDONE_MASK) {
+        reg_pwm_cfg_b6(id) |= mask;
+    } else if ((mask == FLD_PWM0_PNUM_IRQ) || (mask == FLD_PWM0_IR_DMA_FIFO_IRQ) || (mask == FLD_PWM0_IR_FIFO_IRQ)) {
+        reg_pwm_ctrl_b2 |= mask;
+    } else {
+        reg_pwm_irq_sta |= mask;
+    }
 }
 
 /**
@@ -219,30 +225,64 @@ static inline void pwm_set_irq_mask(pwm_irq_e mask)
  * @param[in] mask - variable of enum to select the pwm interrupt source.
  * @return    none.
  */
-static inline void pwm_clr_irq_mask(pwm_irq_e mask)
-{
-    reg_pwm_irq_mask &= ~mask;
+static inline void pwm_clr_irq_mask(pwm_irq_e mask){
+
+    reg_pwm_ctrl_b2 &= ~mask;
+}
+
+/**
+ * @brief     This function servers to get the pwm interrupt status.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
+ * @param[in] status - variable of enum to select the pwm interrupt source.
+ * @retval    non-zero      -  the interrupt occurred.
+ * @retval    zero  -  the interrupt did not occur.
+ */
+static inline unsigned short pwm_get_irq_status(pwm_id_e id, pwm_irq_e status){
+
+    if (status == FLD_PWM_IRQ_CYCDONE_MASK) {
+        return (reg_pwm_cfg_b6(id) & status);
+    } else if ((status == FLD_PWM0_PNUM_IRQ) || (status == FLD_PWM0_IR_DMA_FIFO_IRQ) || (status == FLD_PWM0_IR_FIFO_IRQ)) {
+        return (reg_pwm_ctrl_b2 & status);
+    } else {
+        return (reg_pwm_irq_sta & status);
+    }
 }
 
 /**
  * @brief     This function servers to get the pwm interrupt status.
  * @param[in] status - variable of enum to select the pwm interrupt source.
- * @retval      non-zero      -  the interrupt occurred.
- * @retval      zero  -  the interrupt did not occur.
+ * @retval    non-zero      -  the interrupt occurred.
+ * @retval    zero  -  the interrupt did not occur.
  */
-static inline unsigned short pwm_get_irq_status(pwm_irq_e status)
-{
-    return (reg_pwm_irq_sta & status);
+static inline unsigned short pwm0_get_irq_status(pwm_irq_e status){
+    return (reg_pwm_int & status);
+}
+
+/**
+ * @brief     This function servers to clear the pwm interrupt.When a PWM interrupt occurs, the corresponding interrupt flag bit needs to be cleared manually.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~23.
+ * @param[in] status  - variable of enum to select the pwm interrupt source.
+ * @return    none.
+ */
+static inline void pwm_clr_irq_status(pwm_id_e id, pwm_irq_e status){
+
+    if (status == FLD_PWM_IRQ_CYCDONE_MASK) {
+        reg_pwm_cfg_b6(id) |= status;
+    } else if ((status == FLD_PWM0_PNUM_IRQ) || (status == FLD_PWM0_IR_DMA_FIFO_IRQ) || (status == FLD_PWM0_IR_FIFO_IRQ)) {
+        reg_pwm_ctrl_b2 |= status;
+    } else {
+        reg_pwm_irq_sta |= status;
+    }
 }
 
 /**
  * @brief     This function servers to clear the pwm interrupt.When a PWM interrupt occurs, the corresponding interrupt flag bit needs to be cleared manually.
  * @param[in] status  - variable of enum to select the pwm interrupt source.
  * @return    none.
+ * @note      This interface is only used for the count, ir mode and ir dma fifo mode of the PWM0 channel.
  */
-static inline void pwm_clr_irq_status(pwm_irq_e status)
-{
-    reg_pwm_irq_sta = status;
+static inline void pwm0_clr_irq_status(pwm_irq_e status){
+    reg_pwm_int = status;
 }
 
 /**
@@ -250,9 +290,8 @@ static inline void pwm_clr_irq_status(pwm_irq_e status)
  * @param[in] mode - variable of enum to indicates the pwm mode.
  * @return    none.
  */
-static inline void pwm_set_pwm0_mode(pwm_mode_e mode)
-{
-    reg_pwm0_mode = mode; //only PWM0 has count/IR/fifo IR mode
+static inline void pwm_set_pwm0_mode(pwm_mode_e mode){
+        reg_pwm0_mode = mode;  //only PWM0 has count/IR/fifo IR mode
 }
 
 /**
@@ -272,8 +311,7 @@ static inline void pwm_set_pwm0_tcmp_and_tmax_shadow(unsigned short max_tick, un
  * @param[in] pulse_num - variable of the pwm pulse number.The maximum bits is 14bits.
  * @return    none.
  */
-static inline void pwm_set_pwm0_pulse_num(unsigned short pulse_num)
-{
+static inline void pwm_set_pwm0_pulse_num(unsigned short pulse_num){
     reg_pwm0_pulse_num = pulse_num;
 }
 
@@ -284,7 +322,7 @@ static inline void pwm_set_pwm0_pulse_num(unsigned short pulse_num)
  */
 static inline void pwm_set_pwm0_ir_fifo_irq_trig_level(unsigned char trig_level)
 {
-    reg_pwm_ir_fifo_irq_trig_level = trig_level;
+    reg_pwm_ctrl_b2 = (reg_pwm_ctrl_b2 & (~FLD_PWM0_FIFO_NUM_OF_TRIGGER_LEVEL)) | (trig_level<<4);
 }
 
 /**
@@ -301,7 +339,7 @@ static inline void pwm_clr_pwm0_ir_fifo(void)
  * @brief     This function serves to get the number of data in fifo.
  * @return    the number of data in fifo
  */
-static inline unsigned char pwm_get_pwm0_ir_fifo_data_num(void) //????TODO
+static inline unsigned char pwm_get_pwm0_ir_fifo_data_num(void)
 {
     return (reg_pwm_ir_fifo_data_status & FLD_PWM0_IR_FIFO_DATA_NUM);
 }
@@ -327,8 +365,9 @@ static inline unsigned char pwm_get_pwm0_ir_fifo_is_full(void)
 /**
  * @brief     This function serves to config the pwm's dma wave form.
  * @param[in] pulse_num - the number of pulse.
- * @param[in] shadow_en - whether enable shadow mode.
- * @param[in] carrier_en - must 1 or 0.
+ * @param[in] shadow_en - determine whether the configuration of shadow cmp and shadow max is used
+ *                         1: use shadow, 0: not use
+ * @param[in] carrier_en - enable sending carrier, 1: enable, 0: disable
  * @return    none.
  */
 static inline unsigned short pwm_cal_pwm0_ir_fifo_cfg_data(unsigned short pulse_num, unsigned char shadow_en, unsigned char carrier_en)
@@ -408,11 +447,11 @@ void pwm_set_tx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_a
 
 /**
  * @brief       This function servers to set pwm shift time.
- * @param[in]   id   - variable of enum to select the pwm number,Value range 0~5.
+ * @param[in]   id   - variable of enum to select the pwm number,Value range 0~23.
  * @param[in]   shift_clk_num - pwm_pclk_speed(M)*pwm_shift_time(US),pwm_shift_time=tmax/2.
  * @return      none.
  * @attention   1: must: shift time must be set before setting the duty and cycle.
- *              2: If you want to reconfigure shift time, you must reconfiguretcmp and tmax (Whether the tcmp value and tmax value need to be modified or not) again
+ *              2: If you want to reconfigure shift time, you must reconfigure tcmp and tmax (Whether the tcmp value and tmax value need to be modified or not) again
  *               after reconfiguring shift time.
  *              3: If you only want to reconfigure tcmp and tmax, you only need to configure tcmp and tmax without first configuring shift time.
  */
@@ -425,22 +464,20 @@ static inline void pwm_set_shift_time(pwm_id_e id, unsigned short shift_clk_num)
  * @brief     This function servers to enable the pwm center align,the pwm defaults to edge alignment.
  *            Edge alignment:In this mode, the pulse counter is a cyclic increment count,the duty cycle count is determined at the beginning,count initial value is 0.
  *            Center alignment: In this mode, the pulse counter is a two-way count,the duty cycle count is determined at the center,count initial value is 0.
- * @param[in] id -  select the pwm id,Value range 0~5.
+ * @param[in] id -  select the pwm id,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_set_align_en(pwm_id_e id)
-{
-    reg_pwm_align |= BIT(id);
-}
+static inline void pwm_set_align_en(pwm_id_e id){
 
+    reg_pwm_cfg_b6(id) |= FLD_PWM_CENTER_ALIGN;
+}
 /**
  * @brief     This function servers to disable the pwm align.
- * @param[in] id -  select the pwm id,Value range 0~5.
+ * @param[in] id -  select the pwm id,Value range 0~23.
  * @return    none.
  */
-static inline void pwm_set_align_dis(pwm_id_e id)
-{
-    reg_pwm_align &= ~BIT(id);
+static inline void pwm_set_align_dis(pwm_id_e id){
+    reg_pwm_cfg_b6(id) &= ~FLD_PWM_CENTER_ALIGN;
 }
 
 /**
@@ -451,18 +488,9 @@ static inline void pwm_set_align_dis(pwm_id_e id)
  * @return    none.
  */
 
-static inline void pwm_32k_chn_dis(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
+static inline void pwm_32k_chn_dis(pwm_id_e id)
 {
-    BM_CLR(reg_pwm_mode32k, pwm_32K_en_chn);
-}
-
-/**
- * @brief     This function servers to disable pwm0 output to analog.
- * @return    none.
- */
-static inline void pwm_set_pwm0_output_to_ana_ir_dis(void)
-{
-    BM_CLR(reg_pwm0_mode, BIT(4));
+    BM_CLR(reg_pwm_cfg_b6(id), FLD_PWM_32K_ENABLE);
 }
 
 /**
@@ -474,4 +502,12 @@ static inline void pwm_set_pwm0_output_to_ana_ir_en(void)
     BM_SET(reg_pwm0_mode, BIT(4));
 }
 
+/**
+ * @brief     This function servers to disable pwm0 output to analog.
+ * @return    none.
+ */
+static inline void pwm_set_pwm0_output_to_ana_ir_dis(void)
+{
+    BM_CLR(reg_pwm0_mode, BIT(4));
+}
 #endif

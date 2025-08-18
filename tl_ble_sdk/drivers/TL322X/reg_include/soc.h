@@ -100,12 +100,12 @@ enum
     FLD_I3C1_DIV_IN_SEL = BIT_RNG(4, 5), //0:rc24m   1:xtl 24m  2:pll
 };
 
-#define reg_i2s0_step REG_ADDR16(SC_BASE_ADDR + 0x06)
+#define reg_sdm_step REG_ADDR16(SC_BASE_ADDR + 0x06)
 
 enum
 {
-    FLD_I2S0_STEP = BIT_RNG(0, 14),
-    FLD_I2S0_EN   = BIT(15),
+    FLD_SDM_STEP     = BIT_RNG(0, 14),
+    FLD_SDM_CLK_EN_0 = BIT(15),
 };
 
 #define reg_i2s2_step REG_ADDR16(SC_BASE_ADDR + 0x08)
@@ -117,7 +117,7 @@ enum
 };
 
 #define reg_i2s2_mod      REG_ADDR16(SC_BASE_ADDR + 0x0a)
-#define reg_i2s0_mod      REG_ADDR16(SC_BASE_ADDR + 0x2a)
+#define reg_sdm_mod       REG_ADDR16(SC_BASE_ADDR + 0x2a)
 
 
 #define reg_d25f_sram_cfg REG_ADDR8(SC_BASE_ADDR + 0x0c)
@@ -178,12 +178,12 @@ enum
     FLD_PROBE_CLK_SEL = BIT_RNG(0, 5),
 };
 
-#define reg_adcdig_clk_set(num) REG_ADDR8(SC_BASE_ADDR + (((num) == 0) ? 0x1b : 0x66))
+#define reg_adc_dig_clk_set(num) REG_ADDR8(SC_BASE_ADDR + (((num) == 0) ? 0x1b : 0x66))
 
 enum
 {
-    FLD_ADCDIG_CLK_MOD    = BIT_RNG(0, 3),
-    FLD_ADCDIG_DIV_IN_SEL = BIT_RNG(4, 5), //0:rc24m   1:xtl 24m  2:pll
+    FLD_ADC_DIG_CLK_MOD    = BIT_RNG(0, 3),
+    FLD_ADC_DIG_DIV_IN_SEL = BIT_RNG(4, 5), //0:rc24m   1:xtl 24m  2:pll
 };
 
 #define reg_rst  REG_ADDR32(SC_BASE_ADDR + 0x20)

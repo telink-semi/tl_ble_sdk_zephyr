@@ -109,7 +109,7 @@
 
 #define HCI_SUB_EVT_LE_ENHANCED_CONNECTION_COMPLETE_V2                0x29
 
-
+#define HCI_SUB_EVT_LE_READ_ALL_REMOTE_FEATURES_COMPLETE              0x2B //core_6.0  7.7.65.38 LE Read All Remote Features Complete event
 #define HCI_SUB_EVT_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE 0x2C //core_6.0  7.7.65.39 LE CS Read Remote Supported Capabilities Complete event
 #define HCI_SUB_EVT_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE              0x2D //core_6.0  7.7.65.40 LE CS Read Remote FAE Table Complete event
 #define HCI_SUB_EVT_LE_CS_SECURITY_ENABLE_COMPLETE                    0x2E //core_6.0  7.7.65.41 LE CS Security Enable Complete event
@@ -119,7 +119,7 @@
 #define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE                    0x32 //core_6.0  7.7.65.45 LE CS Subevent Result Continue event
 #define HCI_SUB_EVT_LE_CS_TEST_END_COMPLETE                           0x33 //core_6.0  7.7.65.46 LE CS Test End Complete event
 #define HCI_SUB_EVT_LE_MONITORED_ADVERTISERS_REPORT                   0x34 //core_6.0  7.7.65.47 LE Monitored Advertises Report event
-#define HCI_SUB_EVT_LE_FRAME_SPACE_UPDATE_COMPLETE                    0x35 //core_6.0   7.7.65.48 LE Frame Space Update Complete event
+#define HCI_SUB_EVT_LE_FRAME_SPACE_UPDATE_COMPLETE                    0x35 //core_6.0  7.7.65.48 LE Frame Space Update Complete event
 
 
 #define HCI_SUB_EVT_MAX                                               0x24
@@ -214,6 +214,7 @@
 
 #define HCI_LE_EVT_MASK_2_ENHANCED_CONNECTION_COMPLETE_V2                0x00000100 // core5.4 - bit40
 
+#define HCI_LE_EVT_MASK_2_READ_ALL_REMOTE_FEATURES_COMPLETE              0x00000400 // core6.0 - bit42
 #define HCI_LE_EVT_MASK_2_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE 0x00000800 //channel sounding bit43
 #define HCI_LE_EVT_MASK_2_CS_READ_REMOTE_FAE_TABLE_COMPLETE              0x00001000 //channel sounding bit44
 #define HCI_LE_EVT_MASK_2_CS_SECURITY_ENABLE_COMPLETE                    0x00002000 //channel sounding bit45
@@ -222,7 +223,7 @@
 #define HCI_LE_EVT_MASK_2_CS_SUBEVENT_RESULT                             0x00010000 //channel sounding bit48
 #define HCI_LE_EVT_MASK_2_CS_SUBEVENT_RESULT_CONTINUE                    0x00020000 //channel sounding bit49
 #define HCI_LE_EVT_MASK_2_CS_TEST_END_COMPLETE                           0x00040000 //channel sounding bit50
-
+#define HCI_LE_EVT_MASK_2_MONITORED_ADVERTISERS_REPORT                   0x00080000 // core6.0 - bit51
 #define HCI_LE_EVT_MASK_2_FRAME_SPACE_UPDATE_COMPLETE                    0x00100000 // core6.0 - bit52
 
 //HDT LE EVNET MASK
@@ -461,6 +462,7 @@
 //core_5.3 end
 
 //core_5.4 begin
+#define HCI_CMD_LE_SET_EXTENDED_ADVERTISING_PARAMETERS_V2 0x7F //7.8.53 LE Set Extended Advertising Parameters Command [v2]
 #define HCI_CMD_LE_SET_PERIODIC_ADVERTISING_SUBEVENT_DATA 0X82 //7.8.125 LE Set Periodic Advertising Subevent Data command
 #define HCI_CMD_LE_SET_PERIODIC_ADVERTISING_RESPONSE_DATA 0x83 //7.8.126 LE Set Periodic Advertising Response Data command
 #define HCI_CMD_LE_SET_PERIODIC_SYNC_SUBEVENT             0x84 //7.8.127 LE Set Periodic Sync Subevent command
@@ -469,11 +471,11 @@
 //core_5.4 end
 
 //core_6.0 begin
-//channel sounding begin
 #define HCI_CMD_LE_SET_DECISION_DATA                      0x80 //7.8.144 LE Set Decision Data command
 #define HCI_CMD_LE_SET_DECISION_INSTRUCTIONS              0x81 //7.8.145 LE Set Decision Instructions command
 #define HCI_CMD_LE_READ_ALL_SUPPORTED_FEATURES            0x87 //7.8.128 LE Read All Supported Features command
 #define HCI_CMD_LE_READ_ALL_REMOTE_FEATURES               0x88 //7.8.129 LE Read Supported States command
+//channel sounding begin
 #define HCI_CMD_LE_CS_READ_LOCAL_SUPPORTED_CAPABILITIES   0x89 //7.8.X+0 LE CS Read Local Supported Capabilities command
 #define HCI_CMD_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES  0x8A //7.8.X+1 LE CS Read Remote Supported Capabilities command
 #define HCI_CMD_LE_CS_WRITE_REMOTE_SUPPORTED_CAPABILITIES 0x8B //7.8.X+2 LE CS Write Remote Supported Capabilities command

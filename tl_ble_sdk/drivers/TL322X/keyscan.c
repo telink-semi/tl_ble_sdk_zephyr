@@ -24,7 +24,6 @@
 #include "keyscan.h"
 
 #define KEYSCAN_BUFFER_DMA_ADDR 0x8014071c
-#define KEYSCAN_DEST_ADDR       0x4000
 
 dma_chain_config_t ks_rx_dma_list_config;
 
@@ -53,36 +52,64 @@ unsigned int g_col_mask = 0x00;
 /**
  * @brief      This function serves to configure keyscan DMA.
  * @param[in]  chn       - DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
  * @param[in]  size_byte - DMA buffer size
  * @return     none
  */
-void keyscan_dma_config(dma_chn_e chn, unsigned char size_byte)
+void keyscan_dma_config(dma_chn_e chn, unsigned int *data_buffer, unsigned char size_byte)
 {
-    dma_set_address(chn, KEYSCAN_BUFFER_DMA_ADDR, KEYSCAN_DEST_ADDR);
+    dma_set_address(chn, KEYSCAN_BUFFER_DMA_ADDR, (unsigned int)data_buffer);
     dma_set_size(chn, size_byte, DMA_WORD_WIDTH);
     dma_config(chn, &keyscan_rx_dma_config);
     dma_chn_en(chn);
 }
 
 /**
+ * @brief     This function serves to configure adc_dma_chn channel llp.
+ * @param[in] chn          - the DMA channel
+ * @param[in] data_buffer  - the DMA data_buffer address
+ * @param[in] config       - the DMA config
+ * @param[in] head_of_list - the DMA linked list head
+ * @param[in] size_byte    - the DMA buffer size
+ * @return    none
+ */
+void keyscan_dma_config_llp_list(dma_chn_e chn, unsigned int *data_buffer, unsigned int size_byte, dma_chain_config_t *head_of_list)
+{
+    dma_set_address(chn, KEYSCAN_BUFFER_DMA_ADDR, (unsigned int)data_buffer);
+    dma_set_size(chn, size_byte, DMA_WORD_WIDTH);
+    dma_config(chn, &keyscan_rx_dma_config);
+    reg_dma_llp(chn) = (unsigned int)(head_of_list);
+}
+
+/**
+ * @brief      This function serves to configure adc_dma_chn channel list element.
+ * @param[in]  chn          - the DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
+ * @param[in]  node         - the list node
+ * @param[in]  llpointer    - the linked list pointer
+ * @param[in]  size_byte    - the DMA buffer size
+ * @return     none
+ */
+void keyscan_dma_add_list_element(dma_chn_e chn, unsigned int *data_buffer, dma_chain_config_t *node, dma_chain_config_t *llpointer, unsigned int size_byte)
+{
+    node->dma_chain_ctl      = reg_dma_ctrl(chn) | BIT(0);
+    node->dma_chain_src_addr = KEYSCAN_BUFFER_DMA_ADDR;
+    node->dma_chain_dst_addr = (unsigned int)(data_buffer);
+    node->dma_chain_data_len = dma_cal_size(size_byte, 4);
+    node->dma_chain_llp_ptr  = (unsigned int)(llpointer);
+}
+
+/**
  * @brief      This function serves to configure keyscan DMA LLP.
  * @param[in]  chn       - DMA channel
+ * @param[in]  data_buffer  - the DMA data_buffer address
  * @param[in]  size_byte - DMA buffer size
  * @return     none
  */
-void keyscan_dma_config_llp(dma_chn_e chn, unsigned char size_byte)
+void keyscan_dma_config_llp(dma_chn_e chn, unsigned int *data_buffer, unsigned char size_byte)
 {
-    dma_set_address(chn, KEYSCAN_BUFFER_DMA_ADDR, KEYSCAN_DEST_ADDR);
-    dma_set_size(chn, size_byte, DMA_WORD_WIDTH);
-    dma_config(chn, &keyscan_rx_dma_config);
-    reg_dma_llp(chn) = (unsigned int)(&ks_rx_dma_list_config);
-
-    ks_rx_dma_list_config.dma_chain_ctl      = reg_dma_ctrl(chn) | BIT(0);
-    ks_rx_dma_list_config.dma_chain_src_addr = KEYSCAN_BUFFER_DMA_ADDR;
-    ks_rx_dma_list_config.dma_chain_dst_addr = (unsigned int)(KEYSCAN_DEST_ADDR);
-    ks_rx_dma_list_config.dma_chain_data_len = dma_cal_size(size_byte, 4);
-    ks_rx_dma_list_config.dma_chain_llp_ptr  = (unsigned int)(&ks_rx_dma_list_config);
-
+    keyscan_dma_config_llp_list(chn, data_buffer, size_byte, &ks_rx_dma_list_config);
+    keyscan_dma_add_list_element(chn, data_buffer, &ks_rx_dma_list_config, &ks_rx_dma_list_config, size_byte);
     dma_chn_en(chn);
 }
 
@@ -94,18 +121,34 @@ void keyscan_dma_config_llp(dma_chn_e chn, unsigned char size_byte)
 static unsigned int keyscan_pin_map(unsigned char pin)
 {
     unsigned int gpio_pin;
-
-    if (pin > 23) {     //PA0-PA4 PB0-PB2
-        if (pin > 28) { //PB0-PB2
-            gpio_pin = ((0x100) | BIT(pin % 29));
-        } else {        //PA0-PA4
-            gpio_pin = ((0x000) | BIT(pin % 24));
-        }
-    } else {
-        if (pin % 8 > 4) {
-            gpio_pin = ((4 - pin / 8) << 8) | BIT((pin % 8) - 5);
+    if(pin & BIT(5)){
+         pin = pin&(~BIT(5));
+         if (pin > 23) {     //PE3-PE7 PF0-PF2
+            if (pin > 28) { //PF0-PF2
+                gpio_pin = ((0x500) | BIT(pin % 29));
+            } else {        //PE3-PE7
+                gpio_pin = ((0x400) | BIT((pin % 24)+3));
+            }
         } else {
-            gpio_pin = ((3 - pin / 8) << 8) | BIT((pin % 8) + 3);
+            if (pin % 8 > 4) {
+                gpio_pin = ((8 - pin / 8) << 8) | BIT((pin % 8) - 5);
+            } else {
+                gpio_pin = ((7 - pin / 8) << 8) | BIT((pin % 8) + 3);
+            }
+        }
+    }else{
+        if (pin > 23) {     //PA0-PA4 PB0-PB2
+            if (pin > 28) { //PB0-PB2
+                gpio_pin = ((0x100) | BIT(pin % 29));
+            } else {        //PA0-PA4
+                gpio_pin = ((0x000) | BIT(pin % 24));
+            }
+        } else {
+            if (pin % 8 > 4) {
+                gpio_pin = ((4 - pin / 8) << 8) | BIT((pin % 8) - 5);
+            } else {
+                gpio_pin = ((3 - pin / 8) << 8) | BIT((pin % 8) + 3);
+            }
         }
     }
 
@@ -132,25 +175,31 @@ void keyscan_set_time(ks_debounce_period_e debounce_period, unsigned char enter_
  * @param[in]  row_cnt  - Count of rows. Range is 1-8.
  * @return     none
  */
-void keyscan_set_row(unsigned char *ks_row, unsigned char row_cnt)
+void keyscan_set_row(unsigned char *ks_row, unsigned char row_cnt, ks_col_pull_type_e ks_col_pull)
 {
     unsigned char i;
     unsigned int  martix_row_sel   = 0;
     unsigned char martix_row_7_sel = 0;
-
+    if ((KS_EXT_PIN_PULLUP == ks_col_pull) || (KS_INT_PIN_PULLUP == ks_col_pull)) {
+       BM_SET(reg_ks_en, FLD_KS_OUT_INV );
+    } else if ((KS_EXT_PIN_PULLDOWN == ks_col_pull) || (KS_INT_PIN_PULLDOWN == ks_col_pull)) {
+       BM_CLR(reg_ks_en, FLD_KS_OUT_INV );
+    }
+    ks_col_pull = ks_col_pull & 0x0f;
     for (i = 0; i < row_cnt; i++) {
         gpio_function_dis(keyscan_pin_map(ks_row[i]));
+        gpio_set_up_down_res(keyscan_pin_map(ks_row[i]),(gpio_pull_type_e)ks_col_pull);
         gpio_set_mux_function(keyscan_pin_map(ks_row[i]), KEYS0_IO);
 
         if (i < 6) {
-            martix_row_sel |= (ks_row[i] << (5 * i));
+            martix_row_sel |= ((ks_row[i]&(~BIT(5))) << (5 * i));
         }
         if (i == 6) {
-            martix_row_sel |= (ks_row[i] & 0x3) << 30;
-            martix_row_7_sel |= ks_row[i] >> 2;
+            martix_row_sel |= ((ks_row[i]&(~BIT(5))) & 0x3) << 30;
+            martix_row_7_sel |= (ks_row[i]&(~BIT(5))) >> 2;
         }
         if (i == 7) {
-            martix_row_7_sel |= ks_row[i] << 3;
+            martix_row_7_sel |= (ks_row[i]&(~BIT(5))) << 3;
         }
     }
 
@@ -183,9 +232,9 @@ void keyscan_set_col(unsigned char *ks_col, unsigned char col_cnt, ks_col_pull_t
     unsigned int  martix_col_sel = 0;
 
     if ((KS_EXT_PIN_PULLUP == ks_col_pull) || (KS_INT_PIN_PULLUP == ks_col_pull)) {
-        BM_SET(reg_ks_en, FLD_KS_IN_INV | FLD_KS_OUT_INV);
+        BM_SET(reg_ks_en, FLD_KS_IN_INV );
     } else if ((KS_EXT_PIN_PULLDOWN == ks_col_pull) || (KS_INT_PIN_PULLDOWN == ks_col_pull)) {
-        BM_CLR(reg_ks_en, FLD_KS_IN_INV | FLD_KS_OUT_INV);
+        BM_CLR(reg_ks_en, FLD_KS_IN_INV );
     }
 
     ks_col_pull = ks_col_pull & 0x0f;
@@ -197,7 +246,7 @@ void keyscan_set_col(unsigned char *ks_col, unsigned char col_cnt, ks_col_pull_t
         gpio_set_up_down_res(keyscan_pin_map(ks_col[i]), (gpio_pull_type_e)ks_col_pull);
         gpio_set_mux_function(keyscan_pin_map(ks_col[i]), KEYS0_IO);
 
-        martix_col_sel |= (unsigned int)(1 << (ks_col[i]));
+        martix_col_sel |= (unsigned int)(1 << (ks_col[i]&(~BIT(5))));
     }
     reg_ks_col_mask0 = martix_col_sel;
 
@@ -215,15 +264,15 @@ void keyscan_set_col(unsigned char *ks_col, unsigned char col_cnt, ks_col_pull_t
  */
 void keyscan_set_martix(unsigned char *ks_row, unsigned char row_cnt, unsigned char *ks_col, unsigned char col_cnt, ks_col_pull_type_e ks_col_pull)
 {
+
     unsigned char i;
     /* g_keyscan_col_cnt saves the total number of columns during user configuration,
      * and g_keyscan_col saves the number of columns during user configuration.*/
     g_keyscan_col_cnt = col_cnt;
     for (i = 0; i < col_cnt; i++) {
-        g_keyscan_col[i] = ks_col[i];
+        g_keyscan_col[i] = (ks_col[i]&(~BIT(5)));
     }
-
-    keyscan_set_row((unsigned char *)ks_row, (unsigned char)row_cnt);
+    keyscan_set_row((unsigned char *)ks_row, (unsigned char)row_cnt,ks_col_pull);
     keyscan_set_col((unsigned char *)ks_col, (unsigned char)col_cnt, ks_col_pull);
 }
 
@@ -297,27 +346,32 @@ void keyscan_init(ks_debounce_period_e debounce_period, unsigned char enter_idle
 
 /**
  * @brief      This function serves to set keyscan configuration.
- * @param[in]  ks_col       - The array element must be a member of the enumeration type ks_value_e.
- * @param[in]  col_cnt      - Count of columns. Range is 1-31.
- * @param[in]  col_data     - the meta col data
- * @return     int          - the col value
+ * @param[in]  baud_rate                - ks_baud_rate_e.
+ * @param[in]  clk_src                  - ks_clk_src_e.
+ * @param[in]  enter_idle_period_num    - Set how many debounce cycles to enter the idle state without detecting a button.
+ *                                        The value setting range is 1-32.
+ *                                        The idle state will stop scanning and reduce power consumption.
+ *                                        Press again to exit the idle state.
+ * @return     none
  */
-int keyscan_get_col_from_meta_data(unsigned char *ks_col, unsigned char col_cnt, unsigned int col_data)
-{
-    unsigned int key_pin_mask = col_data & g_col_mask;
+void keyscan_init_clk_24m(ks_baud_rate_e baud_rate, ks_clk_src_e clk_src, unsigned char enter_idle_period_num){
+    unsigned int clk_div = (unsigned int)(24000000/(unsigned int)(2*2*baud_rate * 32000));
+    reg_clkks_mode =  ( clk_div& 0xff) | (clk_src<<5);
+    reg_rst5 |= FLD_RST5_KEY_SCAN;
+    reg_clk_en5 |= FLD_CLK5_KEYSCAN_EN;
 
-    unsigned char key_pin = 0, col = 0;
+    reg_ks_end_flag = KESYCAN_END_FLAG;
 
-    while (!(key_pin_mask & 1)) {
-        key_pin++;
-        key_pin_mask >>= 1;
-    }
+    keyscan_set_time(1, enter_idle_period_num);
+    keyscan_set_scan_times(1);
 
-    for (col = 0; col < col_cnt; col++) {
-        if (ks_col[col] == key_pin) {
-            return col;
-        }
-    }
+    BM_CLR(reg_ks_a_en0, FLD_KS_CAPTURE_IO); //When idle, row power on
+    reg_ks_a_en0 |= (reg_ks_a_en0 &(~(FLD_KS_RXDMA_CACHE)));
+    BM_CLR(reg_ks_en,FLD_KS_IE);
+    reg_ks_a_en0 |= FLD_KS_RXDONE_IE;
+    //enable keyscan clk and set irq mask.If the mask bit is not enabled, the FLD_IRQ_KS status bit will not be set.
+    BM_SET(reg_ks_en, FLD_KS_CLK_EN | FLD_KS_RESET);
 
-    return -1;
+
 }
+

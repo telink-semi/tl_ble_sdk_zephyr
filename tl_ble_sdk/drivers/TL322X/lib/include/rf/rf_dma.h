@@ -109,7 +109,7 @@ static inline void rf_dma_config(rf_dma_chn_e chn, rf_dma_config_t *config)
 * @param[in]  src_addr - the address of source.
 * @note      When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
 **/
-static _always_inline void rf_dma_set_src_address(rf_dma_chn_e chn, unsigned int src_addr)
+static _always_inline void rf_dma_set_src_address(rf_dma_chn_e chn, unsigned int src_addr) //BLE SDK USE
 {
     reg_bb_dma_src_addr(chn) = (unsigned int)src_addr;
 }

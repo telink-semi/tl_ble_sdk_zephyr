@@ -96,11 +96,6 @@
     #define FLASH_ADR_SMP_PAIRING_2M_FLASH 0x1EC000 //1EC000 & 1ED000 & 1EE000 & 1EF000
 #endif
 
-/* SMP pairing and key information area */
-#ifndef FLASH_ADR_SMP_PAIRING_2M_FLASH
-    #define FLASH_ADR_SMP_PAIRING_2M_FLASH 0x1EC000 //1EC000 & 1ED000 & 1EE000 & 1EF000
-#endif
-
 /* for ACL Central simple SDP: bonding ACL Peripheral GATT service critical information area */
 #ifndef FLASH_SDP_ATT_ADDRESS_2M_FLASH
     #define FLASH_SDP_ATT_ADDRESS_2M_FLASH 0x1EA000 //1EA000 & 1EB000

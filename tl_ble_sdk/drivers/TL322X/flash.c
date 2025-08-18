@@ -32,7 +32,7 @@
 #include "types.h"
 #include "watchdog.h"               //BLE SDK use
 
-#if 1//!defined(MCU_CORE_TL322X_N22)
+#if !defined(MCU_CORE_TL322X_N22)
 _attribute_data_retention_sec_ flash_handler_t flash_read_page  = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 /*
@@ -47,6 +47,21 @@ _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
         .preempt_en = 0,
         .threshold  = 1,
 };
+
+
+
+
+__attribute__((weak, unused))
+void tlk_flash_startOperationHook(void)
+{
+
+}
+
+__attribute__((weak, unused))
+void tlk_flash_postOperationHook(void)
+{
+
+}
 
 
 /*******************************************************************************************************************
@@ -95,9 +110,12 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 #ifdef MCU_CORE_N22_ENABLE
 #else
     wd_clear(); //BLE SDK use
+    tlk_flash_startOperationHook();   //BLE SDK use
+
     DISABLE_BTB;
     flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
     ENABLE_BTB;
+    tlk_flash_postOperationHook();   //BLE SDK use
 #endif
 }
 
@@ -122,10 +140,15 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, unsigned char *buf)
 {
 #ifdef MCU_CORE_N22_ENABLE
+
 #else
+    tlk_flash_startOperationHook();   //BLE SDK use
+
     DISABLE_BTB;
     flash_mspi_read_ram(FLASH_DREAD_CMD, addr, buf, len);
     ENABLE_BTB;
+
+    tlk_flash_postOperationHook();   //BLE SDK use
 #endif
 }
 
@@ -223,6 +246,8 @@ _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,
  */
 _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
+     tlk_flash_startOperationHook();   //BLE SDK use
+
     unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
     int          nw = 0;
 
@@ -236,6 +261,8 @@ _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long l
         buf += nw;
         len -= nw;
     }
+
+    tlk_flash_postOperationHook();   //BLE SDK use
 }
 
 /**

@@ -393,7 +393,15 @@ _attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8
             mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
             mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
 
+            if(flash_prot_op_cb){
+                flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_BEGIN, flash_addr, flash_addr + 6);
+            }
+
             flash_write_page(flash_addr, 6, mac_public); //store public address on flash for future use
+
+            if(flash_prot_op_cb){
+                flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_END, flash_addr, flash_addr + 6);
+            }
         }
     }
 
@@ -407,6 +415,14 @@ _attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8
         mac_random_static[3] = value_rand[3];
         mac_random_static[4] = value_rand[4];
 
+        if(flash_prot_op_cb){
+            flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_BEGIN, flash_addr + 6, flash_addr + 8);
+        }
+
         flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3)); //store random address on flash for future use
+
+        if(flash_prot_op_cb){
+            flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_END, flash_addr + 6, flash_addr + 8);
+        }
     }
 }

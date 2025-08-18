@@ -180,6 +180,7 @@ typedef enum
 
 } ble_sts_t;
 
+
 /**
  *  @brief  Definition for Error Response of ATTRIBUTE PROTOCOL PDUS
  *  See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
@@ -216,6 +217,7 @@ typedef enum
     ATT_ERR_OUT_OF_RANGE,                         //!< Out of Range
 
 } att_err_t;
+
 
 /**
  *  @brief  error code for user initialization error

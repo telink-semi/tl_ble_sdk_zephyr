@@ -198,7 +198,7 @@ union {                                               /* offset: 0x80 */
       unsigned int cs;                                /**< message buffer 0 cs register..Message Buffer 127 CS Register, array offset: 0x80, array step: 0x10 */
       unsigned int id;                                /**< Message Buffer 0 ID Register..Message Buffer 127 ID Register, array offset: 0x84, array step: 0x10 */
       unsigned int word[2];                           /**< Message Buffer 0 WORD_8B Register..Message Buffer 127 WORD_8B Register, array offset: 0x88, array step: index*0x10, index2*0x4 */
-    } mb_8byte[127];
+    } mb_8byte[128];
     struct {                                         /* offset: 0x80 */
       struct {                                       /* offset: 0x80, array step: 0x18 */
         unsigned int cs;                             /**< Message Buffer 0 CS Register..Message Buffer 20 CS Register, array offset: 0x80, array step: 0x18 */
@@ -677,7 +677,7 @@ typedef struct
 #define ENHANCED_RX_FIFO_FSCH(x) (((unsigned int)(((unsigned int)(x)) << 30)) & 0xC0000000)
 #define RTR_STD_HIGH(x)          (((unsigned int)(((unsigned int)(x)) << 27)) & 0x08000000)
 #define RTR_STD_LOW(x)           (((unsigned int)(((unsigned int)(x)) << 11)) & 0x00000800)
-#define RTR_EXT(x)               (((unsigned int)(((unsigned int)(x)) << 29)) & 0x40000000)
+#define RTR_EXT(x)               (((unsigned int)(((unsigned int)(x)) << 29)) & 0x20000000)
 #define ID_STD_LOW(id)           (((unsigned int)id) & 0x7FF)
 #define ID_STD_HIGH(id)          (((unsigned int)(((unsigned int)(id)) << 16)) & 0x07FF0000)
 #define ID_EXT(id)               (((unsigned int)id) & 0x1FFFFFFF)
@@ -720,7 +720,7 @@ typedef struct
     unsigned int *id_filter_table;        /*!< Pointer to the CAN Enhanced Rx FIFO identifier filter table, each table member
                                           occupies 32 bit word, table size should be equal to idFilterNum. There are two types of
                                           Enhanced Rx FIFO filter elements that can be stored in table : extended-ID filter element
-                                          (1 word, occupie 1 table members) and standard-ID filter element (2 words, occupies 2 table
+                                          (2 word, occupie 2 table members) and standard-ID filter element (1 words, occupies 1 table
                                           members), the extended-ID filter element needs to be placed in front of the table. */
     unsigned char id_filter_pairnum;     /*!< idFilterPairNum is the Enhanced Rx FIFO identifier filter element pair numbers,
                                          each pair of filter elements occupies 2 words and can consist of one extended ID filter
@@ -992,6 +992,13 @@ typedef enum {
  *  @return     none
  */
 static inline  void can_module_en(can_chn_e chn){
+    if(chn == CAN0){
+        reg_rst7 |= FLD_RST7_CAN0;
+        reg_clk_en7|=FLD_CLK7_CAN0_EN;
+    }else if(chn == CAN1){
+        reg_rst7 |= FLD_RST7_CAN1;
+        reg_clk_en7|=FLD_CLK7_CAN1_EN;
+    }
     reg_can_mcr3(chn) &= ~FLD_CAN_MDIS;
     while(reg_can_mcr2(chn)&FLD_CAN_LPMACK);
 }
@@ -1663,6 +1670,9 @@ void can_set_rx_dma_config(can_chn_e chn, dma_chn_e dma_chn);
  * @param[in]   addr     - pointer to the buffer receive data.
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
+ * @note        When it is CAN_ENHANCED_RXFIFO, for example, the number of triggers set by can_set_enhanced_rxfifo_watermark is n.
+ *              When the number of packets in rxfifo reaches n, dma is triggered to carry n packets, and if the consecutively received packets are larger than 2n,
+ *              and do not have the time to configure dma, then, after configuring the dma to carry n, and then configuring the next dma, the dma will not work.
  */
 void can_receive_dma(can_chn_e chn,dma_chn_e dma_chn,can_rxfifo_mode_e rx_mode, unsigned char *addr, unsigned int rev_size);
 
@@ -1715,6 +1725,7 @@ void can_set_pn_config(can_chn_e chn, can_pn_config_t* pn_cfg);
  * @param[in] frame -TxFrame Pointer to CAN message frame to be sent.
  * @param[in] is_rtr_response - can_remote_received_type_e
  * @return 0 - Write Tx Message Buffer Successfully.1 - Tx Message Buffer is currently in use.
+ * @note  1. Sends data in big-end mode by default; 2. the length is sent according to the configured length, but the data is fetched in word units;
  */
 unsigned char can_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_frame_t* frame,unsigned char is_rtr_response);
 
@@ -1726,6 +1737,7 @@ unsigned char can_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_frame_t* 
  * @param[in] mb_index - The CAN Message Buffer index.
  * @param[in] frame -TxFrame Pointer to CAN FD message frame to be sent.
  * @return  - none
+ * @note  1. Sends data in big-end mode by default; 2. the length is sent according to the configured length, but the data is fetched in word units;
  */
 void canfd_write_tx_mb(can_chn_e chn,unsigned char mb_index,can_fd_frame_t* frame);
 
@@ -1792,5 +1804,3 @@ void can_enhanced_rxfifo_dma_reset_idhit(can_chn_e chn,can_fd_frame_t* frame);
  * @return  none
  */
 void can_set_mb_remote_frame_payload(can_chn_e chn,unsigned char mb_index,unsigned int*payload,can_fd_frame_length_e dlc_len);
-
-
