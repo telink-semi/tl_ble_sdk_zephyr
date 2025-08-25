@@ -88,27 +88,27 @@ void rf_set_ble_500K_mode(void);
  * @note      TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)
  */
 void rf_set_ble_125K_mode(void);
-#if 0
+
 /**
  * @brief     This function serves to  set ble_4M_NO_PN  mode of RF.
  * @return    none.
  * @note      TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)
  */
 void rf_set_ble_4M_NO_PN_mode(void);
-#endif
+
 /**
  * @brief     This function serves to  set ble_6M_NO_PN  mode of RF.
  * @return    none.
  */
 void rf_set_ble_6M_NO_PN_mode(void);
-#if 0
+
 /**
  * @brief     This function serves to  set ble_4M_NO_PN  mode of RF.
  * @return    none.
  * @note      TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)
  */
 void rf_set_ble_4M_mode(void);
-#endif
+
 /**
  * @brief     This function serves to  set ble_6M_NO_PN  mode of RF.
  * @return    none.
