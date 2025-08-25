@@ -41,12 +41,14 @@
 
 typedef enum {
     PM_ESLEEP_SUCCESS = 0x00,
-    PM_ESLEEP_NOT_ALLOWED = 0x01,
-    PM_ESLEEP_RF_FSM_BUSY = 0x02,
-    PM_ESLEEP_TO_SHORT = 0x03,
-    PM_ESLEEP_TASKS_NOT_RDY = 0x04,
-    PM_ESLEEP_INVALID_PARAM = 0x05,
-    PM_ESLEEP_MCU_RUN = 0x06,
+    PM_ESLEEP_NOT_ALLOWED,
+    PM_ESLEEP_HOST_NOT_ALLOWED,
+    PM_ESLEEP_CTRL_NOT_ALLOWED,
+    PM_ESLEEP_RF_FSM_BUSY,
+    PM_ESLEEP_TO_SHORT,
+    PM_ESLEEP_TASKS_NOT_RDY,
+    PM_ESLEEP_INVALID_PARAM,
+    PM_ESLEEP_MCU_RUN,
 } pm_sleep_error_t;
 
 
@@ -123,6 +125,7 @@ typedef enum
     PM_EV_FLAG_SLEEP_ENTER,
     PM_EV_FLAG_SUSPEND_EXIT,
     PM_EV_FLAG_GPIO_EARLY_WAKEUP,
+    PM_EV_FLAG_SLEEP_EXIT,
     PM_EV_MAX_NUM,
 } pm_ev_flag_t;
 
@@ -289,10 +292,22 @@ u32 tlksdk_pm_enterSleep(u32 sleep_mode, u32 nxt_task_wakeup_tick);
  */
 u32 tlksdk_pm_getPMWakeupSRC(void);
 
-/* Only for N22 core */
-void tlksdk_pm_n22GetD25fPmShareAddr(uint8_t* data);
 
+/**
+ * @brief  Function to enable or disable WFI (Wait For Interrupt) mode.
+ * @param  enable - true to enable WFI mode, false to disable WFI mode
+ * @return none
+ */
+void blc_pm_enableWfiMode(bool enable);
 
+/**
+ * @brief  Function to initialize delay parameters for WFI mode wakeup.
+ *         This function configures timing parameters required for delayed wakeup
+ *         when operating in WFI (Wait For Interrupt) mode.
+ * @param  none
+ * @return none
+ */
+void blc_pm_InitWfiDelayWakeup(void);
 
 
 #endif //#if TLK_PM_ENABLE

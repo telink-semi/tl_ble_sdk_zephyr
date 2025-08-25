@@ -72,7 +72,7 @@ typedef enum
 {
     //available mode for customer
     SUSPEND_MODE                    = 0x00,
-    DEEPSLEEP_MODE                  = 0xf0, //when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
+    DEEPSLEEP_MODE                  = 0xe0, //when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
                                             //system will not enter sleep and go to below of pm API, will reboot by core_6f = 0x20.
                                             //deep retention also had this issue, but not to reboot.
     DEEPSLEEP_MODE_RET_SRAM_LOW32K  = 0x01, //for boot from sram
@@ -81,7 +81,7 @@ typedef enum
     DEEPSLEEP_MODE_RET_SRAM_LOW256K = 0x0f, //for boot from sram
     DEEPSLEEP_MODE_RET_SRAM_LOW384K = 0x1f, //for boot from sram
     //not available mode
-    DEEPSLEEP_RETENTION_FLAG        = 0x0F,
+    DEEPSLEEP_RETENTION_FLAG        = 0x1F,
 } pm_sleep_mode_e;
 
 /**
@@ -284,7 +284,7 @@ static _always_inline void pm_set_wakeup_src(pm_sleep_wakeup_src_e wakeup_src)
 #if PM_FUNCTION_SUPPORT
 /**
  * @brief       This function configures a GPIO pin as the wakeup pin.
- * @param[in]   pin - the pins can be set to all GPIO except PB0/PC5 and GPIOG groups.
+ * @param[in]   pin - the pins can be set to all GPIO except GPIOD and GPIOI groups.
  * @param[in]   pol - the wakeup polarity of the pad pin(0: low-level wakeup, 1: high-level wakeup).
  * @param[in]   en  - enable or disable the wakeup function for the pan pin(1: enable, 0: disable).
  * @return      none.
