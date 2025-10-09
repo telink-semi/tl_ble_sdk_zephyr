@@ -165,7 +165,7 @@ void blc_readFlashSize_autoConfigCustomFlashSector(void)
 }
 
 #if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || \
-    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X))
+    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X)|| (MCU_CORE_TYPE == CHIP_TYPE_TL322X))
 /**
  * @brief      This function serves to update rf frequency offset.
  * @param[in]  velfrom - the calibration value from flash or otp.
@@ -302,7 +302,7 @@ void blc_app_loadCustomizedParameters_normal(void)
     // Check if flash sector for calibration is valid
     if (flash_sector_calibration) {
 #if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || \
-    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X))
+    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X) || MCU_CORE_TYPE == MCU_CORE_TL322X)
         // Load RF frequency offset calibration
         user_calib_freq_offset(USER_CALIB_FROM_FLASH, (flash_sector_calibration + CALIB_OFFSET_CAP_INFO));
 #endif

@@ -51,6 +51,8 @@
 #define HCI_EVT_AUTH_PAYLOAD_TIMEOUT_EXPIRED  0x57
 #define HCI_EVT_HT_ERR_FLAG                   0xF0
 
+#define HCI_EVT_LE_VENDOR                     0xFF
+
 //HDT EVENT CODE
 #define HCI_EVT_ENCRYPTION_CHANGE_V3                                  0xFC //core_6.x higher data throughput
 #define HCI_EVT_ENCRYPTION_KEY_REFRESH_COMPLETE_V2                    0xFB //core_6.x higher data throughput

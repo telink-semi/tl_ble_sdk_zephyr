@@ -268,14 +268,16 @@ void tlksdk_pm_setDeepsleepRetentionType(pm_sleep_mode_e sleep_type);
  * @return  none
  */
 void tlksdk_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
-void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
+//void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
+#define blc_pm_setAppWakeupLowPower(wakeup_tick, enable)    tlksdk_pm_setAppWakeupLowPower(wakeup_tick, enable)
 /**
  * @brief   for user to register the callback for application wake up low power mode process
  * @param   cb - the pointer of callback function
  * @return  none.
  */
 void tlksdk_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
-void blc_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
+//void blc_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
+#define blc_pm_registerAppWakeupLowPowerCb(cb)  tlksdk_pm_registerAppWakeupLowPowerCb(cb)
 
 /**
  * @brief   Check the system's readiness and put the CPU into sleep for entering Power Management (PM) mode.

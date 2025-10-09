@@ -21,6 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+ #include "user_config.h"
 #ifdef MCU_STARTUP_FLASH
 /**
  * @brief   Set "DP_THROUGH_SWIRE_DIS" as "1" to disable the "dp_through_swire" function. Set "DP_THROUGH_SWIRE_DIS" as "0" to enable the "dp_through_swire" function.
@@ -59,7 +60,7 @@
 #define SRAM_384K      0 //256K SRAM, all-Retention
 #define SRAM_256K      1 //384K SRAM, all-Retention
 
-#if (defined(__PROJECT_SNIF_SUB_NODE__) || defined(__PROJECT_SNIF_FOB_NODE__))
+#if (__PROJECT_SNIF_SUB_NODE__) || (__PROJECT_SNIF_FOB_NODE__)
     #define SRAM_SIZE  SRAM_256K
 #else
     #define SRAM_SIZE  SRAM_384K
@@ -72,12 +73,12 @@
         .equ __N22_IRAM_SIZE,    4 //128KB
         .equ __N22_DRAM_SIZE,    1 //32KB
     #else
-        #if defined(__PROJECT_SNIF_SUB_NODE__) && (__PROJECT_SNIF_SUB_NODE__ == 1)
+        #if (__PROJECT_SNIF_SUB_NODE__ == 1)
             .equ __D25F_IRAM_SIZE,   5 //160KB
             .equ __D25F_DRAM_SIZE,   3 //96KB
             .equ __N22_IRAM_SIZE,    0
             .equ __N22_DRAM_SIZE,    0
-        #elif defined(__PROJECT_SNIF_FOB_NODE__) && (__PROJECT_SNIF_FOB_NODE__ == 1)
+        #elif (__PROJECT_SNIF_FOB_NODE__ == 1)
             .equ __D25F_IRAM_SIZE,   4 //128KB
             .equ __D25F_DRAM_SIZE,   4 //128KB
             .equ __N22_IRAM_SIZE,    0
@@ -127,11 +128,30 @@
 _RESET_ENTRY:
     j        _START
     //free the 6th ~ 7th byte to store the crc type of the bin file
+
+    //2th ~ 5th bytes to store firmware version of the bin file
+#if BLE_OTA_SERVER_ENABLE
+    #ifdef FIRMWARE_VERSION_U16
+        .if FIRMWARE_VERSION_U16 < 0 || FIRMWARE_VERSION_U16 > 0xFFFF
+            .error "FIRMWARE_VERSION_U16 is not a 16-bit unsigned integer!"
+        .endif
+        .org 0x2
+        .half FIRMWARE_VERSION_U16
+    #endif
+#endif
+
     /* This configuration is specifically for RF_Certification and does not need to be enabled for other scenarios */
 #ifdef RF_CERTIFICATION_CGF_EN
     .org 0x10
     .word(_RF_CERTIFICATION_CFG_ADDR_OFFSET)
 #endif
+
+/* used to check flash protection function consistency between the old and new  firmware when OTA upgrading */
+#if APP_FLASH_PROTECTION_ENABLE
+    .org 0x15    //correspond to "FIRMWARE_FLASH_PROTECTION_FLAG_ADDR" in mcu_boot.h
+    .byte (0x5A)
+#endif
+
     .org 0x18
     .word (BIN_SIZE)
 

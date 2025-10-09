@@ -48,7 +48,7 @@ SECTIONS
     
     . = ALIGN(8);
     .ram_code   : AT( ALIGN(LOADADDR (.retention_data) + SIZEOF (.retention_data),8)) 
-        { KEEP(*(.ram_code )) }
+        {  }
     PROVIDE (_RAMCODE_VMA_END = .);
     PROVIDE (_RAMCODE_VMA_START = ADDR(.ram_code));
     PROVIDE (_RAMCODE_LMA_START = LOADADDR(.ram_code));
@@ -64,7 +64,7 @@ SECTIONS
     
     . = ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8);
     .text           : AT(ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8)) 
-        { *(.text .stub .text.* .gnu.linkonce.t.* ) KEEP(*(.text.*personality* )) *(.gnu.warning )  }
+        { KEEP(*(.ram_code )) *(.text .stub .text.* .gnu.linkonce.t.* ) KEEP(*(.text.*personality* )) *(.gnu.warning )  }
     .rodata         : AT(ALIGN(LOADADDR (.text) + SIZEOF (.text), ALIGNOF(.rodata))) 
         { *(.rodata .rodata.* .gnu.linkonce.r.* )}
     .eh_frame_hdr   : AT(ALIGN(LOADADDR (.rodata) + SIZEOF (.rodata), ALIGNOF(.eh_frame_hdr)))

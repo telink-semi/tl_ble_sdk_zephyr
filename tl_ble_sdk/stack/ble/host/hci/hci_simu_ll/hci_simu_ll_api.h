@@ -67,6 +67,13 @@ void blc_ll_initBasicMCU(void);
 void blc_ll_initStandby_module(u8 *public_adr);
 
 
+/**
+ * @brief      this function is used to set the LE Public Device Address in the Controller
+ * @param[in]  *randomAddr -  Public Device Address
+ * @return     status, 0x00:  succeed
+ *                     other: failed
+ */
+ble_sts_t blc_ll_writeBDAddr(u8 *addr);
 
 /**
  * @brief      this function is used to set the LE Random Device Address in the Controller

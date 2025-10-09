@@ -56,3 +56,8 @@
 #elif(CHIP_TYPE == CHIP_TYPE_TL322X)
     #define MCU_CORE_TYPE   MCU_CORE_TL322X
 #endif
+
+#ifdef TLK_ONLY_BLE_HOST
+    #define TLK_MESSAGE_D25F    1
+    #define TLK_MESSAGE_N22     0
+#endif

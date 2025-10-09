@@ -88,9 +88,9 @@
  */
 #ifndef TLKAPI_DEBUG_UART_TX_PIN
     #ifdef MCU_CORE_N22_ENABLE
-        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PE0
+        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PD0
     #else
-        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PG1
+        #define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PD1
     #endif
 #endif
 
@@ -98,7 +98,7 @@
  * @brief   debug UART RX pin selection, user can change in app_config.h
  */
 #ifndef TLKAPI_DEBUG_UART_RX_PIN
-#define TLKAPI_DEBUG_UART_RX_PIN                    GPIO_FC_PG0
+#define TLKAPI_DEBUG_UART_RX_PIN                    GPIO_FC_PD2
 #endif
 
 
@@ -106,7 +106,7 @@
  * @brief   debug UART baudrate definition, user can change in app_config.h
  */
 #ifndef TLKAPI_DEBUG_UART_BAUDRATE
-#define TLKAPI_DEBUG_UART_BAUDRATE                  2000000
+#define TLKAPI_DEBUG_UART_BAUDRATE                  1000000
 #endif
 
 
@@ -135,4 +135,4 @@ void uart_debug_init(void);
  */
 void uart_debug_prepare_dma_data(unsigned char * addr, unsigned int len);
 
-#endif /* DRIVERS_TL721X_EXT_DRIVER_EXT_UART_H_ */
+#endif /* DRIVERS_TL322X_EXT_DRIVER_EXT_UART_H_ */

@@ -32,7 +32,8 @@
 #include "mcu_boot.h"
 #include "ext_hci_uart.h"
 #include "ext_flash.h"
-
+#include "ext_mailbox.h"
+#include "ext_adc.h"
 
 
 

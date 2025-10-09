@@ -53,9 +53,20 @@ typedef enum
     HCI_TELINK_READ_MAX_TX_FIFI_NUM      = 0x0b,
     HCI_TELINK_READ_TX_FIFI_NUM          = 0x0c,
 
+    HCI_TELINK_CONFIG_BLE_LEG_ADV_ADDR       = 0x0d,
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM       = 0x0e,
+
     HCI_EBQ_TEST_CASE_LOG = 0xE2,        //EBQ log case name and timestamp
     HCI_TELINK_VENDOR_MAX_CBC
 } hci_vendor_cab_e;
+
+
+typedef enum
+{
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_FIFO          = 0x01,
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_INTERVAL       = 0x02,
+
+} hci_vendor_read_con_param_e;
 
 //HCI VS Command (future use)
 //-- OGF --

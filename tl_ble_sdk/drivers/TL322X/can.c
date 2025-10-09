@@ -1218,7 +1218,7 @@ unsigned char canfd_read_rx_mb(can_chn_e chn,unsigned char mb_index,can_fd_frame
         }
 
         /* Read free-running timer to unlock Rx Message Buffer. */
-        (void)reg_can_timer(chn);
+        //(void)reg_can_timer(chn);  // BLE SDK Remove
 
         if (CAN_RX_MB_FULL == rx_code)
         {

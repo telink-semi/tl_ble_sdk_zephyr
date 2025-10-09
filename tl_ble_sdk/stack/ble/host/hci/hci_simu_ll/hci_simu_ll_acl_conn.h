@@ -45,7 +45,7 @@ ble_sts_t blc_ll_updateConnection(u16 connHandle, conn_inter_t conn_min, conn_in
 
 
 /**
- * @brief      for user to initialize ACL connection module, this is must if user want use ACL master role or ACL slave role.
+ * @brief      for user to initialize ACL connection module, this is must if user want use ACL central role or ACL peripheral role.
  * @param      none
  * @return     none
  */
@@ -85,13 +85,13 @@ ble_sts_t blc_ll_initAclPeriphrTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number
 
 
 /**
- * @brief      This function is used to configure the number of master and slave connections that the protocol stack can support.
- * @param[in]  max_master_num - Number of master ACL connections supported.
- * @param[in]  max_slave_num - Number of slave ACL connections supported.
+ * @brief      This function is used to configure the number of central and peripheral connections that the protocol stack can support.
+ * @param[in]  max_central_num - Number of central ACL connections supported.
+ * @param[in]  max_peripheral_num - Number of peripheral ACL connections supported.
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t blc_ll_setMaxConnectionNumber(int max_master_num, int max_slave_num);
+ble_sts_t blc_ll_setMaxConnectionNumber(int max_central_num, int max_peripheral_num);
 
 /**
  * @brief      This function is used to obtain the currently available TX FIFO numbers according to the ACL handle.
@@ -102,12 +102,21 @@ u8 blc_ll_getTxFifoNumber(u16 connHandle);
 
 
 /**
- * @brief      This function is used to obtain the number of ACL connections of the Slave role.
+ * @brief      This function is used to obtain the number of ACL connections of the peripheral role.
  * @param[in]  none.
- * @return     The number of currently connected slave ACLs.
+ * @return     The number of currently connected peripheral ACLs.
  */
 int blc_ll_getCurrentPeripheralRoleNumber(void);
 
 
 ble_sts_t blc_ll_disconnect(u16 connHandle, u8 reason);
+
+
+/**
+ * @brief      for user to read current ACL connection interval
+ * @param[in]  connHandle - ACL connection handle.
+ * @return     0    :  connHandle invalid, not match a connection
+ *             other:  connection interval, unit: 1.25mS
+ */
+u16 blc_ll_getAclConnectionInterval(u16 connHandle);
 
