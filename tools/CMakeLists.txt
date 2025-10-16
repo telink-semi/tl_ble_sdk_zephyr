@@ -66,6 +66,13 @@ zephyr_compile_options(
         -DDUAL_CORE_MODE_ENABLED=1
 )
 endif()
+
+if(CONFIG_TELINK_TL322X_ENABLE_N22 AND CONFIG_PM)
+	zephyr_compile_definitions(
+		-DBLE_APP_PM_ENABLE=1
+	)
+endif()
+
 file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/error_handler/*.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/*.c
