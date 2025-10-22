@@ -39,6 +39,7 @@ zephyr_compile_definitions(
 	-DSTACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION=0
 	-DSTACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2=0
 	-DBLC_PM_RETENTION_DRIVERS_ONLY=1
+	-DRF_RX_DCOC_SOFTWARE_CAL_EN=0
 )
 
 if(CONFIG_PM)
@@ -174,6 +175,8 @@ if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
 	if(CONFIG_SOC_RISCV_TELINK_TL322X)
 		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb0hw.c)
+	elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
+		message(STATUS "no usbhw module for TELINK_TL323X")
 	else()
 		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
 	endif()

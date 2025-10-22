@@ -325,6 +325,8 @@
     #elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
        #define BOARD_SELECT BOARD_322X_EVK_C1T371A20
        //#define BOARD_SELECT BOARD_322X_EVK_C1T382A102
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
+        #define BOARD_SELECT BOARD_323X_EVK_C1T388A20
     #else
         #error "SDK do not support this MCU!"
     #endif
