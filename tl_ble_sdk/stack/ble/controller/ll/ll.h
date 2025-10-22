@@ -47,7 +47,8 @@ typedef enum
     BLT_EV_FLAG_SLEEP_ENTER,
     BLT_EV_FLAG_SUSPEND_EXIT,
     BLT_EV_FLAG_KEY_MISSING,
-
+    BLT_EV_FLAG_WFI_ENTER,
+    BLT_EV_FLAG_WFI_EXIT,
     BLT_EV_MAX_NUM,
 } blt_ev_flag_t;
 
@@ -108,6 +109,15 @@ void blc_ll_initStandby_module(u8 *public_adr);
  *                     other: failed
  */
 ble_sts_t blc_ll_readBDAddr(u8 *addr);
+
+
+/**
+ * @brief      this function is used to set the LE Public Device Address in the Controller
+ * @param[in]  *randomAddr -  Public Device Address
+ * @return     status, 0x00:  succeed
+ *                     other: failed
+ */
+ble_sts_t blc_ll_writeBDAddr(u8 *addr);
 
 
 /**
