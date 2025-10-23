@@ -56,25 +56,48 @@ void blc_app_setDeepsleepRetentionSramSize(void)
         ".option pop\n"
     );
     #endif
+    #if (MCU_CORE_TYPE == MCU_CORE_TL322X)      //todo-jk: deepRet size for Condor in not set automatically yet, because D25F should konw N22 usage.
+        #if defined(TLK_ONLY_BLE_HOST)          //todo-jk: design dual-core/single-core unified code.
+    if (1) {
+        blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW384K);
+        tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 348K\r\n");
+        return;
+    }
+        #endif
+    #endif //#if (MCU_CORE_TYPE == MCU_CORE_TL322X)
     if (deepret_size <= 0x8000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW32K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 32K\r\n");
-    } else if (deepret_size <= 0x10000) {
+    }
+#if (MCU_CORE_TYPE != MCU_CORE_TL323X)
+    else if (deepret_size <= 0x10000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW64K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 64K\r\n");
     }
-    #if ((MCU_CORE_TYPE == MCU_CORE_B92) || (MCU_CORE_TYPE == MCU_CORE_TL321X))
+#endif /* MCU_CORE_TYPE != MCU_CORE_TL323X */
+    #if ((MCU_CORE_TYPE == MCU_CORE_B92) || (MCU_CORE_TYPE == MCU_CORE_TL321X) || (MCU_CORE_TYPE == MCU_CORE_TL323X))
     else if (deepret_size <= 0x18000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW96K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 96K\r\n");
     }
-    #endif //#if ((MCU_CORE_TYPE == MCU_CORE_B92) || (MCU_CORE_TYPE == MCU_CORE_TL321X) )
+    #endif //#if ((MCU_CORE_TYPE == MCU_CORE_B92) || (MCU_CORE_TYPE == MCU_CORE_TL321X)  || (MCU_CORE_TYPE == MCU_CORE_TL323X) )
 
     #if (MCU_CORE_TYPE == MCU_CORE_TL721X)
     else if (deepret_size <= 0x20000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW128K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 128K\r\n");
-    } else if (deepret_size <= 0x40000) {
+    }
+    #endif //#if (MCU_CORE_TYPE == MCU_CORE_TL721X)
+
+    #if (MCU_CORE_TYPE == MCU_CORE_TL323X)
+    else if (deepret_size <= 0x28000) {
+        blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW160K);
+        tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 128K\r\n");
+    }
+    #endif
+
+    #if (MCU_CORE_TYPE == MCU_CORE_TL721X)
+    else if (deepret_size <= 0x40000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW256K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 256K\r\n");
     }

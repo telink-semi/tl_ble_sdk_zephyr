@@ -383,9 +383,12 @@ _attribute_ram_code_sec_noinline_ void tlkapi_send_str_data(char *str, u8 *pData
     printf("%s%s", str, temp_str);
 
 #elif (TLKAPI_DEBUG_ENABLE)
-    if (data_len > TLKAPI_DEBUG_FIFO_SIZE) {
-        return;
-    }
+    #if (0)
+        /* No need. The following already has length truncation. */
+        if (data_len > TLKAPI_DEBUG_FIFO_SIZE) {
+            return;
+        }
+    #endif
 
     tlkapi_debug_handler();
 
@@ -632,9 +635,9 @@ int tlk_printf(const char *format, ...)
     va_start(args, format);
 
     if (tlkDbgCtl.dbg_chn == TLKAPI_DEBUG_CHANNEL_UDB) {
-        ret = vsnprintf((char *)(pd + 9 + 6), TLKAPI_DEBUG_FIFO_SIZE, format, args);
+        ret = vsnprintf((char *)(pd + 9 + 6), tlkDbgCtl.fifo_data_len, format, args);
     } else {
-        ret = vsnprintf((char *)(pd + 4 + 6), TLKAPI_DEBUG_FIFO_SIZE, format, args);
+        ret = vsnprintf((char *)(pd + 4 + 6), tlkDbgCtl.fifo_data_len, format, args);
     }
 
     va_end(args);

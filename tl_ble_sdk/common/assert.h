@@ -66,9 +66,11 @@
     #define _STRINGIFY(x) #x
 #endif
 
-#ifndef STRINGIFY
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+# ifndef STRINGIFY
     #define STRINGIFY(x) _STRINGIFY(x)
-#endif
+# endif /* STRINGIFY */
+#endif /* BLC_ZEPHYR_BLE_INTEGRATION */
 
 #ifdef __GNUC__
     #define COMPILE_MESSAGE(x) _Pragma(#x)

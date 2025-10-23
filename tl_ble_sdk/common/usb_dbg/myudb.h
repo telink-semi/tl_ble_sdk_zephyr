@@ -90,10 +90,12 @@ void usb_send_str_u32s(char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 
 //#define           log_uart(d)             uart_send_byte_dma(0,d)
 
-#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
-#define log_uart(d) (reg_usb_ep8_dat = d)
+#if (MCU_CORE_TYPE != MCU_CORE_TL322X && MCU_CORE_TYPE != MCU_CORE_TL323X)
+    #define log_uart(d) (reg_usb_ep8_dat = d)
+#elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
+    #define log_uart(d) do { (void)(d); } while (0)
 #else
-#define log_uart(d) (reg_usb1_ep8_dat = d)
+    #define log_uart(d) (reg_usb1_ep8_dat = d)
 #endif
 
 #define DEBUG_PORT          GPIO_PB2

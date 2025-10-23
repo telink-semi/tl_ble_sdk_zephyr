@@ -373,6 +373,8 @@
 
 #elif (BOARD_SELECT == BOARD_322X_EVK_C1T371A20)
     #include "boards/TL322X_C1T371A20.h"
+#elif (BOARD_SELECT == BOARD_323X_EVK_C1T388A20)
+     #include "boards/TL323X_C1T388A20.h"
 #endif
 
 
