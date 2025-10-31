@@ -57,7 +57,9 @@ queue_sts_t queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc)
   * @param[in]   pItem  - The payload of the new element
   * @return      Status
   */
+#if (!ESL_RAM_OPTIMIZATION)
 _attribute_ram_code_
+#endif //(!ESL_RAM_OPTIMIZATION)
     queue_sts_t
     queue_enq(queue_t *pQueue, queue_item_t *pItem)
 {
@@ -128,7 +130,10 @@ _attribute_ram_code_
  * @param[in]   pQueue - The specified queue
  * @return      Pointer to first element in the queue
  */
-_attribute_ram_code_ queue_item_t *queue_deq(queue_t *pQueue)
+#if (!ESL_RAM_OPTIMIZATION)
+_attribute_ram_code_
+#endif //(!ESL_RAM_OPTIMIZATION)
+queue_item_t *queue_deq(queue_t *pQueue)
 {
     queue_item_t *pItem = NULL;
     u32           r     = irq_disable();

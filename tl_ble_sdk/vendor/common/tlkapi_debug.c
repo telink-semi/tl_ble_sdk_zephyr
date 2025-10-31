@@ -236,17 +236,17 @@ int tlkapi_debug_init(void)
     #else
 
         #if (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_GSUART)
-    tlkDbgCtl.dbg_chn   = TLKAPI_DEBUG_CHANNEL_GSUART;
-    sTlkApiDebugBitIntv = SYSTEM_TIMER_TICK_1S / TLKAPI_DEBUG_GSUART_BAUDRATE;
-    gpio_set_gpio_en(TLKAPI_DEBUG_GPIO_PIN);
-    gpio_set_up_down_res(TLKAPI_DEBUG_GPIO_PIN, GPIO_PIN_PULLUP_1M);
-    gpio_set_output_en(TLKAPI_DEBUG_GPIO_PIN, 1);
-    gpio_write(TLKAPI_DEBUG_GPIO_PIN, 1);
+            tlkDbgCtl.dbg_chn   = TLKAPI_DEBUG_CHANNEL_GSUART;
+            sTlkApiDebugBitIntv = SYSTEM_TIMER_TICK_1S / TLKAPI_DEBUG_GSUART_BAUDRATE;
+            gpio_set_gpio_en(TLKAPI_DEBUG_GPIO_PIN);
+            gpio_set_up_down_res(TLKAPI_DEBUG_GPIO_PIN, GPIO_PIN_PULLUP_1M);
+            gpio_set_output_en(TLKAPI_DEBUG_GPIO_PIN, 1);
+            gpio_write(TLKAPI_DEBUG_GPIO_PIN, 1);
         #elif (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_UART)
-    tlkDbgCtl.dbg_chn = TLKAPI_DEBUG_CHANNEL_UART;
+            tlkDbgCtl.dbg_chn = TLKAPI_DEBUG_CHANNEL_UART;
 
-    tlkDbgCtl.uartSendIsBusy = 0;
-    uart_debug_init();
+            tlkDbgCtl.uartSendIsBusy = 0;
+            uart_debug_init();
         #endif
 
         #if (TLKAPI_USE_INTERNAL_SPECIAL_UART_TOOL)

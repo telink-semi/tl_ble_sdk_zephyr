@@ -269,6 +269,46 @@ static inline void usb0hw_clear_gintsts(usb_gintsts_e status)
 }
 
 /**
+ * @brief      This function servers to disable usb pcgc clk
+ * @return     None.
+ *
+ */
+static inline void usb0hw_pcgc_clk_dis(void)
+{
+    reg_usb_pcgcctl |= FLD_USB_PCGCCTL_STOPPCLK | FLD_USB_PCGCCTL_PWRCLMP;
+}
+
+/**
+ * @brief      This function servers to enable usb pcgc clk
+ * @return     None.
+ *
+ */
+static inline void usb0hw_pcgc_clk_en(void)
+{
+    reg_usb_pcgcctl &= ~(FLD_USB_PCGCCTL_STOPPCLK | FLD_USB_PCGCCTL_PWRCLMP);
+}
+
+/**
+ * @brief      This function servers to disable usb phy pll clk
+ * @return     None.
+ *
+ */
+static inline void usb0hw_phy_pll_dis(void)
+{
+    reg_usb_usbphy_ct &= ~FLD_USB_USBPHYCT_RELEASE_AUDO;
+}
+
+/**
+ * @brief      This function servers to enable usb phy pll clk
+ * @return     None.
+ *
+ */
+static inline void usb0hw_phy_pll_en(void)
+{
+    reg_usb_usbphy_ct |= FLD_USB_USBPHYCT_RELEASE_AUDO;
+}
+
+/**
  * @brief      This function servers to flush the TX FIFO.
  * 
  * @param[in]  ep_num - endpoint number.

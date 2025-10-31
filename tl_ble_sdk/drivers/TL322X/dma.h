@@ -48,7 +48,7 @@ typedef enum
     DMA4,
     DMA5,
     DMA6,
-    DMA7, // BLE Sniffer SDK use
+    DMA7,
 
     DMA8,
     DMA9,

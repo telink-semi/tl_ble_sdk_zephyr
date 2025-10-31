@@ -239,33 +239,33 @@ typedef enum
     LIN_ACTION_TX   = 0,
     LIN_ACTION_RX   = 1,
     LIN_ACTION_NONE = 2
-} test_lin_action_type_e;
+} lin_action_type_e;
 
-struct test_lin_frame_item_t;
-typedef struct test_lin_frame_item_t test_lin_frame_item_t, *test_lin_frame_item_t_ptr;
+struct lin_frame_item_t;
+typedef struct lin_frame_item_t lin_frame_item_t, *lin_frame_item_t_ptr;
 
-struct test_lin_schedule_t;
-typedef struct test_lin_schedule_t test_lin_schedule_t, *test_lin_schedule_t_ptr;
+struct lin_schedule_t;
+typedef struct lin_schedule_t lin_schedule_t, *lin_schedule_t_ptr;
 
-struct test_lin_schedule_t
+struct lin_schedule_t
 {
-    test_lin_schedule_t_ptr   next_proc_schedule;
-    test_lin_frame_item_t_ptr frame_list;
+    lin_schedule_t_ptr   next_proc_schedule;
+    lin_frame_item_t_ptr frame_list;
     unsigned char             item_cnt;
     unsigned char             item_index;
 };
 
 typedef void (*LIN_CALLBACK_FUNC)(void *para);
 
-struct test_lin_frame_item_t
+struct lin_frame_item_t
 {
-    test_lin_action_type_e  action;
+    lin_action_type_e  action;
     unsigned char           id;
     unsigned char           len;
     unsigned char           data[10];
     unsigned char           checksum_type;
     unsigned char           slot_cnt;
-    test_lin_schedule_t_ptr conflict_proc_schedule;
+    lin_schedule_t_ptr conflict_proc_schedule;
     LIN_CALLBACK_FUNC       callback_func;
 };
 
@@ -310,16 +310,39 @@ static inline void lin_clr_irq_mask(lin_handle_t_ptr handle, unsigned short mask
 }
 
 /**
+ * @brief      This function serves to get the irq status of LIN controller.
+ * @param[in]  handle - operation handle.
+ * @return     irq status.
+ */
+static inline unsigned short lin_get_irq_status(lin_handle_t_ptr handle)
+{
+    if (handle->init_flag) {
+        return reg_lin_status(handle->lin_num);
+    }
+    return  0;
+}
+
+/**
  * @brief      This function serves to clear the status of LIN controller.
  * @param[in]  handle - operation handle.
  * @param[in]  mask - the mask value.
  * @return     none.
  */
-static inline void lin_clr_status(lin_handle_t_ptr handle, lin_irq_status_e mask)
+static inline void lin_clr_irq_status(lin_handle_t_ptr handle, lin_irq_status_e mask)
 {
     if (handle->init_flag) {
         reg_lin_status(handle->lin_num) = mask;
     }
+}
+
+/**
+ * @brief      This function serves to trigger the action of discarding frame response.
+ * @param[in]  lin_num - LIN0/LIN1.
+ * @return     none
+ */
+static inline void lin_set_response_discard(lin_num_e lin_num)
+{
+    reg_lin_cmd(lin_num) |= FLD_LIN_RESPONSE_DISCARD_W;
 }
 
 /**

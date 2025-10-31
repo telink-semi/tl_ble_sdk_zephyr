@@ -615,7 +615,7 @@ typedef enum
 } pem_gpio_group_task_type_e;
 
 /**
- *  @brief  Define pull up or down types
+ *  @brief  Define driving strength types
  */
 typedef enum
 {

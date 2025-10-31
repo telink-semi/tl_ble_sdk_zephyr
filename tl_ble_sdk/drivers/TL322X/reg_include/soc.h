@@ -319,11 +319,12 @@ enum
 
 enum
 {
-    FLD_USB_PWDN_I     = BIT(0),
+    FLD_USB1_PWDN_I    = BIT(0),
     FLD_GPIO_WAKEUP_I  = BIT(1),
     FLD_QDEC_RESUME    = BIT(2),
     FLD_KS_WAKEUP_I    = BIT(3),
     FLD_QDEC1_WAKEUP_I = BIT(4),
+    FLD_USB0_PWDN_I    = BIT(5),
     FLD_USB_RESUME     = BIT(6),
     FLD_STANDBY_EX     = BIT(7),
 };

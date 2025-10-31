@@ -26,6 +26,7 @@
 
 #define N22_FW_DOWNLOAD_FLASH_ADDR  0x20080000
 #define N22_FW_DOWNLOAD_NVM_ADDR    0x00500000
+#define N22_IRAM_STARTUP_ADDR       0x50000000
 
 /**
  * @brief  Default to D25F core if no MCU core is explicitly specified
@@ -35,10 +36,6 @@
 #define MCU_CORE_D25F_ENABLE        1
 #endif
 
-#if defined(TLK_ONLY_BLE_HOST)
-#undef PM_DEEPSLEEP_RETENTION_ENABLE
-#define PM_DEEPSLEEP_RETENTION_ENABLE 0
-#endif
 /**
  *  @brief  Keyboard Configuration
  */
@@ -207,9 +204,9 @@
 
 #if TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_GSUART
     #if MCU_CORE_D25F_ENABLE
-    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PB4
+    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PA6
     #elif MCU_CORE_N22_ENABLE
-    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PB5
+    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PA5
     #endif
     #define TLKAPI_DEBUG_GSUART_BAUDRATE 1000000
 #endif

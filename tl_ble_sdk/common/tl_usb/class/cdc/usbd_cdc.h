@@ -1,9 +1,9 @@
 /********************************************************************************************************
- * @file    comm.c
+ * @file    usbd_cdc.h
  *
- * @brief   This is the source file for TLSR/TL
+ * @brief   This is the header file for Telink RISC-V MCU
  *
- * @author  Bluetooth Group
+ * @author  Driver Group
  * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -21,24 +21,14 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#ifndef __USBD_CDC_H__
+#define __USBD_CDC_H__
 
-#ifndef STACK_MULTICORECOMM_COMM_H_
-#define STACK_MULTICORECOMM_COMM_H_
+#include "usb_cdc.h"
 
-#include "common/config/user_config.h"
-#include "tl_common.h"
-#ifndef TLK_MESSAGE_N22
-    #define TLK_MESSAGE_N22  0
+unsigned char usbd_cdc_interface_request_handler(unsigned char bus, usb_control_request_t const *setup, unsigned char setup_stage);
+WEAK void     usbd_cdc_get_line_coding(unsigned char bus, unsigned char intf, cdc_line_coding_t *line_coding);
+WEAK void     usbd_cdc_set_line_coding(unsigned char bus, unsigned char intf, cdc_line_coding_t *line_coding);
+WEAK void     usbd_cdc_set_line_state(unsigned char bus, unsigned char intf, bool dtr, bool rts);
+
 #endif
-
-#ifndef TLK_MESSAGE_D25F
-    #define TLK_MESSAGE_D25F 0
-#endif
-
-
-void tlk_multi_core_communication_init(void);
-
-
-void tlk_multi_core_communication_loop(void);
-
-#endif /* STACK_MULTICORECOMM_COMM_H_ */

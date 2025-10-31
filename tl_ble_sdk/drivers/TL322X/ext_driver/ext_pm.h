@@ -117,6 +117,8 @@ static inline int pm_get_mcu_status(void)
 {
 #if !defined(MCU_CORE_TL322X_N22)
     return g_pm_status_info.mcu_status;
+#else
+    return 0;
 #endif
 }
 
@@ -129,6 +131,8 @@ static inline int pm_get_wake_src(void)
 {
 #if !defined(MCU_CORE_TL322X_N22)
     return g_pm_status_info.wakeup_src;
+#else
+    return 0;
 #endif
 }
 

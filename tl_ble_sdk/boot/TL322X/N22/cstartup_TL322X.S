@@ -81,8 +81,26 @@ _RESET_ENTRY:
 
     .option pop
     .align 2
-    /* Move start reset from flash to sram */
+
 _START_INIT:
+    /* Enable I-Cache */                       //BLE SDK use
+    csrr    t0,  mcache_ctl
+    ori     t0,  t0,  1  #/I-Cache
+//    ori     t0,  t0,  2  //N22 does not have D-Cache
+    csrw    mcache_ctl,  t0
+    fence.i
+
+#if 0
+    // add debug, DBG_CHN6 GPIO_PG6 toggle
+    lui     t0, 0x80140
+    addi    t0, t0, 0x790
+    li      t1, 0xbf
+    li      t2, 0x40
+    sb      t1, 0x4D2(t0)       //0x80140c62  PG oen     =  0xbf    //0x80140c12  PB oen     =  0xef
+    sb      t2, 0x4D7(t0)       //0x80140c67  PG output toggle =  0x40    //0x80140c14  PB output  =  0x10
+#endif
+
+    /* Move start reset from flash to sram */
     la     t1, _START_LMA_START
     la     t2, _START_VMA_START
     la     t3, _START_VMA_END
@@ -144,10 +162,20 @@ _JUMP_TO_START:
     .option norelax
     .align 2
 
+    j       _START
     /* BLE SDK use: set to 0x24 */
     .org 0x24
 
 _START:
+#if 0
+    // add debug, DBG_CHN7 GPIO_PG4 toggle (Bug PG4\5\6\7 are used as GPIO Debug, should all be output)
+    lui     t0, 0x80140
+    addi    t0, t0, 0x790
+    li      t1, 0x0f
+    li      t2, 0x10
+    sb      t1, 0x4D2(t0)       //0x80140c62  PG oen     =  0x0f    //0x80140c12  PB oen     =  0xef
+    sb      t2, 0x4D7(t0)       //0x80140c67  PG output toggle =  0x10    //0x80140c14  PB output  =  0x10
+#endif
     /* Initialize global pointer */
     .option push
     .option norelax
@@ -181,13 +209,6 @@ _START:
     li      t1, 0x02
     sw      t1, 0x0(t0)      //(*(volatile unsigned long*)(0xe4000000))= 0x02
 #endif
-
-    /* Enable I/D-Cache */
-    csrr    t0,  mcache_ctl
-    ori     t0,  t0,  1  #/I-Cache
-    ori     t0,  t0,  2  #/D-Cache
-    csrw    mcache_ctl,  t0
-    fence.i
 
     /* Zero .bss section in sram */
 _ZERO_BSS:

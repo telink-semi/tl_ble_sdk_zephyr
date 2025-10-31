@@ -580,7 +580,7 @@ void adc_chn_config(adc_num_e sar_adc_num, adc_sample_chn_e chn, adc_chn_cfg_t *
 void adc_channel_sample_init(adc_num_e sar_adc_num,adc_mode_e mode,adc_sample_chn_e chn , adc_chn_cfg_t *cfg)
 {   
     if(mode == ADC_GPIO_MODE){
-        adc_pin_config(cfg->input_p >> 12);
+        adc_pin_config(cfg->input_p & 0xfff);
     }else if(mode == ADC_VBAT_MODE){
         cfg->input_n = ADC_GND_N;
         cfg->input_p = ADC_VBAT_P;
@@ -596,7 +596,7 @@ void adc_channel_sample_init(adc_num_e sar_adc_num,adc_mode_e mode,adc_sample_ch
 #endif
 
     if (cfg->input_n != ADC_GND_N) {
-        adc_pin_config(cfg->input_n >> 12);
+        adc_pin_config(cfg->input_n & 0xfff);
     }
 
     adc_chn_config(sar_adc_num, chn, cfg);

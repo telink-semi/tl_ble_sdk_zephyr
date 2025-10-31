@@ -71,7 +71,7 @@
 #if(__CHANNEL_SOUNDING_EN__)
     #define SRAM_SIZE      SRAM_512K
 #elif(__PROJECT_ESLP_AP_DEMO__)
-    #define SRAM_SIZE      SRAM_512K
+    #define SRAM_SIZE      SRAM_256K
 #else
     #define SRAM_SIZE      SRAM_128K
 #endif

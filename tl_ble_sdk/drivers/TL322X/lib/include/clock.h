@@ -108,10 +108,12 @@ typedef struct
  *  @brief  Define sys_clk_config_t struct.
  */
 typedef struct
-{
-    unsigned char cclk_cfg;      /* cpu clk cfg */
-    unsigned char hclk_pclk_cfg; /* hclk and pclk cfg */
-    unsigned char mspi_clk_cfg;  /* mspi_clk cfg */
+{   
+    unsigned char bbpll_input_divider;      /* bbpll input divider */
+    unsigned char bbpll_divider_control;    /* bbpll divider control */
+    unsigned char cclk_cfg;                 /* cpu clk cfg */
+    unsigned char hclk_pclk_cfg;            /* hclk and pclk cfg */
+    unsigned char mspi_clk_cfg;             /* mspi_clk cfg */
     unsigned char rc_24m_is_used;
     unsigned char bbpll_is_used;
 } sys_clk_config_t;
@@ -308,7 +310,7 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsigned i
  * @param[in]   div - the mspi clk source divider
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div);
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clk_src_config_e src, sys_clock_div_e div);
 
 /**
  * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK when the PLL is 240M.
@@ -319,7 +321,7 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clo
  * @param[in]   pclk_div - divider of PCLK.
  * @return      none
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div, sys_cclk_div_to_hclk_pclk_e hclk_pclk_div);
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_config(sys_clk_src_config_e src, sys_clock_div_e cclk_div, sys_cclk_div_to_hclk_pclk_e hclk_pclk_div);
 
 /**
  * @brief       This function use to set all clock to default. 

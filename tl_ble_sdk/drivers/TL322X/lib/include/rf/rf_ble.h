@@ -42,7 +42,7 @@
 #define rf_ble_dma_rx_offset_time_stamp(p)  (p[RF_BLE_DMA_RFRX_OFFSET_RFLEN] + 9)  //data len:4
 #define rf_ble_dma_rx_offset_freq_offset(p) (p[RF_BLE_DMA_RFRX_OFFSET_RFLEN] + 13) //data len:2
 #define rf_ble_dma_rx_offset_rssi(p)        (p[RF_BLE_DMA_RFRX_OFFSET_RFLEN] + 15) //data len:1, signed
-#define rf_ble_packet_length_ok(p)          (*((unsigned int *)p) ==(unsigned int)(p[5]+13))    //dma_len must 4 byte aligned
+#define rf_ble_packet_length_ok(p)          (*((unsigned int *)p) == p[5] + 13)    //dma_len must 4 byte aligned
 #define rf_ble_packet_crc_ok(p)             ((p[(p[5] + 5 + 11)] & 0x01) == 0x0)
 
 #define rf_set_ble_crc_value(crc)           rf_set_crc_init_value(crc)

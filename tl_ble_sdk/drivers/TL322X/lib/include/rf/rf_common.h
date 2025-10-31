@@ -44,7 +44,9 @@
  *     increases significantly during their first invocation.
  * (2) After the first execution, the calibration value is retained in the variable g_rf_dcoc1m_iq_code and g_rf_dcoc2m_iq_code
  * */
-#define RF_RX_DCOC_SOFTWARE_CAL_EN     1
+#ifndef RF_RX_DCOC_SOFTWARE_CAL_EN
+    #define RF_RX_DCOC_SOFTWARE_CAL_EN     1
+#endif /* RF_RX_DCOC_SOFTWARE_C */
 
 /**
  * @brief       This define for ble debug the effect of rx_dly.
@@ -66,7 +68,7 @@
 
 
 #ifndef FCAL_BASE_CHANNEL
-   #define FCAL_BASE_CHANNEL       6// 0~9 BLE SDK USE
+   #define FCAL_BASE_CHANNEL       4// 0~9 BLE SDK USE
 #endif
 /**
  *  @brief  RX fast settle time
@@ -198,7 +200,7 @@ typedef struct
 
 typedef struct
 {
-    unsigned short cal_tbl[8];
+    unsigned short cal_tbl[81];
     rf_ldo_trim_t  ldo_trim;
     rf_dcoc_cal_t  dcoc_cal;
     rf_rccal_cal_t rccal_cal;
@@ -1085,6 +1087,12 @@ int rf_set_trx_state(rf_status_e rf_status, signed char rf_channel);
  * @return      none.
  */
 void rf_update_internal_cap(unsigned char value);
+
+/**
+ * @brief       This function serves to close internal cap;
+ * @return      none.
+ */
+void rf_turn_off_internal_cap(void);
 
 /**
  * @brief       This function serve to change the length of preamble.

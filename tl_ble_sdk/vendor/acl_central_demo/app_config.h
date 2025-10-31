@@ -48,11 +48,7 @@
  *    be directly used on user's mass production application without any change. User should refer to sample code, understand the
  *    principles and methods, then change and implement a more appropriate mechanism according to their application if needed.
  */
-#if (MCU_CORE_TYPE == MCU_CORE_TL322X)
-    #define APP_FLASH_PROTECTION_ENABLE 0
-#else
-    #define APP_FLASH_PROTECTION_ENABLE 1
-#endif
+#define APP_FLASH_PROTECTION_ENABLE 1
 
 #if MCU_CORE_TYPE == MCU_CORE_TL322X
     #define PLIC_ENABLE           1
@@ -68,9 +64,9 @@
 #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
     #define BOARD_SELECT BOARD_721X_EVK_C1T315A20
 #elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
-    #define BOARD_SELECT BOARD_321X_EVK_C1T335A20 //BOARD_321X_EVK_C1T331A20
+    #define BOARD_SELECT BOARD_321X_EVK_C1T331A20 //BOARD_321X_EVK_C1T335A20
 #elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
-    #define BOARD_SELECT BOARD_322X_EVK_C1T382A20
+    #define BOARD_SELECT BOARD_322X_EVK_C1T371A20
 #endif
 
 

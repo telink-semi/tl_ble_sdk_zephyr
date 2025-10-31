@@ -31,7 +31,7 @@
 
 #if (CHIP_TYPE == CHIP_TYPE_TL322X)
 #if defined(HCI_INTERFACE) && defined(HCI_SHAREMEMORY) && (HCI_INTERFACE==HCI_SHAREMEMORY)
-#include"stack/multiCoreComm/service/service_shareMemory.h"
+#include"stack/multicore_comm/service/service_n22.h"
 #endif
 #endif
 
@@ -167,7 +167,7 @@ void HCI_TxHandler(void)
         #if (HCI_INTERFACE==HCI_UART)
             if (ext_hci_uartSendData(pBuf, len)) {
         #else
-            if(!tlk_n22_hci_send_message(TLK_SHARE_MEMOTY_MESSAGE_TYPE_BLE, pBuf, len)){
+            if(!mcc_n22_hci_send_msg(pBuf, len)){
         #endif
     #else
         if (ext_hci_uartSendData(pBuf, len)) {

@@ -1,10 +1,10 @@
 /********************************************************************************************************
- * @file    mailbox.h
+ * @file    service_d25f.h
  *
  * @brief   This is the source file for TLSR/TL
  *
- * @author  Bluetooth Group
- * @date    2024
+ * @author  BLE Group
+ * @date    2025
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
@@ -21,13 +21,41 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma once
-#define BTBLE_MAILBOX_TX_MAX_BLOCK_TIME_US (100 * 1000)
+#ifndef SERVICE_D25F_H__
+#define SERVICE_D25F_H__
 
-void tlk_mailbox_receive_hook(uint8_t* cmd);
+#include "stack/ble/ble.h"
+#include "../port/sharememory.h"
+#include "../port/mailbox.h"
+#include "mcc.h"
 
-void mailbox_send_data(uint8_t* data, uint32_t maxBlockTimeUs);
+#if TLK_MESSAGE_D25F
 
-bool mailbox_is_trans_busy(void);
+/* 
+ * @brief   D25F service initialization 
+ */
+void mcc_d25f_service_init(void);
 
-void mailbox_n22_to_d25_irq_handler(void);
+/* 
+ * @brief   Send HCI message to N22
+ * @param   data: pointer to the data to be sent
+ * @param   data_len: length of the data to be sent
+ * @return  status of the operation
+ */
+shm_fifo_status_e mcc_d25f_hci_send_msg(uint8_t *data, uint32_t data_len);
+
+/* 
+ * @brief   D25F main loop to process incoming messages
+ */
+void mcc_d25f_loop(void);
+
+void mcc_d25f_register_shm_recv_cb(tlk_shm_msg_type_e type, shm_recv_cb_t cb);
+
+void mcc_d25f_flash_start_operation_hook(void);
+
+void mcc_d25f_flash_post_operation_hook(void);
+
+void mcc_d25f_set_pm_info_addr(void);
+
+#endif /* TLK_MESSAGE_D25F */
+#endif /* SERVICE_D25F_H__ */

@@ -74,8 +74,8 @@
         .equ __N22_DRAM_SIZE,    1 //32KB
     #else
         #if (__PROJECT_SNIF_SUB_NODE__ == 1)
-            .equ __D25F_IRAM_SIZE,   5 //160KB
-            .equ __D25F_DRAM_SIZE,   3 //96KB
+            .equ __D25F_IRAM_SIZE,   6 //192KB
+            .equ __D25F_DRAM_SIZE,   2 //64KB
             .equ __N22_IRAM_SIZE,    0
             .equ __N22_DRAM_SIZE,    0
         #elif (__PROJECT_SNIF_FOB_NODE__ == 1)
@@ -91,16 +91,26 @@
         #endif
     #endif
 #elif (SRAM_SIZE == SRAM_384K)
-    #ifdef MCU_CORE_D25F_ENABLE
-        .equ __D25F_IRAM_SIZE,   2 //64KB
-        .equ __D25F_DRAM_SIZE,   3 //96KB
-        .equ __N22_IRAM_SIZE,    5 //160KB
-        .equ __N22_DRAM_SIZE,    2 //64KB
-    #else
+     #if defined(MCU_CORE_D25F_ENABLE) && defined(__CHANNEL_SOUNDING_EN__)
         .equ __D25F_IRAM_SIZE,   7 //224KB
         .equ __D25F_DRAM_SIZE,   5 //160KB
         .equ __N22_IRAM_SIZE,    0
         .equ __N22_DRAM_SIZE,    0
+    #elif defined(MCU_CORE_D25F_ENABLE) && defined(__2P4G_BLE_SC_KMD_EN__)
+        .equ __D25F_IRAM_SIZE,   7 //224KB
+        .equ __D25F_DRAM_SIZE,   5 //160KB
+        .equ __N22_IRAM_SIZE,    0
+        .equ __N22_DRAM_SIZE,    0
+    #elif defined(MCU_CORE_D25F_ENABLE) && defined(__2P4G_BLE_DC_KMD_EN__)
+        .equ __D25F_IRAM_SIZE,   3 //96KB
+        .equ __D25F_DRAM_SIZE,   2 //64KB
+        .equ __N22_IRAM_SIZE,    5 //160KB
+        .equ __N22_DRAM_SIZE,    2 //64KB
+    #else
+        .equ __D25F_IRAM_SIZE,   2 //128KB
+        .equ __D25F_DRAM_SIZE,   3 //96KBd
+        .equ __N22_IRAM_SIZE,    5 //96KB
+        .equ __N22_DRAM_SIZE,    2 //64KB
     #endif
 #endif
 

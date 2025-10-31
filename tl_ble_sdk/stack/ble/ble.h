@@ -30,6 +30,8 @@
 
 #ifndef TLK_ONLY_BLE_HOST
 #include "stack/ble/controller/ble_controller.h"
+#else
+#include "stack/pm/pm_sys.h"
 #endif
 
 #include "host/ble_host.h"

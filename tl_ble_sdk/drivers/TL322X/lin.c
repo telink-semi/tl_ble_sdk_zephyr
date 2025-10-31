@@ -597,16 +597,6 @@ static inline void lin_comm_send_header_act(lin_num_e lin_num)
 }
 
 /**
- * @brief      This function serves to trigger the action of discarding frame response.
- * @param[in]  lin_num - LIN0/LIN1.
- * @return     none
- */
-static inline void lin_set_response_discard(lin_num_e lin_num)
-{
-    reg_lin_cmd(lin_num) |= FLD_LIN_RESPONSE_DISCARD_W;
-}
-
-/**
  * @brief      This function serves to trigger the action of manually clearing the t-base counter.
  * @param[in]  lin_num - LIN0/LIN1.
  * @return     none
