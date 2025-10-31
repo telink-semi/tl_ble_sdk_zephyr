@@ -241,7 +241,7 @@ unsigned short adc_get_result(adc_transfer_mode_e transfer_mode, adc_sample_chn_
  * @return signed int Processed ADC result
  */
 signed int ext_adc_read_data(void) {
-    signed int adc_vol_mv_average = adc_get_resultadc_get_result(NDMA, ADC_M_CHANNEL, ADC_VOLTAGE);
+    signed int adc_vol_mv_average = adc_get_result(NDMA, ADC_M_CHANNEL, ADC_VOLTAGE);
     return adc_vol_mv_average;
 }
 

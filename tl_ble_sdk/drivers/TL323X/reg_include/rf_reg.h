@@ -1481,6 +1481,31 @@ enum
 };
 
 #define reg_rf_modem_sync_thres_ble REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x4e)
+#define reg_rf_modem_rx_auto0       REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x50)
+
+enum
+{
+    FLD_RF_BIT_AUTO        = BIT(0),
+    FLD_RF_SYMB_AUTO       = BIT(1),
+    FLD_RF_SYNC_AUTO       = BIT(2),
+    FLD_RF_DEC_AUTO        = BIT(3),
+    FLD_RF_VITDEC_AUTO     = BIT(4),
+    FLD_RF_GFSK_AUTO       = BIT(5),
+    FLD_RF_DCIQ_AUTO       = BIT(6),
+    FLD_RF_EDR_AUTO        = BIT(7),
+};
+
+#define reg_rf_modem_rx_auto1       REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x51)
+
+enum
+{
+    FLD_RF_EDR_DCOC_AUTO   = BIT(0),
+    FLD_RF_FREQ_COMP_AUTO  = BIT(1),
+    FLD_RF_AAF1_AUTO       = BIT(2),
+    FLD_RF_FIR1_AUTO       = BIT(3),
+    FLD_RF_EDR_FIR2_AUTO   = BIT(4),
+};
+
 #define reg_rf_modem_fdc_dbg_lat    REG_ADDR16(REG_TL_MODEM_BASE_ADDR + 0x58)
 #define reg_rf_modem_gain_lat0      REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x5c)
 

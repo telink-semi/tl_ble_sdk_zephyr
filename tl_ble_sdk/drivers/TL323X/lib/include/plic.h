@@ -159,7 +159,7 @@ extern _attribute_data_retention_sec_ volatile unsigned long g_plic_preempt_en;
 #define IRQ_UART1              18 /* UART1_IRQ, - uart1_irq_handler */
 #define IRQ_UART0              19 /* UART0_IRQ, - uart0_irq_handler */
 
-#define IRQ_I2C0               21 /* I2C0_IRQ, - i2c0_irq_handler */
+#define IRQ_I2C               21 /* I2C0_IRQ, - i2c0_irq_handler */
 #define IRQ_SKE                22 /* SKE_IRQ, - ske_irq_handler */
 #define IRQ_GSPI               23 /* GSPI_IRQ, - gspi_irq_handler */
 #define IRQ_USB_PWDN           24 /* USB_PWDN_IRQ: USB suspend interrupt, - usb_pwdn_irq_handler */

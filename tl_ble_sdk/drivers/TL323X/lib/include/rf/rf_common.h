@@ -1242,6 +1242,14 @@ void rf_fpga_set_chn(signed char chn);
  * @return      none.
  */
 void rf_turn_off_internal_cap(void);
+
+/**
+ * @brief      This function initializes zb-related components to ensure proper access to relevant registers after RF power-up.
+ * @return     None.
+ * @note       Call this function after the RF is powered on.
+ */
+void rf_zb_init(void);
+
 #endif
 
 
