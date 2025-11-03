@@ -204,7 +204,11 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+_attribute_text_sec_ void protected_sys_reboot(void);
+#else
 _attribute_text_sec_ void sys_reboot(void);
+#endif
 
 /**
  * @brief      This function reboot mcu.
@@ -234,5 +238,11 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
  * @note      This function can only used when cclk is 24M RC cause the function execution process will power down the 24M crystal.
  */
 _attribute_ram_code_sec_noinline_ void crystal_manual_settle(void);
+
+/**
+ * @brief      This function servers to reset and hold mcu.
+ * @return     none
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void sys_mcu_reset_hold(void);
 
 #endif
