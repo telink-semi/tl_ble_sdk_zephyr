@@ -26,7 +26,7 @@
 
 /******************************* platform code Use  *********************************/
 #define _attribute_ram_code_sec_            __attribute__((section(".ram_code")))
-#define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code_ble"))) __attribute__((noinline))
 
 #define _attribute_text_sec_                __attribute__((section(".text"))) __attribute__((noinline)) //Inlining happens when __attribute__((noinline)) is not added.
 #ifndef STD_GCC //standard open source risc-V GCC
