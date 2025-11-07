@@ -145,11 +145,7 @@ extern _attribute_data_retention_sec_ volatile unsigned long g_plic_preempt_en;
 #define IRQ_TIMER0             4  /* TIMER0_IRQ, - timer0_irq_handler */
 #define IRQ_DMA                5  /* DMA_IRQ_IRQ, - dma_irq_handler */
 #define IRQ_BMC                6  /* BMC_IRQ: ahb bus matrix controller interrupt, - bmc_irq_handler */
-#define IRQ_USB_CTRL_EP_SETUP  7  /* USB_SETUP_IRQ: USB setup interrupt, - usb_ctrl_ep_setup_irq_handler */
-#define IRQ_USB_CTRL_EP_DATA   8  /* USB_DATA_IRQ: USB data interrupt, - usb_ctrl_ep_data_irq_handler */
-#define IRQ_USB_CTRL_EP_STATUS 9  /* USB_STATUS_IRQ: USB status interrupt, - usb_ctrl_ep_status_irq_handler */
-#define IRQ_USB_CTRL_EP_SETINF 10 /* USB_SETINF_IRQ: USB set interface interrupt, - usb_ctrl_ep_setinf_irq_handler */
-#define IRQ_USB_ENDPOINT       11 /* USB_EDP_IRQ: USB edp (1-8) interrupt, - usb_endpoint_irq_handler */
+
 #define IRQ_UART3              12 /* UART3_IRQ, - uart3_irq_handler */
 #define IRQ_DC                 13 /* DC_IRQ, - dc_irq_handler */
 #define IRQ_UART2              14 /* UART3_IRQ, - uart2_irq_handler */
@@ -158,31 +154,29 @@ extern _attribute_data_retention_sec_ volatile unsigned long g_plic_preempt_en;
 #define IRQ_PKE                17 /* PKE_IRQ, - pke_irq_handler */
 #define IRQ_UART1              18 /* UART1_IRQ, - uart1_irq_handler */
 #define IRQ_UART0              19 /* UART0_IRQ, - uart0_irq_handler */
-
-#define IRQ_I2C               21 /* I2C0_IRQ, - i2c0_irq_handler */
+#define IRQ_LPD                20 /* LPD_IRQ, - lpd_irq_handler */
+#define IRQ_I2C                21 /* I2C0_IRQ, - i2c0_irq_handler */
 #define IRQ_SKE                22 /* SKE_IRQ, - ske_irq_handler */
 #define IRQ_GSPI               23 /* GSPI_IRQ, - gspi_irq_handler */
-#define IRQ_USB_PWDN           24 /* USB_PWDN_IRQ: USB suspend interrupt, - usb_pwdn_irq_handler */
+
 #define IRQ_QDEC1              25 /* QDEC1_IRQ, - qdec1_irq_handler */
 #define IRQ_UART4              26 /* UART4_IRQ, - uart4_irq_handler */
 #define IRQ_I2C1               27 /* I2C1_IRQ, - i2c1_irq_handler */
 #define IRQ_SOFT               28 /* SOFT_IRQ: software interrupt, - soft_irq_handler */
 #define IRQ_MSPI               29 /* MSPI_IRQ, - mspi_irq_handler */
-#define IRQ_USB_RESET          30 /* USB_RESET_IRQ: USB reset interrupt, - usb_reset_irq_handler */
-#define IRQ_USB_250US_OR_SOF   31 /* USB_250US_OR_SOF_IRQ: USB 250us or SOF interrupt, - usb_250us_or_sof_irq_handler */
+
 #define IRQ_RZ                 32 /* RZ_IRQ - rz_irq_handler */
-
 #define IRQ_QDEC0              33 /* QDEC0_IRQ, - qdec0_irq_handler */
-#define IRQ_GPIO_IRQ0           34 /* GPIO_IRQ0, - gpio_irq0_handler */
-#define IRQ_GPIO_IRQ1           35 /* GPIO_IRQ1, - gpio_irq1_handler */
-#define IRQ_GPIO_IRQ2           36 /* GPIO_IRQ2, - gpio_irq2_handler */
-#define IRQ_GPIO_IRQ3           37 /* GPIO_IRQ3, - gpio_irq3_handler */
-#define IRQ_GPIO_IRQ4           38 /* GPIO_IRQ4, - gpio_irq4_handler */
-#define IRQ_GPIO_IRQ5           39 /* GPIO_IRQ5, - gpio_irq5_handler */
-#define IRQ_GPIO_IRQ6           40 /* GPIO_IRQ6, - gpio_irq6_handler */
-#define IRQ_GPIO_IRQ7           41 /* GPIO_IRQ7, - gpio_irq7_handler */
+#define IRQ_GPIO_IRQ0          34 /* GPIO_IRQ0, - gpio_irq0_handler */
+#define IRQ_GPIO_IRQ1          35 /* GPIO_IRQ1, - gpio_irq1_handler */
+#define IRQ_GPIO_IRQ2          36 /* GPIO_IRQ2, - gpio_irq2_handler */
+#define IRQ_GPIO_IRQ3          37 /* GPIO_IRQ3, - gpio_irq3_handler */
+#define IRQ_GPIO_IRQ4          38 /* GPIO_IRQ4, - gpio_irq4_handler */
+#define IRQ_GPIO_IRQ5          39 /* GPIO_IRQ5, - gpio_irq5_handler */
+#define IRQ_GPIO_IRQ6          40 /* GPIO_IRQ6, - gpio_irq6_handler */
+#define IRQ_GPIO_IRQ7          41 /* GPIO_IRQ7, - gpio_irq7_handler */
 #define IRQ_TRNG               42 /* TRNG_IRQ, - trng_irq_handler */
-
+#define IRQ_HASH               43 /* HASH_IRQ, - hash_irq_handler */
 #define IRQ_PM_LVL             44 /* PM_LVL_IRQ: PM level interrupt, - pm_level_irq_handler */
 #define IRQ_PM_IRQ             45 /* PM_MIX_IRQ: PM mixed interrupt, - pm_irq_handler */
 /**
