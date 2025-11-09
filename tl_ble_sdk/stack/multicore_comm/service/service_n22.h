@@ -59,5 +59,8 @@ uint8_t mcc_n22_hci_is_tx_over_threshold(uint32_t percent);
 
 void mcc_n22_wakeup_d25f(void);
 
+void mcc_n22_mb_send_data(uint8_t cmd,uint8_t* data);
+
+shm_fifo_status_e mcc_n22_shm_send_msg(uint8_t *data, uint32_t data_len, tlk_shm_msg_type_e type);
 #endif /* TLK_MESSAGE_N22 */
 #endif /* SERVICE_N22_H__ */
