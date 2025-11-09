@@ -374,15 +374,7 @@ void usb0hw_write_ep_data(usb0_ep_e ep_num, unsigned char *buf, unsigned int len
         in_dma_desc[ep_num].non_iso_in.bs     = 0;
         in_dma_desc[ep_num].non_iso_in.tx_sts = 0;
         in_dma_desc[ep_num].non_iso_in.l      = 1;
-        if ((len % xfer_status[ep_num][USB0_DIR_IN].max_size == 0) && (usb0hw_get_epin_type(ep_num) != USB0_EP_TYPE_INTERRUPT))
-        {
-            in_dma_desc[ep_num].non_iso_in.sp = 1;
-        }
-        else
-        {
             in_dma_desc[ep_num].non_iso_in.sp = 0;
-        }
-
         in_dma_desc[ep_num].non_iso_in.ioc      = 1;
         in_dma_desc[ep_num].non_iso_in.tx_bytes = len;
     }
