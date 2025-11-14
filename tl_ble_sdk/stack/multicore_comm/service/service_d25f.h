@@ -57,5 +57,8 @@ void mcc_d25f_flash_post_operation_hook(void);
 
 void mcc_d25f_set_pm_info_addr(void);
 
+void mcc_d25f_mb_send_data(uint8_t cmd,uint8_t* data);
+
+shm_fifo_status_e mcc_d25f_shm_send_msg(uint8_t *data, uint32_t data_len, tlk_shm_msg_type_e type);
 #endif /* TLK_MESSAGE_D25F */
 #endif /* SERVICE_D25F_H__ */

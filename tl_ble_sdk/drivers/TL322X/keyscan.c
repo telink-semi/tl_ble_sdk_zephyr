@@ -14,6 +14,9 @@
  *
  *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *
+ *
+ *
  *          Unless required by applicable law or agreed to in writing, software
  *          distributed under the License is distributed on an "AS IS" BASIS,
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,12 +43,13 @@ dma_config_t keyscan_rx_dma_config =
         .src_burst_size = 0,                  //must 0
         .read_num_en    = 0,
         .priority       = 0,
-        .write_num_en   = 1,
+        .write_num_en   = 0,
         .auto_en        = 0, //must 0
 };
 
 volatile unsigned char g_keyscan_col_cnt = 0;
 volatile unsigned char g_keyscan_col[31] = {0};
+volatile ks_col_pull_type_e g_pull_type =0;
 
 unsigned int g_col_mask = 0x00;
 
@@ -272,6 +276,7 @@ void keyscan_set_martix(unsigned char *ks_row, unsigned char row_cnt, unsigned c
     for (i = 0; i < col_cnt; i++) {
         g_keyscan_col[i] = (ks_col[i]&(~BIT(5)));
     }
+    g_pull_type = ks_col_pull;
     keyscan_set_row((unsigned char *)ks_row, (unsigned char)row_cnt,ks_col_pull);
     keyscan_set_col((unsigned char *)ks_col, (unsigned char)col_cnt, ks_col_pull);
 }
@@ -371,7 +376,32 @@ void keyscan_init_clk_24m(ks_baud_rate_e baud_rate, ks_clk_src_e clk_src, unsign
     reg_ks_a_en0 |= FLD_KS_RXDONE_IE;
     //enable keyscan clk and set irq mask.If the mask bit is not enabled, the FLD_IRQ_KS status bit will not be set.
     BM_SET(reg_ks_en, FLD_KS_CLK_EN | FLD_KS_RESET);
-
-
 }
 
+/**
+ * @brief      This function serves to after keycsan operation, a power-saving  method that turns on and off as needed.
+ * @param[in]  ks_row       - The array element must be a member of the enumeration type ks_value_e.
+ * @param[in]  row_cnt      - Count of rows. Range is 1-8.
+ * @return     none
+ */
+ void keyscan_scan_enable(unsigned char *ks_row, unsigned char row_cnt)
+{
+     for (unsigned char i = 0; i < row_cnt; i++) {
+         gpio_set_up_down_res(keyscan_pin_map(ks_row[i]),(gpio_pull_type_e)(g_pull_type & 0x0f));
+     }
+    BM_SET(reg_ks_en, FLD_KS_EN);
+}
+
+/**
+ * @brief      This function serves to after keycsan operation, a power-saving  method that turns on and off as needed.
+ * @param[in]  ks_row       - The array element must be a member of the enumeration type ks_value_e.
+ * @param[in]  row_cnt      - Count of rows. Range is 1-8.
+ * @return     none
+ */
+void keyscan_scan_disable(unsigned char *ks_row, unsigned char row_cnt)
+{
+    BM_CLR(reg_ks_en, FLD_KS_EN);
+    for (unsigned char i = 0; i < row_cnt; i++) {
+        gpio_set_up_down_res(keyscan_pin_map(ks_row[i]),GPIO_PIN_UP_DOWN_FLOAT);
+    }
+}

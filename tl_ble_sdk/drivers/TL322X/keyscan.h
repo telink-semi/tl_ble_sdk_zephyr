@@ -135,6 +135,14 @@ typedef enum{
     KS_24MRC =1,
     KS_24MXTAL=2,
 } ks_clk_src_e;
+
+/**
+ *  @brief      Define keyscan scan mode
+ */
+typedef enum{
+    KEYCSAN_MODE0=0,     //When no button is pressed, the device remains in idle mode.
+    KEYSCAN_MODE1=1,     //After the first button press, it continuously operates in scanning mode, conserving power consumption.
+} ks_scan_mode_e;
 /**
  * @brief         This function servers to clear irq status.
  *                 After the hardware writes the key value into the fifo in each debounce period, an interrupt is triggered until it enters the idle state.
@@ -210,6 +218,19 @@ static inline void keyscan_dma_enable(void)
     BM_SET(reg_ks_a_en0, FLD_KS_RXDMA_EN); //keyscan dma enable
 }
 
+
+/**
+ * @brief     This function serves to set keyscan scan mode.
+ * @param[in] mode - ks_scan_mode_e.
+ * @return    none
+ */
+static inline void keyscan_set_scan_mode(ks_scan_mode_e mode){
+   if(mode == KEYCSAN_MODE0 ){
+       reg_ks_en &= (~FLD_KS_MOD);
+   }else if(mode == KEYSCAN_MODE1){
+       reg_ks_en |=FLD_KS_MOD;
+   }
+}
 /**
  * @brief      This function serves to configure keyscan DMA.
  * @param[in]  chn       - DMA channel
@@ -295,4 +316,20 @@ void keyscan_init(ks_debounce_period_e debounce_period, unsigned char enter_idle
  */
 void keyscan_init_clk_24m(ks_baud_rate_e baud_rate, ks_clk_src_e clk_src, unsigned char enter_idle_period_num);
 
+
+/**
+ * @brief      This function serves to after keycsan operation, a power-saving  method that turns on and off as needed.
+ * @param[in]  ks_row       - The array element must be a member of the enumeration type ks_value_e.
+ * @param[in]  row_cnt      - Count of rows. Range is 1-8.
+ * @return     none
+ */
+ void keyscan_scan_enable(unsigned char *ks_row, unsigned char row_cnt);
+
+/**
+ * @brief      This function serves to after keycsan operation, a power-saving  method that turns on and off as needed.
+ * @param[in]  ks_row       - The array element must be a member of the enumeration type ks_value_e.
+ * @param[in]  row_cnt      - Count of rows. Range is 1-8.
+ * @return     none
+ */
+void keyscan_scan_disable(unsigned char *ks_row, unsigned char row_cnt);
 #endif /* KEYSCAN_H_ */
