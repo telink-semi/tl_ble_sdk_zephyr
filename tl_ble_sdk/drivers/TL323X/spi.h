@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2025
+ * @date    2024
  *
- * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
  *
  *  Introduction
  *  ===============
- *  TL721X supports two spi
+ *  TL323X supports one spi
  *
  *  API Reference
  *  ===============
@@ -43,7 +43,7 @@
  *
  *  Introduction
  *  ===============
- *  TL721X supports two spi:gspi lspi
+ *  TL323X supports one spi:gspi
  *
  *  API Reference
  *  ===============
@@ -52,7 +52,7 @@
  *  ==============
   -# SPI Initialization and Configuration
      -# nodma/dma
-        - Initialize the gspi/lspi pin by gspi_set_pin() or lspi_set_pin() API;
+        - Initialize the gspi pin by gspi_set_pin()API;
         - SPI as master:Configure clock idle and phase modes, whether cmd is used,
           how many bytes cmd occupies and the format of cmd, whether addr is used,
           how many bytes addr occupies and the format of addr,
@@ -104,7 +104,7 @@
   -# SPI_XIP
       - how to use
           - The SPI module clock is first initialized by calling the spi_master_init() API.
-          - The second step initializes the pins of the spi by calling the gspi_set_xip_pin() or lspi_set_xip_pin() APIs.
+          - The second step initializes the pins of the spi by calling the gspi_set_xip_pin() APIs.
           - The third step sets the end address of the SPI map by calling the gspi_xip_end_addr_set() API.
           - Step 4 Call the spi_xip_timeout_cnt() and spi_xip_timeout_mode_en() APIs to set the SPI XIP timeout and enable the timeout mode.
           - Step 5 Set the SPI XIP page size and enable page size mode by calling the spi_xip_page_size() and spi_xip_page_mode_en() APIs.
@@ -159,8 +159,9 @@ typedef enum
  */
 typedef enum
 {
-    LSPI_MODULE = 0,
-    GSPI_MODULE = 1,
+    GSPI_MODULE = 1, /* Note:  Currently spi has only one gspi module.
+                               The spi_sel_e parameter is retained for compatibility
+                               with other spi sdk's that have two ways of spi*/
 } spi_sel_e;
 
 /**
@@ -194,14 +195,6 @@ typedef enum
     SPI_3LINE  = 3,
 } spi_normal_3line_mode_e;
 
-/**
- *  @brief  Define token value.
- */
-typedef enum
-{
-    SPI_TOKEN_00 = 0,
-    SPI_TOKEN_69 = 1,
-} spi_token_val_e;
 
 /**
  * @brief  Define the SPI translate mode.
@@ -279,7 +272,7 @@ typedef enum
 } spi_slave_read_cmd_e;
 
 /**
- * @brief  Define the SPI command for Telink RISC-V MCU gspi/lspi slave.
+ * @brief  Define the SPI command for Telink RISC-V MCU gspi slave.
  */
 typedef enum
 {
@@ -299,8 +292,8 @@ typedef enum
  */
 typedef struct
 {
-    spi_io_mode_e  spi_io_mode;       //set spi io mode.
     unsigned short spi_dummy_cnt;     //set dummy cnt if tans_mode have dummy.
+    unsigned char  spi_dummy_hold;    //clock state when sending dummy.
     unsigned char  spi_cmd_en;        //enable cmd phase.
     unsigned char  spi_addr_en;       //enable address phase.
     unsigned char  spi_addr_len;      //enable address phase.
@@ -308,58 +301,8 @@ typedef struct
     unsigned char  spi_addr_fmt_en;   //if addr_en enable addr fmt will follow the interface (dual/quad).
     unsigned char  spi_token_val_sel; //select token val.
     unsigned char  spi_token_en;      //enable token mode.
+    spi_io_mode_e  spi_io_mode;       //set spi io mode.
 } spi_wr_rd_config_t;
-
-/**
- * @brief  Define the lspi pin.
- */
-typedef enum
-{
-    LSPI_CSN_PA0_PIN      = GPIO_PA0,
-    LSPI_CSN_PA1_PIN      = GPIO_PA1,
-    LSPI_CSN_PA2_PIN      = GPIO_PA2,
-    LSPI_CSN_PA3_PIN      = GPIO_PA3,
-    LSPI_CSN_PA4_PIN      = GPIO_PA4,
-    LSPI_CSN_PB0_PIN      = GPIO_PB0,
-    LSPI_CSN_PB1_PIN      = GPIO_PB1,
-    LSPI_CSN_PB2_PIN      = GPIO_PB2,
-    LSPI_CSN_PB3_PIN      = GPIO_PB3,
-    LSPI_CSN_PB4_PIN      = GPIO_PB4,
-    LSPI_CSN_PB5_PIN      = GPIO_PB5,
-    LSPI_CSN_PB6_PIN      = GPIO_PB6,
-    LSPI_CSN_PB7_PIN      = GPIO_PB7,
-    LSPI_CSN_PC0_PIN      = GPIO_PC0,
-    LSPI_CSN_PC1_PIN      = GPIO_PC1,
-    LSPI_CSN_PC2_PIN      = GPIO_PC2,
-    LSPI_CSN_PC3_PIN      = GPIO_PC3,
-    LSPI_CSN_PC4_PIN      = GPIO_PC4,
-    LSPI_CSN_PC5_PIN      = GPIO_PC5,
-    LSPI_CSN_PC6_PIN      = GPIO_PC6,
-    LSPI_CSN_PC7_PIN      = GPIO_PC7,
-    LSPI_CSN_PD0_PIN      = GPIO_PD0,
-    LSPI_CSN_PD1_PIN      = GPIO_PD1,
-    LSPI_CSN_PD2_PIN      = GPIO_PD2,
-    LSPI_CSN_PD3_PIN      = GPIO_PD3,
-    LSPI_CSN_PD4_PIN      = GPIO_PD4,
-    LSPI_CSN_PD5_PIN      = GPIO_PD5,
-    LSPI_CSN_PD6_PIN      = GPIO_PD6,
-    LSPI_CSN_PD7_PIN      = GPIO_PD7,
-    LSPI_CSN_PE0_PIN      = GPIO_PE0,
-    LSPI_CLK_PE1_PIN      = GPIO_PE1,
-    LSPI_MOSI_IO0_PE2_PIN = GPIO_PE2,
-    LSPI_MISO_IO1_PE3_PIN = GPIO_PE3,
-    LSPI_IO2_PE4_PIN      = GPIO_PE4,
-    LSPI_IO3_PE5_PIN      = GPIO_PE5,
-    LSPI_CSN_PE6_PIN      = GPIO_PE6,
-    LSPI_CSN_PE7_PIN      = GPIO_PE7,
-    LSPI_CSN_PF0_PIN      = GPIO_PF0,
-    LSPI_CSN_PF1_PIN      = GPIO_PF1,
-    LSPI_CSN_PF2_PIN      = GPIO_PF2,
-    LSPI_CSN_PF3_PIN      = GPIO_PF3,
-    LSPI_CSN_PF4_PIN      = GPIO_PF4,
-    LSPI_CSN_PF5_PIN      = GPIO_PF5,
-
-} lspi_pin_def_e;
 
 /**
  * @brief  Define the GSPI pin definition structure.
@@ -375,35 +318,6 @@ typedef struct
 } gspi_pin_config_t;
 
 /**
- * @brief  Define the LSPI pin definition structure.
- */
-typedef struct
-{
-    lspi_pin_def_e spi_clk_pin;
-    lspi_pin_def_e spi_csn_pin;
-    lspi_pin_def_e spi_mosi_io0_pin;
-    lspi_pin_def_e spi_miso_io1_pin;
-    lspi_pin_def_e spi_io2_pin;
-    lspi_pin_def_e spi_io3_pin;
-} lspi_pin_config_t;
-
-/**
- * @brief  Define the GSPI XIP pin definition structure.
- */
-typedef struct
-{
-    gpio_func_pin_e gspi_clk_pin;
-    gpio_func_pin_e gspi_csn0_pin;
-    gpio_func_pin_e gspi_csn1_pin;
-    gpio_func_pin_e gspi_csn2_pin;
-    gpio_func_pin_e gspi_csn3_pin;
-    gpio_func_pin_e gspi_mosi_io0_pin;
-    gpio_func_pin_e gspi_miso_io1_pin;
-    gpio_func_pin_e gspi_io2_pin;
-    gpio_func_pin_e gspi_io3_pin;
-} gspi_xip_pin_config_t;
-
-/**
  * @brief  Define the SSPI pin definition structure.
  */
 typedef struct
@@ -413,17 +327,6 @@ typedef struct
     gpio_func_pin_e spi_mosi_io0_pin;
     gpio_func_pin_e spi_miso_io1_pin;
 } sspi_pin_config_t;
-
-/**
- * @brief  Define the gspi xip enum.
- */
-typedef enum
-{
-    GSPI_XIP0 = 0,
-    GSPI_XIP1 = 1,
-    GSPI_XIP2 = 2,
-    GSPI_XIP3 = 3,
-} gspi_xip_e;
 
 /**
  * @brief  Define spi bit sequence.
@@ -477,28 +380,6 @@ typedef struct
 } spi_xip_config_t;
 
 /**
- * @brief  Define the gspi xip end address enum.
- */
-typedef enum
-{
-    GSPI_XIP_16M = 0,
-    GSPI_XIP_32M = 1,
-    GSPI_XIP_48M = 2,
-    GSPI_XIP_64M = 3,
-} gspi_xip_addr_e;
-
-/**
- *  @brief  Define lspi lcd RGB mode.
- */
-typedef enum
-{
-    LSPI_LCD_RGB_RESERVED = 0x00,
-    LSPI_LCD_RGB565       = 0x01,
-    LSPI_LCD_RGB666       = 0x02,
-    LSPI_LCD_RGB888       = 0x03,
-} lspi_lcd_rgb_mode_e;
-
-/**
  * @brief  Define spi api error code.
  */
 typedef enum
@@ -513,16 +394,15 @@ typedef enum
 
 typedef struct
 {
-    unsigned int                          g_spi_error_timeout_us;   //spi error timeout(us)(lspi/gspi),a large value is set by default,can set it by spi_set_error_timeout();
-    timeout_handler_fp                    spi_timeout_handler;      //spi_timeout_handler(lspi/gspi);
-    volatile spi_api_error_timeout_code_e g_spi_error_timeout_code; //record spi error timeout code(lspi/gspi), can obtain the value through the spi_get_error_timeout_code() interface;
+    unsigned int                          g_spi_error_timeout_us;   //spi error timeout(us)(gspi),a large value is set by default,can set it by spi_set_error_timeout();
+    timeout_handler_fp                    spi_timeout_handler;      //spi_timeout_handler(gspi);
+    volatile spi_api_error_timeout_code_e g_spi_error_timeout_code; //record spi error timeout code(gspi), can obtain the value through the spi_get_error_timeout_code() interface;
 } spi_timeout_error_t;
 
-extern spi_timeout_error_t g_spi_timeout_error[2];
+extern spi_timeout_error_t g_spi_timeout_error;
 
 #define SPI_WAIT(condition, spi_sel, g_spi_error_timeout_us, spi_timeout_handler, spi_api_error_code) wait_condition_fails_or_timeout_with_param(condition, (unsigned int)spi_sel, g_spi_error_timeout_us, spi_timeout_handler, (unsigned int)spi_api_error_code)
 
-#define lspi_reset()                                                                                  spi_hw_fsm_reset(LSPI_MODULE)
 #define gspi_reset()                                                                                  spi_hw_fsm_reset(GSPI_MODULE)
 
 /**********************************************************************************************************************
@@ -541,53 +421,16 @@ extern spi_timeout_error_t g_spi_timeout_error[2];
  * @param[in]   config      - configuration struct of gspi xip.
  * @return      none.
  */
-static inline void gspi_set_xip_config(gspi_xip_e gspi_xip_n, spi_xip_config_t *config)
+static inline void gspi_set_xip_config(spi_sel_e spi_sel, spi_xip_config_t *config)
 {
-    reg_gspi_xip_rd_cmd1(gspi_xip_n) = config->spi_xip_rd_cmd1;
-    reg_gspi_xip_wr_cmd1(gspi_xip_n) = config->spi_xip_wr_cmd1;
     if (config->spi_3_line_en == 1) {
         /*The io mode must set to single mode*/
         BM_SET(reg_spi_ctrl3(1), FLD_SPI_3LINE);
     } else {
         BM_CLR(reg_spi_ctrl3(1), FLD_SPI_3LINE);
     }
-    reg_gspi_rd_config(gspi_xip_n) = (*(unsigned int *)config);
-    reg_gspi_wr_config(gspi_xip_n) = (*(((unsigned int *)config) + 1));
-}
-
-/**
- * @brief       This function set lspi xip config.
- * @param[in]   config  - configuration of lspi xip.
- * @return      none.
- */
-static inline void lspi_set_xip_config(spi_xip_config_t *config)
-{
-    reg_lspi_xip_rd_cmd1 = config->spi_xip_rd_cmd1;
-    reg_lspi_xip_wr_cmd1 = config->spi_xip_wr_cmd1;
-    if (config->spi_3_line_en == 1) {
-        /*The io mode must set to single mode*/
-        BM_SET(reg_spi_ctrl3(1), FLD_SPI_3LINE);
-    } else {
-        BM_CLR(reg_spi_ctrl3(1), FLD_SPI_3LINE);
-    }
-    reg_lspi_rd_config = (*(unsigned int *)config);
-    reg_lspi_wr_config = (*(((unsigned int *)config) + 1));
-}
-
-/**
- * @brief       This function set gspi xip end address.
- * @param[in]   gspi_xip_n  - the gspi xip select.
- * @param[in]   addr        - the gspi xip end address.
- * @return      none.
- *  gspi xip base address : 0x88000000
- *  xip0 space  = {0x88000000, 0x88ffff00}.
- *  xip1 space  = {0x89000000, 0x89ffff00}.
- *  xip2 space  = {0x8a000000, 0x8affff00}.
- *  xip3 space  = {0x8b000000, 0x8bffff00}.
- */
-static inline void gspi_xip_end_addr_set(void)
-{
-    reg_gspi_xip_size = ((GSPI_XIP_64M << 6) & FLD_GSPI_XIP3_END_ADDR) | ((GSPI_XIP_48M << 4) & FLD_GSPI_XIP2_END_ADDR) | ((GSPI_XIP_32M << 2) & FLD_GSPI_XIP1_END_ADDR) | ((GSPI_XIP_16M << 0) & FLD_GSPI_XIP0_END_ADDR);
+    reg_spi_rd_config(spi_sel) = (*(unsigned int *)config);
+    reg_spi_wr_config(spi_sel) = (*(((unsigned int *)config) + 1));
 }
 
 /**
@@ -597,14 +440,10 @@ static inline void gspi_xip_end_addr_set(void)
  */
 static inline void spi_hw_fsm_reset(spi_sel_e spi_sel)
 {
-    if (spi_sel == LSPI_MODULE) {
-        //reg_rst0 &= (~FLD_RST0_LSPI);
-        //reg_rst0 |= FLD_RST0_LSPI;
-    } else if (spi_sel == GSPI_MODULE) {
-        reg_rst1 &= (~FLD_RST1_GSPI);
-        reg_rst1 |= FLD_RST1_GSPI;
-    }
-    g_spi_timeout_error[spi_sel].g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE;
+    (void)spi_sel; /* Note:The TL323X only supports GSPI, and the spi_sel parameter is retained for compatibility with different chip interfaces.*/
+    reg_rst1 &= (~FLD_RST1_GSPI);
+    reg_rst1 |= FLD_RST1_GSPI;
+    g_spi_timeout_error.g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE;
 }
 
 /**
@@ -801,12 +640,12 @@ static inline void spi_token_dis(spi_sel_e spi_sel)
 /**
  * @brief   This function servers setting token value.
  * @param[in]   spi_sel     - the spi module.
- * @param[in]   token_val   - the token value.
+ * @param[in]   token_val   - the token value 0x00~0xff.
  * @return  none.
  */
-static inline void spi_set_token_val(spi_sel_e spi_sel, spi_token_val_e token_val)
+static inline void spi_set_token_val(spi_sel_e spi_sel, unsigned char token_val)
 {
-    reg_spi_reg_ctrl0(spi_sel) = ((reg_spi_reg_ctrl0(spi_sel) & (~FLD_SPI_TOKEN_VAL_SEL)) | ((token_val & 0x1) << 1));
+    reg_spi_reg_token_val(spi_sel) = ((reg_spi_reg_token_val(spi_sel) & (~FLD_SPI_REG_TOKEN_VAL)) | token_val);
 }
 
 /**
@@ -922,6 +761,26 @@ static inline void spi_addr_dis(spi_sel_e spi_sel)
 static inline void spi_set_addr_len(spi_sel_e spi_sel, unsigned char len)
 {
     (reg_spi_ctrl1(spi_sel)) = ((reg_spi_ctrl1(spi_sel) & (~FLD_SPI_ADDR_LEN)) | (((len - 1) & 0x3) << 2));
+}
+
+/**
+ * @brief       This function servers to enable spi dummy hold.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      none.
+ */
+static inline void spi_dummy_hold_en(spi_sel_e spi_sel)
+{
+    BM_SET(reg_spi_reg_ctrl0(spi_sel), FLD_SPI_DUMMY_HOLD);
+}
+
+/**
+ * @brief       This function servers to disable spi dummy hold.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      none.
+ */
+static inline void spi_dummy_hold_dis(spi_sel_e spi_sel)
+{
+    BM_CLR(reg_spi_reg_ctrl0(spi_sel), FLD_SPI_DUMMY_HOLD);
 }
 
 /**
@@ -1135,318 +994,6 @@ static inline void spi_clr_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
 }
 
 /**
- * @brief       This function servers to enable single color mode, lspi would send the color in lut1 repeatedly.
- * @return      none.
- */
-static inline void lspi_lcd_single_color_mode_en(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_SINGLE_COLOR_MODE);
-}
-
-/**
- * @brief       This function servers to disable single color mode.
- * @return      none.
- */
-static inline void lspi_lcd_single_color_mode_dis(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_SINGLE_COLOR_MODE);
-}
-
-/**
- * @brief       This function servers to set color send method as little endian mode, default is big little mode.
- * @return      none.
- */
-static inline void lspi_lcd_rgb_little_endian_mode(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_RGB_BIG_ENDIAN_MODE);
-}
-
-/**
- * @brief       This function servers to set color send method as big endian mode, default is little mode, only ramless lcd scan mode support big endian mode.
- * @return      none.
- */
-static inline void lspi_lcd_rgb_big_endian_mode(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_RGB_BIG_ENDIAN_MODE);
-}
-
-/**
- * @brief       This function servers to enable ram 4bit mode, lspi map 4bit to lut table, and send the color in lut table.
- * @return      none.
- */
-static inline void lspi_lcd_ram_4bit_mode_en(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_RAM_4BIT_MODE);
-}
-
-/**
- * @brief       This function servers to disable ram 4bit mode.
- * @return      none.
- */
-static inline void lspi_lcd_ram_4bit_mode_dis(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl2, FLD_LSPI_LCD_RAM_4BIT_MODE);
-}
-
-/**
- * @brief       This function servers to set lspi lcd interrupt mask.
- * @param[in]   mask    - the lcd irq mask.
- * @return      none.
- */
-static inline void lspi_lcd_set_irq_mask(lspi_lcd_irq_mask lcd_irq_mask)
-{
-    BM_SET(reg_lspi_lcd_ctrl2, lcd_irq_mask);
-}
-
-/**
- * @brief       This function servers to get lspi lcd interrupt mask.
- * @param[in]   mask    - the lcd irq mask.
- * @return      none.
- */
-static inline unsigned char lspi_lcd_get_irq_mask(lspi_lcd_irq_mask lcd_irq_mask)
-{
-    return reg_lspi_lcd_ctrl2 & lcd_irq_mask;
-}
-
-/**
- * @brief       This function servers to get lspi lcd interrupt status.
- * @param[in]   status - the lspi lcd irq status.
- * @return      none.
- */
-static inline unsigned char lspi_lcd_get_irq_status(lspi_lcd_irq_status_e status)
-{
-    return reg_lspi_int_status1 & status;
-}
-
-/**
- * @brief       This function servers to clear lspi lcd interrupt status.
- * @param[in]   status - the lspi lcd irq status.
- * @return      none.
- */
-static inline void lspi_lcd_clr_irq_status(lspi_lcd_irq_status_e status)
-{
-    reg_lspi_int_status1 = status;
-}
-
-/**
- * @brief       This function servers to set lspi lcd 3line (9bit)data first bit(dcx) as cmd(0).
- * @return      none.
- */
-static inline void lspi_set_lcd_dcx_cmd(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_DCX);
-}
-
-/**
- * @brief       This function servers to set lspi lcd 3line (9bit)data first bit(dcx) as data(1).
- * @return      none.
- */
-static inline void lspi_set_lcd_dcx_data(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_DCX);
-}
-
-/**
- * @brief       This function servers to enable lspi lcd 3line dcx mode.
- * @return      none.
- */
-static inline void lspi_lcd_dcx_en(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_3LINE_DCX_EN);
-}
-
-/**
- * @brief       This function servers to disable lspi lcd 3line dcx mode.
- * @return      none.
- */
-static inline void lspi_lcd_dcx_dis(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_3LINE_DCX_EN);
-}
-
-/**
- * @brief       This function servers to enable lspi lcd 2lane mode.
- * @return      none.
- */
-static inline void lspi_lcd_2lane_en(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_2LANE_EN);
-}
-
-/**
- * @brief       This function servers to disable lspi lcd 2lane mode.
- * @return      none.
- */
-static inline void lspi_lcd_2lane_dis(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_2LANE_EN);
-}
-
-/**
- * @brief       This function servers to set lspi lcd RGB mode.
- * @param[in]   rgb_mode    - lcd rgb mode.
- * @return      none.
- */
-static inline void lspi_lcd_rgb_mode(lspi_lcd_rgb_mode_e rgb_mode)
-{
-    reg_lspi_lcd_ctrl = ((reg_lspi_lcd_ctrl & (~FLD_LSPI_LCD_RGB_MODE)) | ((rgb_mode & 0x3) << 1));
-}
-
-/**
- * @brief       This function servers to enable lspi lcd scan. Hardware automatic repeat scan lcd.
- * @return      none.
- */
-static inline void lspi_lcd_scan_en(void)
-{
-    BM_SET(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_SCAN_EN);
-}
-
-/**
- * @brief       This function servers to disable lspi lcd scan.
- * @return      none.
- */
-static inline void lspi_lcd_scan_dis(void)
-{
-    BM_CLR(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_SCAN_EN);
-}
-
-/**
- * @brief       This function servers to set lspi lcd back porch line number.
- * @param[in]   vbp_line_cnt    - vbp line cnt.
- * @return      none.
- */
-static inline void lspi_lcd_vbp_line_cnt(unsigned char vbp_line_cnt)
-{
-    reg_lspi_lcd_vbp_line_cnt = vbp_line_cnt;
-}
-
-/**
- * @brief       This function servers to set lspi lcd front porch line number.
- * @param[in]   vfp_line_cnt    - vfp line cnt.
- * @return      none.
- */
-static inline void lspi_lcd_vfp_line_cnt(unsigned char vfp_line_cnt)
-{
-    reg_lspi_lcd_vfp_line_cnt = vfp_line_cnt;
-}
-
-/**
- * @brief       This function servers to set lspi lcd line interrupt trigger level.
- * @param[in]   lcd_line_trig_lvl   - lcd line trigger level.
- * @return      none.
- */
-static inline void lspi_lcd_line_trig_lvl(unsigned short lcd_line_trig_lvl)
-{
-    reg_lspi_lcd_line_trig_lvl = lcd_line_trig_lvl >> 2;
-}
-
-/**
- * @brief       This function servers to set lspi lcd background image address.
- * @param[in]   bimage_start_addr   - background start address.
- * @return      none.
- */
-static inline void lspi_lcd_bimage_start_addr(unsigned int bimage_start_addr)
-{
-    reg_lspi_lcd_bimage_start_addr32 = bimage_start_addr;
-}
-
-/**
- * @brief       This function servers to set lspi lcd front ground image address.
- * @param[in]   fimage_start_addr   - front ground image start address.
- * @return      none.
- */
-static inline void lspi_lcd_fimage_start_addr(unsigned int fimage_start_addr)
-{
-    reg_lspi_lcd_fimage_start_addr32 = fimage_start_addr;
-}
-
-/**
- * @brief       This function servers to set lspi lcd display porch min line time, the unit is spi clk.
- * @param[in]   display_line_time   - lcd display porch min line time.
- * @return      none.
- */
-static inline void lspi_lcd_display_min_line_time(unsigned short display_line_time)
-{
-    reg_lspi_lcd_display_line_time = display_line_time;
-}
-
-/**
- * @brief       This function servers to set lspi lcd back \ front porch min line time, the unit is spi clk.
- * @param[in]   porch_line_time     - lcd back \ front porch min line time.
- * @return      none.
- */
-static inline void lspi_lcd_porch_min_line_time(unsigned short porch_line_time)
-{
-    reg_lspi_lcd_porch_line_time = porch_line_time;
-}
-
-/**
- * @brief       This function servers to set lspi lcd resolution.
- * @param[in]   line_res    - line size in resolution.
- * @param[in]   row_res     - lcd back\front porch min line time.
- * @return      none.
- */
-static inline void lspi_lcd_set_res(unsigned short line_res, unsigned short row_res)
-{
-    reg_lspi_lcd_frame_res = (FLD_LSPI_LCD_LINE_PER_FRAME & ((unsigned int)(line_res - 1)) << 10) | (FLD_LSPI_LCD_PIXEL_PER_LINE & (row_res - 1));
-}
-
-/**
- * @brief       This function servers to set lspi lcd 4bit color look up table. 4bit in ram is mapped to totally 16 lookup tables.
- * @param[in]   addr    - lut address.
- * @param[in]   color   - the color of the setting.
- * @return      none.
- */
-static inline void lspi_lcd_set_lut(unsigned char addr, unsigned int color)
-{
-    reg_lspi_lcd_lut_data32(addr) = color & 0xffffff;
-}
-
-/**
- * @brief       This function servers to set lspi lcd display line transmode.
- * @param[in]   mode    - lcd display line transmode.
- * @return      none.
- */
-static inline void lspi_lcd_set_display_transmode(spi_tans_mode_e mode)
-{
-    reg_lspi_lcd_display_transmode = ((reg_lspi_lcd_display_transmode & (~FLD_LSPI_LCD_DISPLAY_TRANSMODE)) | ((mode & 0xf) << 4));
-}
-
-/**
- * @brief       This function servers to set lspi lcd porch line transmode.
- * @param[in]   mode    - lcd porch line transmode.
- * @return      none.
- */
-static inline void lspi_lcd_set_porch_transmode(spi_tans_mode_e mode)
-{
-    reg_lspi_lcd_porch_transmode = ((reg_lspi_lcd_porch_transmode & (~FLD_LSPI_LCD_PORCH_TRANSMODE)) | ((mode & 0xf) << 4));
-}
-
-/**
- * @brief     This function set DMA spi tx llp sof mode.
- * @param[in] chn       - dma channel.
- * @param[in] sof_mode  - dma llp sof mode.
- * @return    none.
- */
-static inline void spi_set_llp_sof_mode(dma_chn_e chn, unsigned char sof_mode)
-{
-    if (sof_mode) {
-        reg_dma_ctrl_llp |= BIT(chn);
-    } else {
-        reg_dma_ctrl_llp &= ~BIT(chn);
-    }
-}
-
-/**
- * @brief       This function servers to set lspi lcd send cmd.
- * @return      none.
- */
-static inline void lspi_lcd_set_cmd(unsigned char cmd)
-{
-    reg_lspi_lcd_cmd = cmd;
-}
-
-/**
  * @brief       This function servers to set the minimum time between the edge of SPI_CS and  the edges of SPI_CLK
  * @param[in]   spi_sel - the spi module.
  * @param[in]   cs2sclk -  the actual duration is (SPI_CLK period*(cs2sclk+1)),cs2sclk default value is 0x01.
@@ -1455,21 +1002,6 @@ static inline void lspi_lcd_set_cmd(unsigned char cmd)
 static inline void spi_set_cs2sclk_time(spi_sel_e spi_sel, unsigned char cs2sclk)
 {
     reg_spi_timing(spi_sel) = (reg_spi_timing(spi_sel) & ~FLD_SPI_CS2SCLK) | (cs2sclk);
-}
-
-/**
- * @brief       This function servers to set the minimum time that spi cs should stay high,
- *              the minimum time needs to be met from the cs pulling up after the current packet of data is sent to the cs pulling down after the next packet of data is sent,
- *              if pull down the cs before the minimum time is reached, the hardware will wait until the time meet to pull down the cs for the next data operation.
- * @param[in]   spi_sel - the spi module.
- * @param[in]   csht -  the actual duration is (SPI_CLK period*(csht+1)),csht default value is 0x01.
- * @return      none.
- * @note        this interface is currently used for lspi lcd function (there is a minimum limit for cs to maintain high level),
- *              normal spi peripheral communication does not need to call this interface.
- */
-static inline void spi_set_cs_high_time(spi_sel_e spi_sel, unsigned char csht)
-{
-    reg_spi_timing(spi_sel) = (reg_spi_timing(spi_sel) & ~FLD_SPI_CSHT) | (csht << 3);
 }
 
 /**
@@ -1489,34 +1021,31 @@ static inline void spi_set_bit_sequence(spi_sel_e spi_sel, spi_bit_seq_e bit_seq
  * @return    none.
  * @note      This function can be rewritten according to the application scenario.
  */
-__attribute__((weak)) void lspi_timeout_handler(unsigned int spi_error_timeout_code);
 __attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_code);
 
 /**
- * @brief     This function serves to set the spi timeout(us).
- * @param[in] spi_sel    - the spi module.
- * @param[in] timeout_us - the timeout(us).
- * @return    none.
- * @note      The default timeout (g_spi_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
- *            g_spi_error_timeout_us can be changed to a smaller value via this interface, depending on the application.
- *            The minimum time for g_spi_error_timeout_us is related to the following factors:
- *            1.spi clock rate;
- *            2.cclk clock rate;
- *            3.spi's data line(SPI_SINGLE_MODE, SPI_DUAL_MODE, SPI_QUAD_MODE);
- *            4.maximum interrupt processing time;
- *            5.spi write/read data length (especially SPI_WAIT_BUSY);
- *            Solution in case of timeout exit:
- *            when timeout exits, solution:
- *            reset SPI(as master or slave) module,corresponding api:spi_hw_fsm_reset;
- */
-void spi_set_error_timeout(spi_sel_e spi_sel, unsigned int timeout_us);
+  * @brief     This function serves to set the spi timeout(us).
+  * @param[in] timeout_us - the timeout(us).
+  * @return    none.
+  * @note      The default timeout (g_spi_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
+  *            g_spi_error_timeout_us can be changed to a smaller value via this interface, depending on the application.
+  *            The minimum time for g_spi_error_timeout_us is related to the following factors:
+  *            1.spi clock rate;
+  *            2.cclk clock rate;
+  *            3.spi's data line(SPI_SINGLE_MODE, SPI_DUAL_MODE, SPI_QUAD_MODE);
+  *            4.maximum interrupt processing time;
+  *            5.spi write/read data length (especially SPI_WAIT_BUSY);
+  *            Solution in case of timeout exit:
+  *            when timeout exits, solution:
+  *            reset SPI(as master or slave) module,corresponding api:spi_hw_fsm_reset;
+  */
+void spi_set_error_timeout(unsigned int timeout_us);
 
 /**
- * @brief     This function serves to return the spi api error timeout code.
- * @param[in] spi_sel    - the spi module.
- * @return    none.
- */
-spi_api_error_timeout_code_e spi_get_error_timeout_code(spi_sel_e spi_sel);
+    * @brief     This function serves to return the spi api error timeout code.
+    * @return    none.
+    */
+spi_api_error_timeout_code_e spi_get_error_timeout_code(void);
 
 /**
  * @brief      This function selects  pin  for gspi master or slave mode.
@@ -1531,14 +1060,14 @@ void gspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function);
  * @param[in]   pin - the csn pin.
  * @return      none.
  */
-void gspi_cs_pin_en(gpio_pin_e pin);
+void gspi_cs_pin_en(gpio_func_pin_e pin);
 
 /**
  * @brief       This function disable gspi csn pin.
  * @param[in]   pin - the csn pin.
  * @return      none.
  */
-void gspi_cs_pin_dis(gpio_pin_e pin);
+void gspi_cs_pin_dis(gpio_func_pin_e pin);
 
 /**
  * @brief       This function change gspi csn pin.
@@ -1546,15 +1075,7 @@ void gspi_cs_pin_dis(gpio_pin_e pin);
  * @param[in]   next_csn_pin - the next csn pin.
  * @return      none.
  */
-void gspi_change_csn_pin(gpio_pin_e current_csn_pin, gpio_pin_e next_csn_pin);
-
-/**
- * @brief      This function selects  pin  for lspi master or slave mode.
- * @param[in]  pin       - the selected pin.
- * @param[in]  function  - pin-multiplexing function.
- * @return     none.
- */
-void lspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function);
+void gspi_change_csn_pin(gpio_func_pin_e current_csn_pin, gpio_func_pin_e next_csn_pin);
 
 /**
  * @brief       This function servers to set gspi pin.
@@ -1582,7 +1103,12 @@ void spi_slave_set_pin(sspi_pin_config_t *spi_pin_config);
  *              MODE2:  CPOL = 1 , CPHA = 0;
  *              MODE3:  CPOL = 1 , CPHA = 1;
  * @return      none.
- * @note        When using the spi master module, this interface must be configured first, otherwise the following interfaces will not take effect.
+ * @note        - When using the spi master module, this interface must be configured first, otherwise the following interfaces will not take effect.
+ *              - If the master is not connected or if there are other slave devices that can receive a higher frequency, spi_clk on the io output from the master will be 48M max.
+ *              - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula(spi_clock_in(output from master clk_pin )  <= slave clk/4), the maximum value of spi_clk on the io is 96/4=24M.
+ *              - Due to the divider register bit width limitation,The limits between src_clk and spi_clock are as follows.
+ *               src_clk                    GSPI(spi_clk  minimum)=src_clk/255
+ *               SRC_CLK_XTAL_24M                          94117
  */
 void spi_master_init(spi_sel_e spi_sel, unsigned short div_clock, spi_mode_type_e mode);
 
@@ -1597,7 +1123,14 @@ void spi_master_init(spi_sel_e spi_sel, unsigned short div_clock, spi_mode_type_
  *              MODE3:  CPOL = 1 , CPHA = 1;
  * @return      none.
  * @note       - When using the spi slave module, this interface must be configured first, otherwise the following interfaces will not take effect.
- *             - spi_clock_in(output from master clk_pin )  <= slave clk/4
+ *             - spi_clock_in(output from master clk_pin )  <= slave clk/4.
+ *             - The master connects to the telink's slave, since the maximum clock of the slave spi module is 96M, according to the formula, the maximum value of spi_clk on the io is 24M.
+ *                The limits between src_clk and spi_clock  are as follows.
+ *              src_clk (sys_clk.pll_clk)                  GPSI(spi_clk maximum )=src_clk/4
+ *               SRC_CLK_PLL_144M                             (144M/2)/4=18000000
+ *               SRC_CLK_PLL_156M                             (156M/2)/4=19500000
+ *               SRC_CLK_PLL_180M                             (180M/2)/4=22500000
+ *               SRC_CLK_PLL_192M                             (192M/2)/4=24000000
  */
 void spi_slave_init(spi_sel_e spi_sel, spi_mode_type_e mode);
 
@@ -1642,20 +1175,6 @@ void spi_master_config(spi_sel_e spi_sel, spi_normal_3line_mode_e mode);
 void spi_master_config_plus(spi_sel_e spi_sel, spi_wr_rd_config_t *config);
 
 /**
- * @brief       This function servers to set gspi pin for XIP.
- * @param[in]   gspi_xip_pin_config - the pointer of pin config struct.
- * @return      none.
- */
-void gspi_set_xip_pin(gspi_xip_pin_config_t *gspi_xip_pin_config);
-
-/**
- * @brief       This function servers to set lspi pin.
- * @param[in]   spi_pin_config - the pointer of pin config struct.
- * @return      none.
- */
-void lspi_set_pin(lspi_pin_config_t *spi_pin_config);
-
-/**
  * @brief      This function selects  pin  for sspi master or slave mode.
  * @param[in]  pin       - the selected pin.
  * @param[in]  function  - pin-multiplexing function.
@@ -1675,7 +1194,6 @@ drv_api_status_e spi_master_send_cmd(spi_sel_e spi_sel, unsigned char cmd);
 /**
  * @brief       This function servers to write spi fifo.
  * tx_fifo_depth are fixed sizes.
- * lspi with txfifo deepth = 20 bytes.
  * gspi with txfifo deepth = 8 bytes.
  * @param[in]   spi_sel - the spi module.
  * @param[in]   data    - the pointer to the data for write.
@@ -1690,7 +1208,6 @@ drv_api_status_e spi_write(spi_sel_e spi_sel, unsigned char *data, unsigned int 
 /**
  * @brief       This function servers to read spi fifo.
  * rx_fifo_depth are fixed sizes.
- * lspi with rxfifo deepth = 12 bytes.
  * gspi with rxfifo deepth = 8 bytes.
  * @param[in]   spi_sel - the spi module.
  * @param[in]   data    - the pointer to the data for read.
@@ -1745,8 +1262,8 @@ drv_api_status_e spi_master_write_plus(spi_sel_e spi_sel, unsigned char cmd, uns
  * @param[in]   data        - the pointer to the data for write.
  * @param[in]   len         - write length.
  * @param[in]   repeat_time - number of times to write data repeatedly.
- * @return      DRV_API_SUCCESS:master write data successfully. others:master write data failed.
- *              DRV_API_TIMEOUT:timeout exit(solution refer to the note for spi_set_error_timeout).
+ * @return     DRV_API_SUCCESS:master write data successfully. others:master write data failed.
+ *             DRV_API_TIMEOUT:timeout exit(solution refer to the note for spi_set_error_timeout).
  */
 drv_api_status_e spi_master_write_repeat(spi_sel_e spi_sel, unsigned char *data, unsigned int len, unsigned int repeat_time);
 
@@ -1941,7 +1458,7 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len);
  * @param[in]   spi_sel      - the spi module.
  * @param[in]   burst_size   - dma burst size.
  * @return      none.
- * @note        - lspi tx dma support burst4/burst2/burst1,gpsi tx dma only support burst1.
+ * @note        - gpsi tx dma only support burst1.
  *              - If the set burst size is larger than burst1 (burst2/burst4), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
  *              - Must be configured after spi_set_tx_dma_config().
  */
@@ -1952,7 +1469,7 @@ void spi_set_dma_tx_burst(spi_sel_e spi_sel, dma_burst_size_e burst_size);
  * @param[in]   spi_sel     - the spi module.
  * @param[in]   burst_size   - dma burst size
  * @return      none.
- * @note        - lspi rx dma support burst2/burst1,gpsi rx dma only support burst1.
+ * @note        - gpsi rx dma only support burst1.
  *              - If the set burst size is larger than burst1 (burst2), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
  *              - Must be configured after spi_set_master_rx_dma_config().
  */

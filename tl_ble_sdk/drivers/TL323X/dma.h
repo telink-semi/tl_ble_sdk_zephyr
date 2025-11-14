@@ -569,6 +569,21 @@ static inline unsigned char dma_chn_is_complete(dma_chn_e chn)
 }
 
 /**
+ * @brief     This function set DMA spi tx llp sof mode.
+ * @param[in] chn       - dma channel.
+ * @param[in] sof_mode  - dma llp sof mode.
+ * @return    none.
+ */
+static inline void dma_set_llp_sof_mode(dma_chn_e chn, unsigned char sof_mode)
+{
+    if (sof_mode) {
+        reg_dma_ctrl_llp |= BIT(chn);
+    } else {
+        reg_dma_ctrl_llp &= ~BIT(chn);
+    }
+}
+
+/**
  * @brief     This interface is used to configure the address contents corresponding to different modules at once through the dma chain table.
  * @param[in] chn               - dma channel.
  * @param[in] dma_chain_config  - dma chain node buff pointer.

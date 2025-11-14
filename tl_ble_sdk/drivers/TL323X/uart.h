@@ -25,7 +25,7 @@
  *
  *  Introduction
  *  ===============
- *  supports uart: uart0~ uart2.
+ *  supports uart: uart0~ uart4.
  *  -# support nodma/dma
  *  -# support cts/rts
  *  -# support s7816
@@ -88,11 +88,11 @@
   -# UART enter suspend sleep before and after handling
       - nodma_tx
           - before nodma tx goes to suspend sleep, it is necessary to judge the uart busy bit to ensure the completion of UART data transmission.
-          - after suspend sleep wake up, perform the following operations: 
+          - after suspend sleep wake up, perform the following operations:
             -# uart_clr_tx_index();
             -# clear the send data in ram buff;
       - nodma_rx
-          - If go to suspend sleep during nodma rx, the recommended action when waking up is as follows: 
+          - If go to suspend sleep during nodma rx, the recommended action when waking up is as follows:
             -# uart_clr_rx_index();
             -# clear the data received in ram buff;
       - dma_tx
@@ -128,7 +128,7 @@
 - Timeout mechanism
      -# uart_set_error_timeout():define global variable g_uart_error_timeout_us,the default value is a large value,can use the preceding interfaces to adjust the value based on actual applications.
      -# uart_get_error_timeout_code(): when an error timeout abnormally, can use the above interface to read which error belongs to uart_api_error_code_e.
-     -# uart_timeout_handler():when an error timeout exits abnormally,can do timeout processing at the application layer or the application layer redefines the interface.       
+     -# uart_timeout_handler():when an error timeout exits abnormally,can do timeout processing at the application layer or the application layer redefines the interface.
  */
 #ifndef UART_H_
 #define UART_H_
@@ -137,12 +137,12 @@
 #include "dma.h"
 #include "reg_include/register.h"
 
-extern unsigned char uart_rx_byte_index[3];
-extern unsigned char uart_tx_byte_index[3];
+extern unsigned char uart_rx_byte_index[5];
+extern unsigned char uart_tx_byte_index[5];
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
-*********************************************************************************************************************/
+ *********************************************************************************************************************/
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
@@ -170,6 +170,8 @@ typedef enum
     UART0 = 0,
     UART1,
     UART2,
+    UART3,
+    UART4,
 } uart_num_e;
 
 /**
@@ -220,33 +222,33 @@ typedef enum
 typedef enum
 {
     UART_RXBUF_IRQ_STATUS = BIT(2),  /**<
-                                                get interrupt status:uart_get_irq_status(), clr interrupt status: automatically cleared.
-                                            <p>
-                                                in nodma mode,the received data is read by uart_get_rxfifo_num() / uart_read_byte().
-                                            <p>
-                                                in dma mode,dma does not need this interrupt.
-                                             */
+                                        get interrupt status:uart_get_irq_status(), clr interrupt status: automatically cleared.
+                                    <p>
+                                        in nodma mode,the received data is read by uart_get_rxfifo_num() / uart_read_byte().
+                                    <p>
+                                        in dma mode,dma does not need this interrupt.
+                                     */
     UART_TXBUF_IRQ_STATUS = BIT(3),  /**<
-                                                in general, this interrupt is not required, and data is sent in nodma by polling,in dma mode,dma does not need this interrupt.
-                                              */
+                                        in general, this interrupt is not required, and data is sent in nodma by polling,in dma mode,dma does not need this interrupt.
+                                      */
 
     UART_RXDONE_IRQ_STATUS = BIT(4), /**<
-                                               get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status()
-                                             <p>
-                                               in nodma mode,the received data is read by uart_get_rxfifo_num() / uart_read_byte().
+                                        get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status()
+                                      <p>
+                                        in nodma mode,the received data is read by uart_get_rxfifo_num() / uart_read_byte().
 
-                                             <p>
-                                                in dma mode, use dma tc interrupt.
-                                              */
+                                      <p>
+                                         in dma mode, use dma tc interrupt.
+                                       */
 
     UART_TXDONE_IRQ_STATUS = BIT(5), /**<
-                                               get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status().
-                                              */
+                                        get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status().
+                                       */
     UART_RX_ERR            = BIT(6), /**<
-                                                in nodma:get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status() : UART_RXBUF_IRQ_STATUS to clear data in rxfifo.
-                                             <p>
-                                                in dma:When obtaining UART_RXDONE_IRQ_STATUS, by the uart_get_irq_status() to obtain the status and check whether an exception occurs. Clear UART_RXDONE_IRQ_STATUS to clear UART_RX_ERR.
-                                              */
+                                         in nodma:get interrupt status:uart_get_irq_status(),clr interrupt status:uart_clr_irq_status() : UART_RXBUF_IRQ_STATUS to clear data in rxfifo.
+                                      <p>
+                                         in dma:When obtaining UART_RXDONE_IRQ_STATUS, by the uart_get_irq_status() to obtain the status and check whether an exception occurs. Clear UART_RXDONE_IRQ_STATUS to clear UART_RX_ERR.
+                                       */
 } uart_irq_status_e;
 
 typedef enum
@@ -266,15 +268,15 @@ typedef enum
 
 typedef struct
 {
-    unsigned int                           g_uart_error_timeout_us;   //uart_x error timeout(us),a large value is set by default,can set it by uart_set_error_timeout();
-    timeout_handler_fp                     uart_timeout_handler;      //uartx_timeout_handler;
-    volatile uart_api_error_timeout_code_e g_uart_error_timeout_code; //record uart_x error timeout code, can obtain the value through the uart_get_error_timeout_code() interface;
+    unsigned int                           g_uart_error_timeout_us;   // uart_x error timeout(us),a large value is set by default,can set it by uart_set_error_timeout();
+    timeout_handler_fp                     uart_timeout_handler;      // uartx_timeout_handler;
+    volatile uart_api_error_timeout_code_e g_uart_error_timeout_code; // record uart_x error timeout code, can obtain the value through the uart_get_error_timeout_code() interface;
 } uart_timeout_error_t;
 
-extern uart_timeout_error_t g_uart_timeout_error[3];
+extern uart_timeout_error_t g_uart_timeout_error[5];
 
 #define uart_rtx_pin_tx_trig(uart_num) uart_clr_irq_status(uart_num, UART_TXDONE_IRQ_STATUS)
-//for compatibility
+// for compatibility
 #define uart_reset uart_hw_fsm_reset
 
 /**********************************************************************************************************************
@@ -286,7 +288,7 @@ extern uart_timeout_error_t g_uart_timeout_error[3];
  */
 /**
  * @brief     Choose rxdone(UART_RXDONE_IRQ_STATUS) function,nodma needs to be opened, dma needs to be closed. For the internal interface, the upper layer does not need to be called.
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] sel - 0:no_dma  1:dma
  * @return    none.
  */
@@ -300,7 +302,6 @@ static inline void uart_rxdone_sel(uart_num_e uart_num, uart_rxdone_sel_e sel)
 }
 
 /** @} */
-
 
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
@@ -316,7 +317,7 @@ static inline void uart_rxdone_sel(uart_num_e uart_num, uart_rxdone_sel_e sel)
 
 /**
  * @brief     Get the rxfifo cnt,when data enters rxfifo, the rxfifo cnt increases; when reading data from rx_fifo, rxfifo cnt decays.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline unsigned char uart_get_rxfifo_num(uart_num_e uart_num)
@@ -326,7 +327,7 @@ static inline unsigned char uart_get_rxfifo_num(uart_num_e uart_num)
 
 /**
  * @brief     Get the txfifo cnt,tx_fifo cnt decreases when data is sent from tx_fifo, and tx_fifo cnt increases when data is written to tx_fifo.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline unsigned char uart_get_txfifo_num(uart_num_e uart_num)
@@ -336,7 +337,7 @@ static inline unsigned char uart_get_txfifo_num(uart_num_e uart_num)
 
 /**
  * @brief      This function enable the clock of UART module.
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return     none
  */
 static inline void uart_clk_en(uart_num_e uart_num)
@@ -358,7 +359,7 @@ static inline void uart_clk_en(uart_num_e uart_num)
 
 /**
  * @brief     Select whether to enable auto clr rx fifo pointer.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] en - 1:enable, when UART_RXDONE_IRQ_STATUS trigger,the hardware will automatically clear the rx_fifo pointer,the software only needs to clear UART_RXDONE_IRQ_STATUS interrupt flag bit.
  *                 0:disable,the rxfifo pointer is cleared only when the software clears the UART_RXDONE_IRQ_STATUS interrupt flag bit.
  * @return    none.
@@ -375,7 +376,7 @@ static inline void uart_auto_clr_rx_fifo_ptr(uart_num_e uart_num, unsigned char 
 
 /**
  * @brief     Configure the trigger level of the UART_RXBUF_IRQ_STATUS interrupt. When the number of rx_fifo is greater than or equal to the trigger level, UART_RXBUF_IRQ_STATUS interrupt rises.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] rx_level - the trigger level,the range is less than 8.
  * @return    none
  * @note      This interface is only used in no_dma mode.
@@ -390,7 +391,7 @@ static inline void uart_rx_irq_trig_level(uart_num_e uart_num, unsigned char rx_
 
 /**
  * @brief     Configure the trigger level of the UART_TXBUF_IRQ_STATUS interrupt,when the number of tx_fifo data is less than or equal to the trigger level, UART_TXBUF_IRQ_STATUS interrupt rises.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] tx_level - the trigger level,the range is less than 8.
  * @return    none
  * @note      This interface is used in no_dma mode only.
@@ -402,7 +403,7 @@ static inline void uart_tx_irq_trig_level(uart_num_e uart_num, unsigned char tx_
 
 /**
  * @brief     Enable the irq of UART.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] mask     - enum uart irq mask.
  * @return    none
  */
@@ -413,7 +414,7 @@ static inline void uart_set_irq_mask(uart_num_e uart_num, uart_irq_mask_e mask)
 
 /**
  * @brief     Disable the irq of UART.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] mask     - enum uart irq mask.
  * @return    none
  */
@@ -424,7 +425,7 @@ static inline void uart_clr_irq_mask(uart_num_e uart_num, uart_irq_mask_e mask)
 
 /**
  * @brief     Set the 'uart_rx_byte_index' to 0,'uart_rx_byte_index' is used to synchronize the rxfifo hardware pointer in no_dma mode.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  * @note      Note the following:
  *            -# After waking up from suspend, you must call uart_clr_tx_index and uart_clr_rx_index to clear read and write pointers,
@@ -438,7 +439,7 @@ static inline void uart_clr_rx_index(uart_num_e uart_num)
 
 /**
  * @brief     Set the 'uart_tx_byte_index' to 0,'uart_tx_byte_index' is used to synchronize the txfifo hardware pointer in no_dma mode.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  * @note      Note the following:
  *            -# After waking up from suspend, you must call uart_clr_tx_index and uart_clr_rx_index to clear read and write pointers,
@@ -454,7 +455,7 @@ static inline void uart_clr_tx_index(uart_num_e uart_num)
  * @brief     uart finite state machine reset(the configuration register is still there and does not need to be reconfigured),
  *            For compatibility define uart_reset uart_hw_fms_reset, uart_hw_fms_reset is used when the driver is invoked (no matter at the driver layer or demo layer),
  *            before using UART, it is needed to call uart_hw_fsm_reset() to avoid affecting the use of UART.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  * @note      this function will clear rx and tx status and fifo.
  */
@@ -473,6 +474,14 @@ static inline void uart_hw_fsm_reset(uart_num_e uart_num)
         BM_CLR(reg_rst5, FLD_RST5_UART2);
         BM_SET(reg_rst5, FLD_RST5_UART2);
         break;
+    case UART3:
+        BM_CLR(reg_rst1, FLD_RST1_UART3);
+        BM_SET(reg_rst1, FLD_RST1_UART3);
+        break;
+    case UART4:
+        BM_CLR(reg_rst4, FLD_RST4_UART4);
+        BM_SET(reg_rst4, FLD_RST4_UART4);
+        break;
     default:
         break;
     }
@@ -483,7 +492,7 @@ static inline void uart_hw_fsm_reset(uart_num_e uart_num)
 
 /**
  * @brief     Get the irq status of UART.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] status   - enum uart irq status.
  * @retval      non-zero      -  the interrupt occurred.
  * @retval      zero  -  the interrupt did not occur.
@@ -495,7 +504,7 @@ static inline unsigned int uart_get_irq_status(uart_num_e uart_num, uart_irq_sta
 
 /**
  * @brief     Clear the irq status of UART.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] status   - enum uart irq status.
  * @return    none
  */
@@ -522,7 +531,7 @@ static inline void uart_clr_irq_status(uart_num_e uart_num, uart_irq_status_e st
 
 /**
  * @brief     Enable UART rts.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline void uart_set_rts_en(uart_num_e uart_num)
@@ -532,7 +541,7 @@ static inline void uart_set_rts_en(uart_num_e uart_num)
 
 /**
  * @brief     Disable UART rts.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline void uart_set_rts_dis(uart_num_e uart_num)
@@ -542,7 +551,7 @@ static inline void uart_set_rts_dis(uart_num_e uart_num)
 
 /**
  * @brief     Enable UART cts.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline void uart_set_cts_en(uart_num_e uart_num)
@@ -552,7 +561,7 @@ static inline void uart_set_cts_en(uart_num_e uart_num)
 
 /**
  * @brief     Disable UART cts.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 static inline void uart_set_cts_dis(uart_num_e uart_num)
@@ -562,7 +571,7 @@ static inline void uart_set_cts_dis(uart_num_e uart_num)
 
 /**
  * @brief     Set UART rts trig level,when the number of rx_fifo reaches the rts trig level, rts pin level is active.
- * @param[in] uart_num  - UART0/UART1/UART2.
+ * @param[in] uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @param[in] level    - the rts trigger level,the range is less than 8.
  * @return    none
  */
@@ -574,7 +583,7 @@ static inline void uart_rts_trig_level_auto_mode(uart_num_e uart_num, unsigned c
 
 /**
  * @brief       Get the remain count of rxfifo,the range is 0~3, to get the rx_fifo current pointer position when rxfifo received data less than 1 word.
- * @param[in]   uart_num  - UART0/UART1/UART2.
+ * @param[in]   uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return      the remain count of rxfifo.
  */
 static inline unsigned char uart_get_rxfifo_rem_cnt(uart_num_e uart_num)
@@ -586,7 +595,7 @@ static inline unsigned char uart_get_rxfifo_rem_cnt(uart_num_e uart_num)
 
 /**
  * @brief      This function serves to set uart rts auto mode,flow control generation condition 1. rx_fifo number is greater than or equal to the set threshold 2. rx_done signal generation (if uart_rxdone_rts_en enable)).
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return     none
  */
 static inline void uart_rts_auto_mode(uart_num_e uart_num)
@@ -596,7 +605,7 @@ static inline void uart_rts_auto_mode(uart_num_e uart_num)
 
 /**
  * @brief      This function serves to set uart rts manual mode,in this mode, the rts level changes are controlled by calling the uart_set_rts_level interface.
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return     none
  */
 static inline void uart_rts_manual_mode(uart_num_e uart_num)
@@ -606,7 +615,7 @@ static inline void uart_rts_manual_mode(uart_num_e uart_num)
 
 /**
  * @brief       Enable the rtx function.
- * @param[in]   chn -UART0/UART1/UART2.
+ * @param[in]   chn -UART0/UART1/UART2/UART3/UART4.
  * @return      none.
  */
 static inline void uart_rtx_en(uart_num_e chn)
@@ -627,7 +636,7 @@ static inline void uart_rtx_en(uart_num_e chn)
  *               otherwise, when the sender cts pin receives the active level of rts pin, it stops sending data,
  *               If this function is turned off at this time, no data will be sent, resulting in an interruption in rxdone,
  *               When UART_RXDONE_IRQ_STATUS is cleared, the rx_fifo data will be cleared, causing the rts level to fail.
- * @param[in] uart_num
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  * @note      this function is turned off by uart_init, this function is used in combination with rts function enable, the application determines whether to configure this function.
  */
@@ -639,7 +648,7 @@ static inline void uart_rts_stop_rxtimeout_en(uart_num_e uart_num)
 /**
  * @brief     Disable rts stop rxtimeout.
  *            The uart_rts_stop_rxtimeout_dis is called, the timeout will not be stopped when the rts signal is generated,the UART_RXDONE_IRQ_STATUS signal will not be affected.
- * @param[in] uart_num
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  */
 static inline void uart_rts_stop_rxtimeout_dis(uart_num_e uart_num)
@@ -657,7 +666,7 @@ static inline void uart_rts_stop_rxtimeout_dis(uart_num_e uart_num)
  *            -# When the rts function is used:
  *                -# In nodma :It is recommended to open to avoid data overwriting due to late reception.
  *                -# In DMA:not recommended,the hardware will automatically clear rx_done, there is no mistake to clear the next data.
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  */
 static inline void uart_rxdone_rts_en(uart_num_e uart_num)
@@ -667,7 +676,7 @@ static inline void uart_rxdone_rts_en(uart_num_e uart_num)
 
 /**
  * @brief     Disable rxdone(UART_RXDONE_IRQ_STATUS) rts,rts will not be active after rx_done is generated.
- * @param[in]  uart_num  - UART0/UART1/UART2.
+ * @param[in]  uart_num  - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  */
 static inline void uart_rxdone_rts_dis(uart_num_e uart_num)
@@ -677,7 +686,7 @@ static inline void uart_rxdone_rts_dis(uart_num_e uart_num)
 
 /**
  * @brief      Initialize the UART module.
- * @param[in]  uart_num    - UART0/UART1/UART2.
+ * @param[in]  uart_num    - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  div         - UART clock divider.
  * @param[in]  bwpc        - bitwidth, should be set to larger than 2.
  * @param[in]  parity      - selected parity type for UART interface.
@@ -721,11 +730,11 @@ void uart_init(uart_num_e uart_num, unsigned short div, unsigned char bwpc, uart
     -# The maximum baud rate depends on the hardware environment (such as cable length, etc.) and pclk/cclk/hclk:
          - pclk is the main factor affecting the upper baud rate of UART
          - cclk and pclk affect interrupt processing times(increase the frequency of cclk will increase the maximum baud rate of NDMA, but it has no obvious effect on the maximum baud rate of DMA)
-    -# The maximum baud rate must meet two testing conditions: 
+    -# The maximum baud rate must meet two testing conditions:
          - proper parsing by the logic analyzer
          - successful communication on the development board
     -# Note on the actual use of the maximum baud rate:
-         - if only communication on the development board is considered, the baud rate can be set higher 
+         - if only communication on the development board is considered, the baud rate can be set higher
          - setting a significantly higher baud rate may result in a deviation between the set and actual baud rates, leading to incorrect parsing by the logic analyzer and possible communication failures with other devices
     -# Using the B92 development board,the test results:
          - CCLK_16M_HCLK_16M_PCLK_16M: in nodma,the maximum speed is 2 MHz; in dma,the maximum speed is 2 MHz;
@@ -735,7 +744,6 @@ void uart_init(uart_num_e uart_num, unsigned short div, unsigned char bwpc, uart
          - CCLK_96M_HCLK_48M_PCLK_24M: in nodma,the maximum speed is 3 MHz; in dma,the maximum speed is 3 MHz;
  */
 void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int sysclk, unsigned short *div, unsigned char *bwpc);
-
 
 /**
  * @brief      Set rx_timeout.
@@ -748,7 +756,7 @@ void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int sysclk, unsigned 
        How to set:
          rx_timeout = (((1/baudrate) * bit_cnt)* mul)*(2^rxtimeout_exp)  value = ((bwpc+1) * bit_cnt, the maximum of this value can be set to 0xff.
    @endverbatim
- * @param[in]  uart_num        - UART0/UART1/UART2.
+ * @param[in]  uart_num        - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  bwpc            - bitwidth.
  * @param[in]  bit_cnt         - bit number(for example, if transferring one bytes (1start bit+8bits data+1 priority bit+2stop bits) total 12 bits,then set it to at least 12).
  * @param[in]  mul             - mul.
@@ -759,7 +767,7 @@ void uart_set_rx_timeout_with_exp(uart_num_e uart_num, unsigned char bwpc, unsig
 
 /**
  * @brief      Send UART data by byte in no_dma mode.
- * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  tx_data  - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
@@ -768,14 +776,14 @@ drv_api_status_e uart_send_byte(uart_num_e uart_num, unsigned char tx_data);
 
 /**
  * @brief     Receive UART data by byte in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 unsigned char uart_read_byte(uart_num_e uart_num);
 
 /**
  * @brief     Judge if the transmission of UART is done.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    0:tx is done     1:tx isn't done
  * @note      If upper-layer application calls the interface, if the timeout mechanism is used, the status cannot be detected because the uart send data is abnormal,
  *            see uart_set_error_timeout(time setting requirement).
@@ -784,7 +792,7 @@ unsigned char uart_tx_is_busy(uart_num_e uart_num);
 
 /**
  * @brief     Send UART data by halfword in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] data  - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
@@ -793,7 +801,7 @@ drv_api_status_e uart_send_hword(uart_num_e uart_num, unsigned short data);
 
 /**
  * @brief     Send UART data by word in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] data - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
@@ -802,7 +810,7 @@ drv_api_status_e uart_send_word(uart_num_e uart_num, unsigned int data);
 
 /**
  * @brief     Set the RTS pin's output level manually.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] polarity - 0: RTS pin outputs a low level  1: RTS pin outputs a high level.
  * @return    none
  */
@@ -810,7 +818,7 @@ void uart_set_rts_level(uart_num_e uart_num, unsigned char polarity);
 
 /**
  *  @brief      Set pin for UART cts function, the pin connection mode: CTS<->RTS.
- *  @param[in]  uart_num - UART0/UART1/UART2.
+ *  @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  *  @param[in]  cts_pin -To set cts pin.
  *  @return     none
  */
@@ -818,7 +826,7 @@ void uart_set_cts_pin(uart_num_e uart_num, gpio_func_pin_e cts_pin);
 
 /**
  *  @brief      Set pin for UART rts function, the pin connection mode: RTS<->CTS.
- *  @param[in]  uart_num - UART0/UART1/UART2.
+ *  @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  *  @param[in]  rts_pin - To set rts pin.
  *  @return     none
  */
@@ -826,11 +834,11 @@ void uart_set_rts_pin(uart_num_e uart_num, gpio_func_pin_e rts_pin);
 
 /**
 * @brief      Select pin for UART module, the pin connection mode: TX<->RX RX<->TX.
-* @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
 * @param[in]  tx_pin   - the pin to send data.
 * @param[in]  rx_pin   - the pin to receive data.
-* @return     none
-*/
+ * @return     none
+ */
 void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e rx_pin);
 
 /**
@@ -840,15 +848,15 @@ void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e r
 *                in dma,uart_send_dma.
 *             -# The interface uart_rtx_pin_tx_trig is called,if not calling this interface, the data cannot be sent out.
 *             -# After converting to tx, if tx_fifo has no data, the hardware automatically converts to rx function.
-* @param[in]  uart_num - UART0/UART1/UART2.
-* @param[in]  rtx_pin  - the rtx pin need to set.
-* @return     none
-*/
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
+ * @param[in]  rtx_pin  - the rtx pin need to set.
+ * @return     none
+ */
 void uart_set_rtx_pin(uart_num_e uart_num, gpio_func_pin_e rtx_pin);
 
 /**
  * @brief       Send an amount of data in DMA mode.
- * @param[in]   uart_num - UART0/UART1/UART2.
+ * @param[in]   uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]   addr     - Pointer to data buffer. It must be 4-bytes aligned address
  * @param[in]   len      - Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return      1  DMA start sending.
@@ -861,18 +869,18 @@ unsigned char uart_send_dma(uart_num_e uart_num, unsigned char *addr, unsigned i
 
 /**
 * @brief     Send an amount of data in NODMA mode
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
 * @param[in] addr     - pointer to the buffer.
-* @param[in] len      - NDMA transmission length.
-* @return    1
-*/
+ * @param[in] len      - NDMA transmission length.
+ * @return    1
+ */
 unsigned char uart_send(uart_num_e uart_num, unsigned char *addr, unsigned char len);
 
 /**
  * @brief       This function serves to receive data function by DMA, this function tell the DMA to get data from the uart data fifo.
  *              regardless of the length of the DMA configuration, write_num is available,the dma automatically writes back the data receive length to the first four bytes of the rec_buff without manual calculation,
  *              so need addr = the receive buff addr +4.
- * @param[in]   uart_num - UART0/UART1/UART2.
+ * @param[in]   uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]   addr     - pointer to the buffer  receive data.
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
@@ -887,15 +895,15 @@ void uart_receive_dma(uart_num_e uart_num, unsigned char *addr, unsigned int rev
 
 /**
   * @brief     Configures the UART tx_dma channel control register.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] chn      - dma channel.
   * @return    none
-  */
+ */
 void uart_set_tx_dma_config(uart_num_e uart_num, dma_chn_e chn);
 
 /**
  * @brief      Configures UART rx_dma channel control register.
- * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  chn      - dma channel.
  * @return     none
  */
@@ -903,17 +911,17 @@ void uart_set_rx_dma_config(uart_num_e uart_num, dma_chn_e chn);
 
 /**
   * @brief     Configure UART hardware flow CTS.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] cts_pin    - cts pin select.
   * @param[in] cts_parity -  1:Active high,when the cts pin receives a high level, it stops sending data.
   *                          0:Active low,when the cts pin receives a low level, it stops sending data.
   * @return    none
-  */
+ */
 void uart_cts_config(uart_num_e uart_num, gpio_func_pin_e cts_pin, unsigned char cts_parity);
 
 /**
  * @brief     Configure UART hardware flow RTS.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] rts_pin      - RTS pin select.
  * @param[in] rts_parity   - 0: Active high: rts level changed from low to high.
  *                           1: Active low: rts level changed from high to low.
@@ -937,7 +945,7 @@ void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char
 
 /*
   * @brief      Configure DMA head node.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn         - DMA channel.
   * @param[in]  dst_addr    - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  data_len    - any length less than 0xfffffc(multiple of four).
@@ -946,14 +954,14 @@ void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char
   * @note       there are no usage restrictions, there is no need to configure the dma length to a maximum length, and there is no limit to the send length:
   *              - The condition of linked list jump: one is when the length of the dma configuration is reached, the other is rx_done,
   *                no matter which condition has a write back length.
-  */
+ */
 void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
 /**
   * @brief      Configure DMA cycle chain node.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn         - DMA channel.
-  * @param[in]  config_addr - to servers to configure the address of the current node.
+ * @param[in]  config_addr - to servers to configure the address of the current node.
   * @param[in]  llpointer   - to configure the address of the next node.
   * @param[in]  dst_addr    - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  data_len    - any length less than 0xfffffc(multiple of four).
@@ -961,12 +969,12 @@ void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn, unsigned char *d
   * @note       there are no usage restrictions, there is no need to configure the dma length to a maximum length, and there is no limit to the send length:
   *             - The condition of linked list jump: one is when the length of the dma configuration is reached, the other is rx_done,
   *               no matter which condition has a write back length.
-  */
+ */
 void uart_rx_dma_add_list_element(uart_num_e uart_num, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr, unsigned int data_len);
 
 /**
   * @brief      Set DMA single chain transfer.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn       - DMA channel
   * @param[in]  in_buff   - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  buff_size - any length less than 0xfffffc(multiple of four).
@@ -987,9 +995,11 @@ void uart_rx_dma_chain_init(uart_num_e uart_num, dma_chn_e chn, unsigned char *i
 __attribute__((weak)) void uart0_timeout_handler(unsigned int uart_error_timeout_code);
 __attribute__((weak)) void uart1_timeout_handler(unsigned int uart_error_timeout_code);
 __attribute__((weak)) void uart2_timeout_handler(unsigned int uart_error_timeout_code);
+__attribute__((weak)) void uart3_timeout_handler(unsigned int uart_error_timeout_code);
+__attribute__((weak)) void uart4_timeout_handler(unsigned int uart_error_timeout_code);
 /**
  * @brief     This function serves to set the uart timeout(us).
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] timeout_us - the timeout(us).
  * @return    none.
  * @note      The default timeout (g_uart_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
@@ -1010,7 +1020,7 @@ void uart_set_error_timeout(uart_num_e uart_num, unsigned int timeout_us);
 
 /**
  * @brief     This function serves to return the uart api error code.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none.
  */
 uart_api_error_timeout_code_e uart_get_error_timeout_code(uart_num_e uart_num);

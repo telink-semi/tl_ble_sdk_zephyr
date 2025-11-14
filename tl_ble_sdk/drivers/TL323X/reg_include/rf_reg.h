@@ -2210,6 +2210,25 @@ enum
 
 #define reg_rf_locd_cfg_0         REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x104)
 
+#define reg_rf_ldo1_1             REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x141)
+enum
+{
+    FLD_LDO_PLL_BOOST            = BIT(0),
+    FLD_LDO_VCO_BYPASS           = BIT(1),
+    FLD_LDO_VCO_BOOST            = BIT(2),
+    FLD_LDO_CAL_BYPASS           = BIT(3),
+    FLD_LDO_CAL_BOOST            = BIT(4),
+    FLD_LDO_ANT_BYPASS           = BIT(5),
+};
+
+#define reg_rf_lnm_pa_0          REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x14c)
+enum
+{
+   FLD_RF_LNA_ITRIM             = BIT_RNG(0,3),
+   FLD_RF_MIX_VBIAS             = BIT_RNG(4,5),
+   FLD_RF_PA_VBIAS              = BIT_RNG(6,7),
+};
+
 #define reg_rf_lnm_pa_ow_ctrl_val REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x178)
 
 enum

@@ -27,12 +27,16 @@
 
 /******************************* uart0 registers: 0x140080 *******************************/
 /******************************* uart1 registers: 0x1400c0 *******************************/
-/******************************* uart2 registers: 0x1402C0 *******************************/
-#define uart_base_addr(i)             (((i) < 2) ? (0x140080 + (i) * 0x40) : (0x1402C0)) /* uart[0-2] */
+/******************************* uart2 registers: 0x140440 *******************************/
+/******************************* uart3 registers: 0x140480 *******************************/
+/******************************* uart4 registers: 0x1404c0 *******************************/
+#define uart_base_addr(i) (((i) < 2) ? (0x140080 + (i) * 0x40) : (i == 2) ? (0x140440) : \
+                                                                 (i == 3) ? (0x140480) : \
+                                                                            (0x1404c0)) /* uart[0-4] */
 
-#define reg_uart_data_buf(i, j)       REG_ADDR8(uart_base_addr(i) + (j))                 /* uart[0-2] buf[0-3] */
+#define reg_uart_data_buf(i, j)       REG_ADDR8(uart_base_addr(i) + (j))            /* uart[0-4] buf[0-3] */
 #define reg_uart_data_hword_buf(i, j) REG_ADDR16(uart_base_addr(i) + (j) * 2)
-#define reg_uart_data_word_buf(i)     REG_ADDR32(uart_base_addr(i))                      /* uart[0-2] */
+#define reg_uart_data_word_buf(i)     REG_ADDR32(uart_base_addr(i))                 /* uart[0-4] */
 
 #define reg_uart_clk_div(i)           REG_ADDR16(uart_base_addr(i) + 0x04)
 

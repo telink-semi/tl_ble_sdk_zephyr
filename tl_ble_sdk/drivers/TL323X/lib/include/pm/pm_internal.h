@@ -80,94 +80,6 @@ extern _attribute_data_retention_sec_ unsigned int  g_pm_tick_32k_cur;
 extern _attribute_data_retention_sec_ unsigned char g_pm_long_suspend;
 
 /**
- * @brief   active mode VDDO3 output trim definition
- * @note    The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
- */
-typedef enum
-{
-    PM_VDDO3_VOLTAGE_1V4_2V9 = 0x00, /**<LDO output 1.4V in 1.8V mode & 2.9V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V5_3V0 = 0x01, /**<LDO output 1.5V in 1.8V mode & 3.0V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V6_3V1 = 0x02, /**<LDO output 1.6V in 1.8V mode & 3.1V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V7_3V2 = 0x03, /**<LDO output 1.7V in 1.8V mode & 3.2V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V8_3V3 = 0x04, /**<LDO output 1.8V in 1.8V mode & 3.3V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V9_3V4 = 0x05, /**<LDO output 1.9V in 1.8V mode & 3.4V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_2V0_3V5 = 0x06, /**<LDO output 2.0V in 1.8V mode & 3.5V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_2V1_3V6 = 0x07, /**<LDO output 2.1V in 1.8V mode & 3.6V in 3.3V mode */
-} pm_vddo3_voltage_e;
-
-/**
- * @brief dcdc trim flash out
- * 
- */
-typedef enum
-{
-    TRIM_VDDF_TO_1P64V = 0,
-    TRIM_VDDF_TO_1P66V,
-    TRIM_VDDF_TO_1P68V,
-    TRIM_VDDF_TO_1P70V,
-    TRIM_VDDF_TO_1P72V,
-    TRIM_VDDF_TO_1P74V,
-    TRIM_VDDF_TO_1P76V,
-    TRIM_VDDF_TO_1P78V,
-    TRIM_VDDF_TO_1P80V,
-    TRIM_VDDF_TO_1P83V,
-    TRIM_VDDF_TO_1P86V,
-    TRIM_VDDF_TO_1P89V,
-    TRIM_VDDF_TO_1P92V,
-    TRIM_VDDF_TO_1P95V,
-    TRIM_VDDF_TO_1P98V,
-    TRIM_VDDF_TO_2P01V,
-} pm_trim_vddf_e;
-
-/**
- * @brief trim ldo vdd 1p25 out
- * 
- */
-typedef enum
-{
-    TRIM_VDD1P25_TO_1P127V = 0,
-    TRIM_VDD1P25_TO_1P142V,
-    TRIM_VDD1P25_TO_1P157V,
-    TRIM_VDD1P25_TO_1P172V,
-    TRIM_VDD1P25_TO_1P187V,
-    TRIM_VDD1P25_TO_1p205V,
-    TRIM_VDD1P25_TO_1P220V,
-    TRIM_VDD1P25_TO_1P235V,
-    TRIM_VDD1P25_TO_1p250V,
-    TRIM_VDD1P25_TO_1P273V,
-    TRIM_VDD1P25_TO_1P296V,
-    TRIM_VDD1P25_TO_1P319V,
-    TRIM_VDD1P25_TO_1P342V,
-    TRIM_VDD1P25_TO_1P365V,
-    TRIM_VDD1P25_TO_1P388V,
-    TRIM_VDD1P25_TO_1P411V,
-} pm_trim_ldo_vdd1p25_e;
-
-/**
- * @brief trim dcdc vdd 1p25 out
- * 
- */
-typedef enum
-{
-    TRIM_VDD1P25_TO_1P056V = 0,
-    TRIM_VDD1P25_TO_1P081V,
-    TRIM_VDD1P25_TO_1P106V,
-    TRIM_VDD1P25_TO_1P131V,
-    TRIM_VDD1P25_TO_1P156V,
-    TRIM_VDD1P25_TO_1P181V,
-    TRIM_VDD1P25_TO_1P206V,
-    TRIM_VDD1P25_TO_1P231V,
-    TRIM_VDD1P25_TO_1p256V,
-    TRIM_VDD1P25_TO_1P279V,
-    TRIM_VDD1P25_TO_1P311V,
-    TRIM_VDD1P25_TO_1P334V,
-    TRIM_VDD1P25_TO_1P357V,
-    TRIM_VDD1P25_TO_1P380V,
-    TRIM_VDD1P25_TO_1P403V,
-    TRIM_VDD1P25_TO_1P426V,
-} pm_trim_dcdc_vdd1p25_e;
-
-/**
  * @brief trim dig ldo
  * 
  */
@@ -224,71 +136,6 @@ typedef enum
 } pm_ret_ldo_trim_e;
 
 /**
- * @brief trim deep retention LDO
- *
- */
-typedef enum
-{
-    NTV_LDO_TRIM_1P785V_0P908 = 0x00, //1.817 0.648
-    NTV_LDO_TRIM_1P812V_0P934 = 0x08, //1.860 0.662
-    NTV_LDO_TRIM_1P825V_0P847 = 0x10, //1.883 0.670
-    NTV_LDO_TRIM_1P734V_0P855 = 0x18, //1.895 0.676
-} pm_ntv_ldo_trim_e;
-
-/**
- * @brief trim dcore ldo
- * 
- */
-typedef enum
-{
-    DCORE_LDO_TRIM_0P550V = 0,
-    DCORE_LDO_TRIM_0P575V,
-    DCORE_LDO_TRIM_0P600V,
-    DCORE_LDO_TRIM_0P625V,
-    DCORE_LDO_TRIM_0P650V,
-    DCORE_LDO_TRIM_0P675V,
-    DCORE_LDO_TRIM_0P700V,
-    DCORE_LDO_TRIM_0P725V,
-    DCORE_LDO_TRIM_0P750V,
-    DCORE_LDO_TRIM_0P775V,
-    DCORE_LDO_TRIM_0P800V,
-    DCORE_LDO_TRIM_0P825V,
-    DCORE_LDO_TRIM_0P850V,
-    DCORE_LDO_TRIM_0P875V,
-    DCORE_LDO_TRIM_0P900V,
-    DCORE_LDO_TRIM_0P925V,
-} pm_dcore_ldo_trim_e;
-
-/**
- * @brief trim sram ldo
- * 
- */
-typedef enum
-{
-    SRAM_LDO_TRIM_0P60V = 0,
-    SRAM_LDO_TRIM_0P65V,
-    SRAM_LDO_TRIM_0P70V,
-    SRAM_LDO_TRIM_0P75V,
-    SRAM_LDO_TRIM_0P80V,
-    SRAM_LDO_TRIM_0P85V,
-    SRAM_LDO_TRIM_0P90V,
-    SRAM_LDO_TRIM_0P95V,
-} pm_sram_ldo_trim_e;
-
-typedef struct
-{
-    unsigned char dcdc_1p25v;
-    unsigned char ldo_1p25v;
-    unsigned char dcdc_1p35v;
-    unsigned char ldo_1p35v;
-} pm_cal_vdd1p25_t;
-
-extern _attribute_data_retention_sec_ pm_cal_vdd1p25_t g_pm_cal_vdd1p25_info;
-
-extern _attribute_data_retention_sec_ unsigned char  g_pm_cal_vddo1p8_info;
-extern _attribute_data_retention_sec_ pm_cal_1p25v_e g_pm_vdd1p25_level;
-
-/**
  * @brief       This function serves to reboot system.
  * @return      none
  */
@@ -299,52 +146,6 @@ _always_inline void sys_reset_all(void)
         ;
 #endif
     reg_pwdn_en = 0x20;
-}
-
-// /**
-//  * @brief       This function serves to trim vddo1p8 out.
-//  * @param[in]   trim_vddo1p8 - vddo 1.8v out
-//  * @return      none
-//  * @note        The trim value is the theoretical voltage, and the actual output voltage is subject to testing.
-//  */
-// static _always_inline void pm_set_vddo1p8(pm_trim_vddo1p8_e trim_vddo1p8)
-// {
-//     /*
-//     *                       poweron_dft:    0x44
-//     *       bit                     note
-//     * ---------------------------------------------------------------------------
-//     * <2:0>:vbat_ldo1p8_trim_3v,    calibrate LDO_1p8_HP/LDO_1p8_LP LDO output.
-//     */
-//     analog_write_reg8(areg_aon_0x08, (analog_read_reg8(areg_aon_0x08) & 0xf8) | trim_vddo1p8);
-// }
-
-/**
- * @brief       This function serves to trim dcdc/ldo out.
- * @param[in]   trim_vddf_ldo     - ldo trim vddf out
- * @param[in]   trim_vdd1p25_ldo  - ldo trim 1.25v out
- * @param[in]   trim_vdd1p25_dcdc - dcdc trim 1.25v out
- * @return      none
- * @note        The trim value is the theoretical voltage, and the actual output voltage is subject to testing.
- */
-static _always_inline void pm_set_vddf_vdd1p25(pm_trim_vddf_e trim_vddf_ldo, pm_trim_ldo_vdd1p25_e trim_vdd1p25_ldo, pm_trim_dcdc_vdd1p25_e trim_vdd1p25_dcdc)
-{
-    /*
-    *                       poweron_dft:    0x88
-    *       bit                     note
-    * ---------------------------------------------------------------------------
-    * 0x09<7:4>:tr_dcdc_ldo_1p8,        calibrate VDDF 1.8V LDO output.
-    */
-    analog_write_reg8(0x09, (analog_read_reg8(0x09)) | (trim_vddf_ldo << 4));
-
-    /*
-    *                       poweron_dft:    0x08
-    *       bit                     note
-    * ---------------------------------------------------------------------------
-    * 0x28<3:0>:tr_dcdc_ldo_1p25,     calibrate 1.25V LDO output.
-    * 0x29<3:0>:dcdc_trim_1p25V,      calibrate 1.25V DCDC output.
-    */
-    analog_write_reg8(0x28, (analog_read_reg8(0x28) & 0xf0) | trim_vdd1p25_ldo);
-    analog_write_reg8(0x29, (analog_read_reg8(0x29) & 0xf0) | trim_vdd1p25_dcdc);
 }
 
 /**
@@ -373,7 +174,7 @@ static _always_inline pm_dig_ldo_trim_e pm_get_dig_ldo_voltage(void)
  */
 static _always_inline unsigned char pm_get_spd_ldo_voltage(void)
 {
-    return analog_read_reg8(0x0e) & 0xf8;
+    return analog_read_reg8(0x0e) & 0x07;
 }
 
 /**
@@ -382,7 +183,7 @@ static _always_inline unsigned char pm_get_spd_ldo_voltage(void)
  */
 static _always_inline unsigned char pm_get_ret_ldo_voltage(void)
 {
-    return analog_read_reg8(0x0f) & 0xf8;
+    return analog_read_reg8(0x0f) & 0x07;
 
 }
 
@@ -404,50 +205,6 @@ static _always_inline void pm_set_spd_ldo_voltage(pm_spd_ldo_trim_e spd_ldo_trim
 static _always_inline void pm_set_ret_ldo_voltage(pm_ret_ldo_trim_e ret_ldo_trim)
 {
     analog_write_reg8(areg_aon_0x0f, (analog_read_reg8(areg_aon_0x0f) & 0xf8) | ret_ldo_trim);
-}
-
-/**
- * @brief       This function serves to trim native LDO voltage
- * @param[in]   ntv_ldo_trim - native LDO trim voltage
- * @return      none
- */
-static _always_inline void pm_set_ntv_ldo_voltage(pm_ntv_ldo_trim_e ntv_ldo_trim)
-{
-    analog_write_reg8(0x02, (analog_read_reg8(0x02) & 0xe7) | ntv_ldo_trim);
-}
-
-/**
- * @brief       This function serves to trim dcore ldo voltage.
- * @param[in]   dcore_ldo_trim - dcore ldo trim voltage.
- * @return      none.
- */
-// static _always_inline void pm_set_dcore_ldo_voltage(pm_dcore_ldo_trim_e dcore_ldo_trim)
-// {
-//     analog_write_reg8(0x12, (analog_read_reg8(0x12) & 0xf0) | dcore_ldo_trim);
-// }
-
-/**
- * @brief       This function serves to trim sram ldo voltage
- * @param[in]   sram_ldo_trim - sram ldo trim voltage
- * @return      none
- */
-// static _always_inline void pm_set_sram_ldo_voltage(pm_sram_ldo_trim_e sram_ldo_trim)
-// {
-//     analog_write_reg8(0x0e, (analog_read_reg8(0x0e) & 0x8f) | (sram_ldo_trim << 4));
-// }
-
-/**
- * @brief       This function servers to set 3V3 LDO output voltage in active mode.
- * @param[in]   voltage - vddo3 setting gear, can be set from 0 to 7.
- * @return      none.
- */
-static _always_inline void pm_set_active_vddo3(pm_vddo3_voltage_e voltage)
-{
-    //There are three LDOs connected together inside the chip, which affect the output voltage of VDDO3.
-    //Under different operating modes of the chip, different LDOs will be turned on, as follows: LDO for Active, LCLDO for SUSPEND and AOLDO for DEEP/DEEP_RET.
-    //Among them, LCLDO and AOLDO have weak driving capabilities, while LDO has strong driving capabilities.
-    //Currently, users of this interface only care about the voltage of VDDO3 in active mode so the interface only provides parameters for modifying LDO.
-    analog_write_reg8(0x15, (analog_read_reg8(0x15) & 0xf8) | voltage);
 }
 
 /**
@@ -530,15 +287,15 @@ static _always_inline void pm_trigger_sleep(void)
  */
 static _always_inline void pm_24mrc_power_up(void)
 {
-   if (!g_24m_rc_is_used) {
-       analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD)); //power on 24M RC
+    if (!g_24m_rc_is_used) {
+        analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD)); //power on 24M RC
 
-       /*
-        * the calibration of 24m RC should wait for 1us if just power it up.
-        * (added by jilong.liu, confirmed by yangya at 20240805)
-       */
-       core_cclk_delay_tick((unsigned long long)(2 * sys_clk.cclk));
-   }
+        /*
+         * the calibration of 24m RC should wait for 1us if just power it up.
+         * (added by jilong.liu, confirmed by yangya at 20240805)
+        */
+        core_cclk_delay_tick((unsigned long long)(2 * sys_clk.cclk));
+    }
 }
 
 /**
@@ -596,7 +353,6 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(unsigned c
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
 
-
 /**
  * @brief       this function serves to clear all irq status.
  * @return      Indicates whether clearing irq status was successful.
@@ -609,17 +365,3 @@ _attribute_ram_code_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_statu
  * @return      none.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_stimer_recover(void);
-
-/**
- * @brief      This function serves to get vdd1p25 and vddo1p8 current value from analog register.
- * @return     none.
- */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_update_vdd1p25_level(void);
-
-/**
- * @brief      This function serves to update vdd1p25 and vddo1p8 calibration value.
- * @param[in]  vdd1p25_value - calibration value for vdd1p25(calibration value is 4bytes)
- * @param[in]  vddo1p8_value - calibration value for vddo1p8(calibration value is 1bytes)
- * @return     none
- */
-void pm_update_vdd1p25_vddo1p8_cal_value(unsigned char *vdd1p25_value, unsigned char vddo1p8_value);

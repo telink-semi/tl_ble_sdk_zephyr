@@ -46,6 +46,8 @@ typedef enum
 
     PM_SLEEP_CIS_PERIPHR = BIT(8),
     PM_SLEEP_CIS_CENTRAL = BIT(9),
+
+    PM_SLEEP_CS = BIT(10),
 } sleep_mask_t;
 
 typedef enum

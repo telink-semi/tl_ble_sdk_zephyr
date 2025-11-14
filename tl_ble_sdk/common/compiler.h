@@ -26,12 +26,7 @@
 
 /******************************* platform code Use  *********************************/
 #define _attribute_ram_code_sec_            __attribute__((section(".ram_code")))
-
-#if CHIP_TYPE == CHIP_TYPE_TL323X
-#define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code_ble"))) __attribute__((noinline))
-#else
 #define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
-#endif  /* temporary solutions */
 
 #define _attribute_text_sec_                __attribute__((section(".text"))) __attribute__((noinline)) //Inlining happens when __attribute__((noinline)) is not added.
 #ifndef STD_GCC //standard open source risc-V GCC
@@ -70,36 +65,63 @@
 #else
     #define _attribute_ram_code_sec_optimize_o2_          __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
     #define _attribute_ram_code_sec_optimize_o2_noinline_ __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
-
 #endif
+
 /// Pack a structure field
 #define __PACKED __attribute__((__packed__))
-
 
 /*******************************      BLE Stack Use     ******************************/
 #include "common/config/user_config.h"
 
 #define _attribute_session_(s)               __attribute__((section(s)))
-#define _attribute_noinline_                __attribute__((noinline))        //
+
 #define _attribute_no_inline_                __attribute__((noinline))
-#define _attribute_data_dlm_                 _attribute_session_(".dlm_data") // dlm:Data Local Memory
-#define _attribute_data_sec_                 _attribute_session_(".data")     // Force only read data to be stored in data segments to avoid compiler optimization
+#define _attribute_data_dlm_                 _attribute_session_(".dlm_data")   // dlm:Data Local Memory
+#define _attribute_data_sec_                 __attribute__((section(".data")))  // Force only read data to be stored in data segments to avoid compiler optimization
 
 #define _attribute_iram_noinit_data_         __attribute__((section(".iram_noinit_data")))
 #define _attribute_iram_bss_                 __attribute__((section(".iram_bss")))
 
 #if (BLC_PM_DEEP_RETENTION_MODE_EN)
     #define _attribute_data_retention_sec_   __attribute__((section(".retention_data")))
-    #define _attribute_data_retention_       __attribute__((section(".retention_data")))
-    #define _attribute_ble_data_retention_   __attribute__((section(".retention_data")))
+
+    #ifndef BLC_ZEPHYR_BLE_INTEGRATION
+        #define _attribute_data_retention_       __attribute__((section(".retention_data")))    // used for ble
+        #define _attribute_ble_data_retention_   __attribute__((section(".retention_data")))    // used for ble
+    #else
+        #define _attribute_data_retention_       __attribute__((section(".retention_data_ble")))    // used for ble
+        #define _attribute_ble_data_retention_   __attribute__((section(".retention_data_ble")))    // used for ble
+    #endif
 #else
     #define _attribute_data_retention_sec_
     #define _attribute_data_retention_
     #define _attribute_ble_data_retention_
 #endif
 
-#define _attribute_ram_code_                  __attribute__((section(".ram_code"))) __attribute__((noinline))
-#define _attribute_ram_code_only_             __attribute__((section(".ram_code")))
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+    #define _attribute_ram_code_                  __attribute__((section(".ram_code"))) __attribute__((noinline))
+    #define _attribute_ram_code_only_             __attribute__((section(".ram_code")))
+    #define _attribute_ble_ram_code_noinline_     __attribute__((section(".ram_code"), noinline))
+    #define _attribute_ble_ram_code_              __attribute__((section(".ram_code")))
+#else
+    #define _attribute_ram_code_                  __attribute__((section(".ram_code_ble"))) __attribute__((noinline))
+    #define _attribute_ram_code_only_             __attribute__((section(".ram_code_ble")))
+    #define _attribute_ble_ram_code_noinline_     __attribute__((section(".ram_code_ble"), noinline))
+    #define _attribute_ble_ram_code_              __attribute__((section(".ram_code_ble")))
+#endif
+
+#ifndef STD_GCC //standard open source risc-V GCC, used for ble
+    #define _attribute_ble_ram_code_optimize_o2_            __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
+    #define _attribute_ble_ram_code_optimize_o2_noinline_   __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
+#else
+    #ifndef BLC_ZEPHYR_BLE_INTEGRATION
+        #define _attribute_ble_ram_code_optimize_o2_            __attribute__((section(".ram_code"), optimize("O2")))
+        #define _attribute_ble_ram_code_optimize_o2_noinline_   __attribute__((noinline)) __attribute__((section(".ram_code"), optimize("O2")))
+    #else
+        #define _attribute_ble_ram_code_optimize_o2_            __attribute__((section(".ram_code_ble"), optimize("O2")))
+        #define _attribute_ble_ram_code_optimize_o2_noinline_   __attribute__((noinline)) __attribute__((section(".ram_code_ble"), optimize("O2")))
+    #endif
+#endif
 
 #define _attribute_text_code_                 __attribute__((section(".text")))
 

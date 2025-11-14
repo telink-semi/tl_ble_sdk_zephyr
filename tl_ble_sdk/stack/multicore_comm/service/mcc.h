@@ -137,8 +137,8 @@ typedef enum
 typedef void(*mb_recv_cb_t)(void *);
 typedef void(*shm_recv_cb_t)(uint8_t *pData, uint16_t len);
 
-extern _attribute_data_retention_ mb_recv_cb_t mb_recv_cb[TLK_MAILBOX_RECEIVE_CB_NUM];
-extern _attribute_data_retention_ shm_recv_cb_t shm_recv_cb[TLK_SHM_MSG_RECEIVE_CB_NUM];
+extern _attribute_ble_data_retention_ mb_recv_cb_t mb_recv_cb[TLK_MAILBOX_RECEIVE_CB_NUM];
+extern _attribute_ble_data_retention_ shm_recv_cb_t shm_recv_cb[TLK_SHM_MSG_RECEIVE_CB_NUM];
 /* 
  * @brief   Mailbox receive callback
  * @param   msg: pointer to the received message

@@ -38,7 +38,7 @@
 /**********************************************************************************************************************
  *                                              global variable                                                       *
  *********************************************************************************************************************/
-dma_config_t uart_tx_dma_config[3] = {
+dma_config_t uart_tx_dma_config[5] = {
     {
      .dst_req_sel    = DMA_REQ_UART0_TX, // tx req
         .src_req_sel    = 0,
@@ -48,11 +48,11 @@ dma_config_t uart_tx_dma_config[3] = {
         .srcmode        = DMA_NORMAL_MODE,
      .dstwidth       = DMA_CTR_WORD_WIDTH,                                                                                        // must be word
         .srcwidth       = DMA_CTR_WORD_WIDTH,                                           // must be word
-        .src_burst_size = 0, // must be 0
+        .src_burst_size = 0,               // must be 0
         .read_num_en    = 0,
      .priority       = 0,
      .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+     .auto_en        = 0,                                                                                                                       // must be 0
     },
     {
      .dst_req_sel    = DMA_REQ_UART1_TX,                                   // tx req
@@ -63,11 +63,11 @@ dma_config_t uart_tx_dma_config[3] = {
         .srcmode        = DMA_NORMAL_MODE,
      .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
         .srcwidth       = DMA_CTR_WORD_WIDTH,                                                                                        // must be word
-        .src_burst_size = 0,                             // must be 0
+        .src_burst_size = 0,                                           // must be 0
         .read_num_en    = 0,
      .priority       = 0,
      .write_num_en   = 0,
-     .auto_en        = 0, // must be 0
+     .auto_en        = 0,                                                                                                                       // must be 0
     },
     {
      .dst_req_sel    = DMA_REQ_UART2_TX,     // tx req
@@ -78,14 +78,44 @@ dma_config_t uart_tx_dma_config[3] = {
         .srcmode        = DMA_NORMAL_MODE,
      .dstwidth       = DMA_CTR_WORD_WIDTH,                                           // must be word
         .srcwidth       = DMA_CTR_WORD_WIDTH, // must be word
-        .src_burst_size = 0,                                                                          // must be 0
+        .src_burst_size = 0,                                                                                        // must be 0
+        .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,                             // must be 0
+    },
+    {
+     .dst_req_sel    = DMA_REQ_UART3_TX,                // tx req
+        .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,                             // increment
+        .dstmode        = DMA_HANDSHAKE_MODE,                    // handshake
+        .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,                                                                                        // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH,                                           // must be word
+        .src_burst_size = 0, // must be 0
+        .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,                  // must be 0
+    },
+    {
+     .dst_req_sel    = DMA_REQ_UART4_TX,                // tx req
+        .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,                                                               // increment
+        .dstmode        = DMA_HANDSHAKE_MODE,                                                // handshake
+        .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,                                                                                              // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH,                                                                                        // must be word
+        .src_burst_size = 0,                                           // must be 0
         .read_num_en    = 0,
      .priority       = 0,
      .write_num_en   = 0,
      .auto_en        = 0, // must be 0
     },
 };
-dma_config_t uart_rx_dma_config[3] = {
+dma_config_t uart_rx_dma_config[5] = {
     {
      .dst_req_sel    = 0, // tx req
         .src_req_sel    = DMA_REQ_UART0_RX,
@@ -99,7 +129,7 @@ dma_config_t uart_rx_dma_config[3] = {
      .read_num_en    = 0,
      .priority       = 0,
      .write_num_en   = 1,
-     .auto_en        = 0, // must be 0
+     .auto_en        = 0,                                                                                           // must be 0
     },
     {
      .dst_req_sel    = 0,                    // tx req
@@ -114,7 +144,7 @@ dma_config_t uart_rx_dma_config[3] = {
      .read_num_en    = 0,
      .priority       = 0,
      .write_num_en   = 1,
-     .auto_en        = 0, // must be 0
+     .auto_en        = 0,                                                                                           // must be 0
     },
     {
      .dst_req_sel    = 0,       // tx req
@@ -131,16 +161,46 @@ dma_config_t uart_rx_dma_config[3] = {
      .write_num_en   = 1,
      .auto_en        = 0, // must be 0
     },
+    {
+     .dst_req_sel    = 0, // tx req
+        .src_req_sel    = DMA_REQ_UART3_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,       // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH,                                                 ////must be word
+        .src_burst_size = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 1,
+     .auto_en        = 0, // must be 0
+    },
+    {
+     .dst_req_sel    = 0, // tx req
+        .src_req_sel    = DMA_REQ_UART4_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH, // must be word
+        .srcwidth       = DMA_CTR_WORD_WIDTH,                                                    ////must be word
+        .src_burst_size = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 1,
+     .auto_en        = 0, // must be 0
+    },
 };
 
 /**********************************************************************************************************************
  *                                              local variable                                                        *
  *********************************************************************************************************************/
-static unsigned char uart_dma_tx_chn[3];
-static unsigned char uart_dma_rx_chn[3];
-static unsigned int  uart_dma_rev_size[3];
+static unsigned char uart_dma_tx_chn[5];
+static unsigned char uart_dma_rx_chn[5];
+static unsigned int  uart_dma_rev_size[5];
 dma_chain_config_t   g_uart_rx_dma_list_cfg;
-uart_timeout_error_t g_uart_timeout_error[3] = {
+uart_timeout_error_t g_uart_timeout_error[5] = {
     {
      .g_uart_error_timeout_us   = 0xffffffff,
      .uart_timeout_handler      = uart0_timeout_handler,
@@ -154,6 +214,16 @@ uart_timeout_error_t g_uart_timeout_error[3] = {
     {
      .g_uart_error_timeout_us   = 0xffffffff,
      .uart_timeout_handler      = uart2_timeout_handler,
+     .g_uart_error_timeout_code = UART_API_ERROR_TIMEOUT_NONE,
+     },
+    {
+     .g_uart_error_timeout_us   = 0xffffffff,
+     .uart_timeout_handler      = uart3_timeout_handler,
+     .g_uart_error_timeout_code = UART_API_ERROR_TIMEOUT_NONE,
+     },
+    {
+     .g_uart_error_timeout_us   = 0xffffffff,
+     .uart_timeout_handler      = uart4_timeout_handler,
      .g_uart_error_timeout_code = UART_API_ERROR_TIMEOUT_NONE,
      }
 };
@@ -174,7 +244,7 @@ static unsigned char uart_is_prime(unsigned int n);
 
 /**
  * @brief      Initialize the UART module.
- * @param[in]  uart_num    - UART0/UART1/UART2.
+ * @param[in]  uart_num    - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  div         - UART clock divider.
  * @param[in]  bwpc        - bitwidth, should be set to larger than 2.
  * @param[in]  parity      - selected parity type for UART interface.
@@ -322,7 +392,7 @@ void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int pclk, unsigned sh
        How to set:
          rx_timeout = (((1/baudrate) * bit_cnt)* mul)*(2^rxtimeout_exp)  value = ((bwpc+1) * bit_cnt, the maximum of this value can be set to 0xff.
    @endverbatim
- * @param[in]  uart_num        - UART0/UART1/UART2.
+ * @param[in]  uart_num        - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  bwpc            - bitwidth.
  * @param[in]  bit_cnt         - bit number(for example, if transferring one bytes (1start bit+8bits data+1 priority bit+2stop bits) total 12 bits,then set it to at least 12).
  * @param[in]  mul             - mul.
@@ -358,9 +428,19 @@ __attribute__((weak)) void uart2_timeout_handler(unsigned int uart_error_timeout
     g_uart_timeout_error[UART2].g_uart_error_timeout_code = uart_error_timeout_code;
 }
 
+__attribute__((weak)) void uart3_timeout_handler(unsigned int uart_error_timeout_code)
+{
+    g_uart_timeout_error[UART3].g_uart_error_timeout_code = uart_error_timeout_code;
+}
+
+__attribute__((weak)) void uart4_timeout_handler(unsigned int uart_error_timeout_code)
+{
+    g_uart_timeout_error[UART4].g_uart_error_timeout_code = uart_error_timeout_code;
+}
+
 /**
   * @brief     This function serves to set the uart timeout(us).
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] timeout_us - the timeout(us).
   * @return    none.
   * @note      The default timeout (g_uart_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
@@ -384,7 +464,7 @@ void uart_set_error_timeout(uart_num_e uart_num, unsigned int timeout_us)
 
 /**
   * @brief     This function serves to return the uart api error code.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @return    none.
   */
 uart_api_error_timeout_code_e uart_get_error_timeout_code(uart_num_e uart_num)
@@ -394,7 +474,7 @@ uart_api_error_timeout_code_e uart_get_error_timeout_code(uart_num_e uart_num)
 
 /**
 * @brief     Check whether tx_fifo is full(byte).
-* @param[in] uart_num - UART0/UART1/UART2.
+* @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
 * @return    0: not full  1:full
 */
 static bool uart_byte_txfifo_is_full(uart_num_e uart_num)
@@ -404,7 +484,7 @@ static bool uart_byte_txfifo_is_full(uart_num_e uart_num)
 
 /**
 * @brief     Check whether tx_fifo is full(byte).
-* @param[in] uart_num - UART0/UART1/UART2.
+* @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
 * @return    0: not full  1:full
 */
 static bool uart_hword_txfifo_is_full(uart_num_e uart_num)
@@ -414,7 +494,7 @@ static bool uart_hword_txfifo_is_full(uart_num_e uart_num)
 
 /**
 * @brief     Check whether tx_fifo is full(byte).
-* @param[in] uart_num - UART0/UART1/UART2.
+* @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
 * @return    0: not full  1:full
 */
 static bool uart_word_txfifo_is_full(uart_num_e uart_num)
@@ -425,11 +505,11 @@ static bool uart_word_txfifo_is_full(uart_num_e uart_num)
 #define UART_WAIT(condition, uart_num, g_uart_error_timeout_us, uart_timeout_handler, uart_api_error_code) wait_condition_fails_or_timeout_with_param(condition, (unsigned int)uart_num, g_uart_error_timeout_us, uart_timeout_handler, (unsigned int)uart_api_error_code)
 
 
-unsigned char uart_tx_byte_index[3] = {0};
+unsigned char uart_tx_byte_index[5] = {0};
 
 /**
  * @brief      Send UART data by byte in no_dma mode.
- * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  tx_data  - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
@@ -445,11 +525,11 @@ drv_api_status_e uart_send_byte(uart_num_e uart_num, unsigned char tx_data)
     return DRV_API_SUCCESS;
 }
 
-unsigned char uart_rx_byte_index[3] = {0};
+unsigned char uart_rx_byte_index[5] = {0};
 
 /**
  * @brief     Receive UART data by byte in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    none
  */
 unsigned char uart_read_byte(uart_num_e uart_num)
@@ -462,7 +542,7 @@ unsigned char uart_read_byte(uart_num_e uart_num)
 
 /**
  * @brief     Judge if the transmission of UART is done.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @return    0:tx is done     1:tx isn't done
  * @note      If upper-layer application calls the interface, if the timeout mechanism is used, the status cannot be detected because the uart send data is abnormal,
  *            see uart_set_error_timeout(time setting requirement).
@@ -474,14 +554,14 @@ unsigned char uart_tx_is_busy(uart_num_e uart_num)
 
 /**
  * @brief     Send UART data by halfword in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] data  - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
  */
 drv_api_status_e uart_send_hword(uart_num_e uart_num, unsigned short data)
 {
-    static unsigned char uart_tx_hword_index[3] = {0};
+    static unsigned char uart_tx_hword_index[5] = {0};
     if (UART_WAIT(uart_hword_txfifo_is_full, uart_num, g_uart_timeout_error[uart_num].g_uart_error_timeout_us, g_uart_timeout_error[uart_num].uart_timeout_handler, UART_API_ERROR_TIMEOUT_SEND_HWORD)) {
         return DRV_API_TIMEOUT;
     }
@@ -494,7 +574,7 @@ drv_api_status_e uart_send_hword(uart_num_e uart_num, unsigned short data)
 
 /**
  * @brief     Send UART data by word in no_dma mode.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] data - the data to be send.
  * @return    DRV_API_SUCCESS: operation successful;
  *            DRV_API_TIMEOUT: timeout exit(solution refer to the note for uart_set_error_timeout);
@@ -510,7 +590,7 @@ drv_api_status_e uart_send_word(uart_num_e uart_num, unsigned int data)
 
 /**
  * @brief     Set the RTS pin's output level manually.
- * @param[in] uart_num - UART0/UART1/UART2.
+ * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in] polarity - 0: RTS pin outputs a low level  1: RTS pin outputs a high level.
  * @return    none
  */
@@ -525,7 +605,7 @@ void uart_set_rts_level(uart_num_e uart_num, unsigned char polarity)
 
 /**
  *  @brief      Set pin for UART cts function, the pin connection mode: CTS<->RTS.
- *  @param[in]  uart_num - UART0/UART1/UART2.
+ *  @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  *  @param[in]  cts_pin -To set cts pin.
  *  @return     none
  */
@@ -541,6 +621,12 @@ void uart_set_cts_pin(uart_num_e uart_num, gpio_func_pin_e cts_pin)
     case UART2:
         gpio_set_mux_function(cts_pin, UART2_CTS_I);
         break;
+    case UART3:
+        gpio_set_mux_function(cts_pin, UART3_CTS_I);
+        break;
+    case UART4:
+        gpio_set_mux_function(cts_pin, UART4_CTS_I);
+        break;
     default:
         break;
     }
@@ -550,7 +636,7 @@ void uart_set_cts_pin(uart_num_e uart_num, gpio_func_pin_e cts_pin)
 
 /**
  *  @brief      Set pin for UART rts function, the pin connection mode: RTS<->CTS.
- *  @param[in]  uart_num - UART0/UART1/UART2.
+ *  @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  *  @param[in]  rts_pin - To set rts pin.
  *  @return     none
  */
@@ -566,6 +652,13 @@ void uart_set_rts_pin(uart_num_e uart_num, gpio_func_pin_e rts_pin)
     case UART2:
         gpio_set_mux_function(rts_pin, UART2_RTS);
         break;
+    case UART3:
+        gpio_set_mux_function(rts_pin, UART3_RTS);
+        break;
+    case UART4:
+        gpio_set_mux_function(rts_pin, UART4_RTS);
+        break;
+
     default:
         break;
     }
@@ -574,11 +667,11 @@ void uart_set_rts_pin(uart_num_e uart_num, gpio_func_pin_e rts_pin)
 
 /**
 * @brief      Select pin for UART module, the pin connection mode: TX<->RX RX<->TX.
-* @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
 * @param[in]  tx_pin   - the pin to send data.
 * @param[in]  rx_pin   - the pin to receive data.
-* @return     none
-*/
+ * @return     none
+ */
 void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e rx_pin)
 {
     // When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
@@ -595,6 +688,12 @@ void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e r
             break;
         case UART2:
             gpio_set_mux_function(tx_pin, UART2_TX);
+            break;
+        case UART3:
+            gpio_set_mux_function(tx_pin, UART3_TX);
+            break;
+        case UART4:
+            gpio_set_mux_function(tx_pin, UART4_TX);
             break;
         default:
             break;
@@ -614,6 +713,12 @@ void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e r
         case UART2:
             gpio_set_mux_function(rx_pin, UART2_RTX_IO);
             break;
+        case UART3:
+            gpio_set_mux_function(rx_pin, UART3_RTX_IO);
+            break;
+        case UART4:
+            gpio_set_mux_function(rx_pin, UART4_RTX_IO);
+            break;
         default:
             break;
         }
@@ -628,10 +733,10 @@ void uart_set_pin(uart_num_e uart_num, gpio_func_pin_e tx_pin, gpio_func_pin_e r
 *                in dma,uart_send_dma.
 *             -# The interface uart_rtx_pin_tx_trig is called,if not calling this interface, the data cannot be sent out.
 *             -# After converting to tx, if tx_fifo has no data, the hardware automatically converts to rx function.
-* @param[in]  uart_num - UART0/UART1/UART2.
-* @param[in]  rtx_pin  - the rtx pin need to set.
-* @return     none
-*/
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
+ * @param[in]  rtx_pin  - the rtx pin need to set.
+ * @return     none
+ */
 void uart_set_rtx_pin(uart_num_e uart_num, gpio_func_pin_e rtx_pin)
 {
     // When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
@@ -648,6 +753,12 @@ void uart_set_rtx_pin(uart_num_e uart_num, gpio_func_pin_e rtx_pin)
     case UART2:
         gpio_set_mux_function(rtx_pin, UART2_RTX_IO);
         break;
+    case UART3:
+        gpio_set_mux_function(rtx_pin, UART3_RTX_IO);
+        break;
+    case UART4:
+        gpio_set_mux_function(rtx_pin, UART4_RTX_IO);
+        break;
     default:
         break;
     }
@@ -656,11 +767,11 @@ void uart_set_rtx_pin(uart_num_e uart_num, gpio_func_pin_e rtx_pin)
 
 /**
 * @brief     Send an amount of data in NODMA mode
-* @param[in] uart_num - UART0/UART1/UART2.
+
 * @param[in] addr     - pointer to the buffer.
-* @param[in] len      - NDMA transmission length.
-* @return    1
-*/
+ * @param[in] len      - NDMA transmission length.
+ * @return    1
+ */
 unsigned char uart_send(uart_num_e uart_num, unsigned char *addr, unsigned char len)
 {
     for (unsigned char i = 0; i < len; i++) {
@@ -700,7 +811,7 @@ unsigned char uart_send_dma(uart_num_e uart_num, unsigned char *addr, unsigned i
  * @brief       This function serves to receive data function by DMA, this function tell the DMA to get data from the uart data fifo.
  *              regardless of the length of the DMA configuration, write_num is available,the dma automatically writes back the data receive length to the first four bytes of the rec_buff without manual calculation,
  *              so need addr = the receive buff addr +4.
- * @param[in]   uart_num - UART0/UART1/UART2.
+ * @param[in]   uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]   addr     - pointer to the buffer  receive data.
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
@@ -725,10 +836,10 @@ void uart_receive_dma(uart_num_e uart_num, unsigned char *addr, unsigned int rev
 
 /**
   * @brief     Configures the UART tx_dma channel control register.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] chn      - dma channel.
   * @return    none
-  */
+ */
 void uart_set_tx_dma_config(uart_num_e uart_num, dma_chn_e chn)
 {
     uart_dma_tx_chn[uart_num] = chn;
@@ -737,7 +848,7 @@ void uart_set_tx_dma_config(uart_num_e uart_num, dma_chn_e chn)
 
 /**
  * @brief      Configures UART rx_dma channel control register.
- * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
  * @param[in]  chn      - dma channel.
  * @return     none
  */
@@ -751,12 +862,12 @@ void uart_set_rx_dma_config(uart_num_e uart_num, dma_chn_e chn)
 
 /**
   * @brief     Configure UART hardware flow CTS.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] cts_pin    - cts pin select.
   * @param[in] cts_parity -  1:Active high,when the cts pin receives a high level, it stops sending data.
   *                          0:Active low,when the cts pin receives a low level, it stops sending data.
   * @return    none
-  */
+ */
 void uart_cts_config(uart_num_e uart_num, gpio_func_pin_e cts_pin, unsigned char cts_parity)
 {
     // When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
@@ -773,7 +884,7 @@ void uart_cts_config(uart_num_e uart_num, gpio_func_pin_e cts_pin, unsigned char
 
 /**
   * @brief     Configure UART hardware flow RTS.
-  * @param[in] uart_num - UART0/UART1/UART2.
+  * @param[in] uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in] rts_pin      - RTS pin select.
   * @param[in] rts_parity   - 0: Active high: rts level changed from low to high.
   *                           1: Active low: rts level changed from high to low.
@@ -792,7 +903,7 @@ void uart_cts_config(uart_num_e uart_num, gpio_func_pin_e cts_pin, unsigned char
        -# Manually control the output level of the rts pin through the uart_set_rts_level interface.
     @endverbatim
   * @return    none
-  */
+ */
 void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char rts_parity, unsigned char auto_mode_en)
 {
     uart_set_rts_pin(uart_num, rts_pin);
@@ -811,7 +922,7 @@ void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char
 
 /*
   * @brief      Configure DMA head node.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn         - DMA channel.
   * @param[in]  dst_addr    - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  data_len    - any length less than 0xfffffc(multiple of four).
@@ -820,7 +931,7 @@ void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char
   * @note       there are no usage restrictions, there is no need to configure the dma length to a maximum length, and there is no limit to the send length:
   *              - The condition of linked list jump: one is when the length of the dma configuration is reached, the other is rx_done,
   *                no matter which condition has a write back length.
-  */
+ */
 void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list)
 {
     uart_dma_rev_size[uart_num] = data_len;
@@ -835,9 +946,9 @@ void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn, unsigned char *d
 
 /**
   * @brief      Configure DMA cycle chain node.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn         - DMA channel.
-  * @param[in]  config_addr - to servers to configure the address of the current node.
+ * @param[in]  config_addr - to servers to configure the address of the current node.
   * @param[in]  llpointer   - to configure the address of the next node.
   * @param[in]  dst_addr    - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  data_len    - any length less than 0xfffffc(multiple of four).
@@ -845,7 +956,7 @@ void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn, unsigned char *d
   * @note       there are no usage restrictions, there is no need to configure the dma length to a maximum length, and there is no limit to the send length:
   *             - The condition of linked list jump: one is when the length of the dma configuration is reached, the other is rx_done,
   *               no matter which condition has a write back length.
-  */
+ */
 void uart_rx_dma_add_list_element(uart_num_e uart_num, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr, unsigned int data_len)
 {
     uart_auto_clr_rx_fifo_ptr(uart_num, 1);
@@ -858,7 +969,7 @@ void uart_rx_dma_add_list_element(uart_num_e uart_num, dma_chn_e chn, dma_chain_
 
 /**
   * @brief      Set DMA single chain transfer.
-  * @param[in]  uart_num - UART0/UART1/UART2.
+ * @param[in]  uart_num - UART0/UART1/UART2/UART3/UART4.
   * @param[in]  chn       - DMA channel
   * @param[in]  in_buff   - Pointer to data buffer, which must be 4 bytes aligned.
   * @param[in]  buff_size - any length less than 0xfffffc(multiple of four).

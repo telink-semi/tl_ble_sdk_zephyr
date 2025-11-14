@@ -27,7 +27,6 @@
 #include "compiler.h"
 #include "gpio.h"
 #include "lib/include/clock.h"
-#include "dma.h"
 
 
 /**
@@ -77,6 +76,7 @@ typedef enum
     DEEPSLEEP_MODE_RET_SRAM_LOW32K  = 0x61, //for boot from sram
     DEEPSLEEP_MODE_RET_SRAM_LOW96K  = 0x43, //for boot from sram
     DEEPSLEEP_MODE_RET_SRAM_LOW160K = 0x07, //for boot from sram
+    SHUTDOWN_MODE = 0x80,
 
     //not available mode
     DEEPSLEEP_RETENTION_FLAG = 0x07,
@@ -97,7 +97,7 @@ typedef enum
 
                                             2.When entering sleep, keep the input voltage and reference voltage difference must be greater than 30mV, otherwise can not enter sleep normally, crash occurs.
                                           */
-    //   PM_WAKEUP_SHUTDOWN     = BIT(7),
+    PM_WAKEUP_SHUTDOWN   = BIT(7),
 } pm_sleep_wakeup_src_e;
 
 /**
@@ -150,28 +150,6 @@ typedef enum
     PM_POWER_UP   = 0,
     PM_POWER_DOWN = 1,
 } pm_power_sel_e;
-
-typedef enum
-{
-    CAL_1p25V_TO_1P25V,
-    CAL_1p25V_TO_1P35V,
-} pm_cal_1p25v_e;
-
-/**
- * @brief   active mode CORE/SRAM output trim definition
- * @note    The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
- *          The CORE_0P7V_SRAM_0P8V_BB_0P7V is not opened to user after evaluate. 
- *          As we know, reducing voltage can reduce power consumption in some extent, but for this gear, the benefits may not be significant. 
- *          At this gear, it will takes nearly 150us more time to enter sleep mode, which is unacceptable in most scenarios.
- */
-typedef enum
-{
-    // CORE_0P7V_SRAM_0P8V_BB_0P7V = 0,/**< multi ldo mode  0.94V-LDO/DCDC 0.7V_CORE 0.8V_SRAM 0.7V BB*/
-    CORE_0P8V_SRAM_0P8V_BB_0P8V = 1, /**< dig ldo mode  0.94V-LDO/DCDC 0.8V_CORE 0.8V_SRAM 0.8V BB (default value)*/
-    CORE_0P9V_SRAM_0P9V_BB_0P9V = 2, /**< dig ldo mode  1.05V-LDO/DCDC 0.9V_CORE 0.9V_SRAM 0.9V BB*/
-} pm_power_cfg_e;
-
-extern pm_power_cfg_e g_dvdd_vol;
 
 /**
  * @brief   early wakeup time
@@ -269,7 +247,7 @@ static _always_inline void pm_set_vbat_type(vbat_type_e vbat_v)
 
 /**
  * @brief       This function configures a GPIO pin as the wakeup pin.
- * @param[in]   pin - the pins can be set to all GPIO except PB0/PC5 and GPIOG groups.
+ * @param[in]   pin - the pins can be set to all GPIO except GPIOF groups.
  * @param[in]   pol - the wakeup polarity of the pad pin(0: low-level wakeup, 1: high-level wakeup).
  * @param[in]   en  - enable or disable the wakeup function for the pan pin(1: enable, 0: disable).
  * @return      none.
@@ -342,36 +320,6 @@ _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wa
 pm_sw_reboot_reason_e pm_get_sw_reboot_event(void);
 
 /**
- * @brief       This function serves to switch digital module power.
- * @param[in]   module - digital module.
- * @param[in]   power_sel - power up or power down.
- * @return      none.
- */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
-
-/**
- * @brief       This function serves to set dvdd
- * @param[in]   vol      - CORE_0P8V_SRAM_0P8V_BB_0P8V /CORE_0P9V_SRAM_0P9V_BB_0P9V.
- *                       - the 0.8v/0.9v confirms which of the pm_core_sram_bb_voltage_e enumeration is configured, and then assigns the value to the macro CORE_0P8V_SRAM_0P8V_BB_0P8V_CONFG/CORE_0P9V_SRAM_0P9V_BB_0P9V_CONFG.
- * @param[in]   chn      - dma channel.
- * @param[in]   dma_timeout_us - wait dma all chn complete timeout.
- * @return      DRV_API_SUCCESS - successful;
- *              DRV_API_INVALID_PARAM - equal to the current voltage configuration or dvdd1_dvdd2_vol error;
- *              DRV_API_FAILURE - core error(need contains all the cores used);
- *              DRV_API_TIMEOUT - wait for dma all chn idle timeout to exit;
- *              DRV_API_OTHER_ERROR - clear all interrupt requests failed;
- * @note        1.If the voltage goes up, after calling the interface first, then adjust the frequency;
- *                If the voltage goes down, adjust the frequency first, then call the interface;
- *              2.When adjusting this voltage, no access ram operation is allowed, so it will wait for dma idle in this interface,
- *                modifying dma_timeout_us won't work if there are dma chains working all the time, and needs to be turned off by the upper layers themselves depending on the situation.
- *              3.When adjusting this voltage, the mcu will be stalled because the ram cannot be operated, use the dma method to modify the dvdd configuration and wake up the d25f with this dma interrupt,
- *                so will turns off the general interrupt and clears all interrupt requests.
- *              4.When adjusting this voltage, no access ram operation is allowed, disable swire.
- *              5.If the check configuration fails, reboot.
- */
-drv_api_status_e pm_set_dvdd(pm_power_cfg_e vol, dma_chn_e chn, unsigned int dma_timeout_us);
-
-/**
  * @brief       This function serves to update wakeup status.
  * @param[in]   clr_en  - Whether to set the value of the status register to a fixed value.
  *                        If the interface is called twice, the first time it is not modified, clr_en=0;
@@ -387,7 +335,7 @@ _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_e
 
 /**
  * @brief       This function serves to set system power mode.
- * @param[in]   power_mode  - power mode(LDO/DCDC/LDO_DCDC).
+ * @param[in]   power_mode  - power mode(LDO/LDO_DCDC).
  * @return      none.
  * @note        pd_dcdc_ldo_sw<1:0>, dcdc & bypass ldo status bits:
                     dcdc_1p25   dcdc_1p8     ldo_1p25    ldo_1p8
@@ -395,20 +343,6 @@ _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_e
                 01:     Y           N           N           Y
  */
 _attribute_ram_code_sec_noinline_ void pm_set_power_mode(power_mode_e power_mode);
-
-/**
- * @brief      This function serves to update vdd1p25 and vddo1p8 current value current from global variable.
- * @return     pm_cal_1p25v_e - the vdd 0.94 current voltage level.
- * @note       This function must call after sys_init, otherwise the return value may be incorrect.
- */
-pm_cal_1p25v_e pm_get_vdd1p25_level(void);
-
-/**
- * @brief       This function serves to trim dcdc/ldo 0.94v.
- * @param[in]   value - the voltage to be set.
- * @return      none
- */
-_attribute_ram_code_sec_noinline_ void pm_set_vdd1p25(pm_cal_1p25v_e value);
 
 /********************************************************************************************************
  *                                          internal
@@ -423,3 +357,11 @@ _attribute_ram_code_sec_noinline_ void pm_set_vdd1p25(pm_cal_1p25v_e value);
  * @return      none.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en);
+
+/**
+ * @brief       This function serves to switch digital module power.
+ * @param[in]   module - digital module.
+ * @param[in]   power_sel - power up or power down.
+ * @return      none.
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_  void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);

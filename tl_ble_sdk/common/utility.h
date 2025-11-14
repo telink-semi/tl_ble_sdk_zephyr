@@ -132,10 +132,8 @@
 #define foreach_range(i, s, e) for (int i = (s); i < (e); ++i)
 #define foreach_arr(i, arr)    for (unsigned int i = 0; i < ARRAY_SIZE(arr); ++i)
 
-#ifndef STD_GCC
-#define ARRAY_SIZE(a)          (sizeof(a) / sizeof(*a))
-#else
-#include <zephyr/sys/util.h>
+#ifndef ARRAY_SIZE
+    #define ARRAY_SIZE(a)          (sizeof(a) / sizeof(*a))
 #endif
 
 #define everyN(i, n)           \

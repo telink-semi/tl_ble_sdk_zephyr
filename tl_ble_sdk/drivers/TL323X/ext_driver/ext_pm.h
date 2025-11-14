@@ -38,8 +38,7 @@
 
 #define DEEPSLEEP_RAM_SIZE_TO_MODE(ram_size)  ram_size==0x8000? DEEPSLEEP_MODE_RET_SRAM_LOW32K: (ram_size==0x10000)? DEEPSLEEP_MODE_RET_SRAM_LOW64K:DEEPSLEEP_MODE_RET_SRAM_LOW96K
 
-typedef int (*cpu_pm_handler_t)(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
-extern  cpu_pm_handler_t            cpu_sleep_wakeup;
+
 
 
 #define DEFAULT_DEEPSLEEP_MODE_RET_SRAM_SIZE  DEEPSLEEP_MODE_RET_SRAM_LOW96K
@@ -71,44 +70,19 @@ void bls_pm_registerFuncBeforeSuspend (suspend_handler_t func );
  * @param[in]  wakeup_tick - the time of short sleep, which means MCU can sleep for less than 5 minutes.
  * @return     indicate whether the cpu is wake up successful.
  */
-int  cpu_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
-
-/**
- * @brief      This function serves to set the working mode of MCU based on 32k crystal,e.g. suspend mode, deepsleep mode, deepsleep with SRAM retention mode and shutdown mode.
- * @param[in]  sleep_mode - sleep mode type select.
- * @param[in]  wakeup_src - wake up source select.
- * @param[in]  wakeup_tick - the time of short sleep, which means MCU can sleep for less than 5 minutes.
- * @return     indicate whether the cpu is wake up successful.
- */
-int  cpu_sleep_wakeup_32k_xtal(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
+typedef int (*cpu_pm_handler_t)(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
+extern  cpu_pm_handler_t            cpu_sleep_wakeup;
 
 /**
  * @brief   This function serves to reboot chip.
  * @param   none.
  * @return  none.
  */
-void start_reboot(void);
-
-/**
- * @brief   This function serves to recover system timer from tick of internal 32k RC.
- * @param   none.
- * @return  none.
- */
-unsigned int pm_tim_recover_32k_rc(unsigned int now_tick_32k);
-
-/**
- * @brief   This function serves to recover system timer from tick of external 32k crystal.
- * @param   none.
- * @return  none.
- */
-unsigned int pm_tim_recover_32k_xtal(unsigned int now_tick_32k);
-
-/**
- * @brief   This function serves to get the 32k tick.
- * @param   none
- * @return  tick of 32k .
- */
-unsigned int clock_get_digital_32k_tick(void);
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+    #define start_reboot                sys_reboot   //This function serves to reboot chip.
+#else
+    #define start_reboot                protected_sys_reboot
+#endif
 
 /**
  * @brief      This function serves to determine whether wake up source is internal 32k RC.
@@ -124,15 +98,6 @@ void blc_pm_select_internal_32k_crystal(void);
  * @return     none.
  */
 void blc_pm_select_external_32k_crystal(void);
-
-/**
- * @brief      This function servers to wake up the cpu from sleep mode.
- * @param[in]  sleep_mode - sleep mode type select.
- * @param[in]  wakeup_src - wake up source select.
- * @param[in]  wakeup_tick - the time of sleep,unit is 31.25us,1ms = 32.
- * @return     indicate whether the cpu is wake up successful.
- */
-int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
 
 /**
  * @brief      This function serves to determine whether mcu is waked up from deep retention.
