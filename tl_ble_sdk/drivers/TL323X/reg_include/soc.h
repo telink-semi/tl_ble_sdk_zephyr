@@ -319,6 +319,8 @@ enum
 
 #define reg_clkzb_set REG_ADDR8(SC_BASE_ADDR + 0x56)
 
+#define reg_pvd_config    REG_ADDR8(SC_BASE_ADDR + 0x58)
+
 #define reg_i2s0_step REG_ADDR16(SC_BASE_ADDR + 0x06)
 
 enum

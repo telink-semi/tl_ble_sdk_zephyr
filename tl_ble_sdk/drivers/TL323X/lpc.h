@@ -30,6 +30,7 @@
  */
 typedef enum
 {
+    LPC_FLOAT = 0,
     LPC_INPUT_PB5 = 1,
     LPC_INPUT_PB6 = 2,
     LPC_INPUT_PB7 = 3,
@@ -59,8 +60,8 @@ typedef enum
     LPC_REF_923MV = 2,
     LPC_REF_872MV = 3,
     LPC_REF_820MV = 4,
-    LPC_REF_PB0   = 5,
-    LPC_REF_PB3   = 6,
+    LPC_REF_PB4   = 5,
+    LPC_REF_PB7   = 6,
 } lpc_reference_e;
 
 /**
@@ -74,6 +75,27 @@ typedef enum
     LPC_SCALING_PER75  = 2, // 3/4
     LPC_SCALING_PER100 = 3, // 4/4
 } lpc_scaling_e;
+
+/**
+ * @brief lpc vbat detect threshold
+ * |            |                    |
+ * | :--------- | :----------------- |
+ * |   <7:4>    |        <3:0>       |
+ * |bg trim gear| threshold voltage  |
+ */
+typedef enum
+{
+    LPC_VBAT_FALLING_2P50V_RISING_2P60V  = 1 | (1<<4),
+    LPC_VBAT_FALLING_2P34V_RISING_2P45V  = 2 | (1<<4),
+    LPC_VBAT_FALLING_2P20V_RISING_2P30V  = 3 | (1<<4),
+    LPC_VBAT_FALLING_2P04V_RISING_2P15V  = 4 | (1<<4),
+
+    LPC_VBAT_FALLING_3P10V_RISING_3P20V  = 1 | (2<<4),
+    LPC_VBAT_FALLING_2P94V_RISING_3P05V  = 2 | (2<<4),
+    LPC_VBAT_FALLING_2P80V_RISING_2P90V  = 3 | (2<<4),
+    LPC_VBAT_FALLING_2P64V_RISING_2P75V  = 4 | (2<<4),
+
+} lpc_vbat_threshold_vol_e;
 
 /**
  * @brief       This function servers to powers down low power comparator.
@@ -123,9 +145,46 @@ static inline unsigned char lpc_get_result(void)
 }
 
 /**
+ * @brief       This function serves to enable the vbat low power detection.
+ * @return      none.
+ */
+static inline void lpc_vbat_detect_enable(void)
+{
+     analog_write_reg8(0x0f, (analog_read_reg8(0x0f) | 0x08));
+     analog_write_reg8(0x0d, (analog_read_reg8(0x0d)  | 0x08));
+}
+
+/**
+ * @brief       This function serves to disable the vbat low power detection.
+ * @return      none.
+ */
+static inline void lpc_vbat_detect_disable(void)
+{
+    analog_write_reg8(0x0f, (analog_read_reg8(0x0f) & ~(0x08)));
+    analog_write_reg8(0x0d, (analog_read_reg8(0x0d)  & ~(0x08)));
+}
+
+/**
  * @brief       This function selects input reference voltage for low power comparator.
  * @param[in]   mode    - lower power comparator working mode includes normal mode and low power mode.
  * @param[in]   ref     - selected input reference voltage.
  * @return      none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
+
+/**
+ * @brief       This function is used to initialize GPIO voltage detection.
+ * @param[in]   mode    - lower power comparator working mode includes normal mode and low power mode.
+ * @param[in]   pin     - selected input channel.Input derived from external PortB(PB<1>~PB<7>).
+ * @param[in]   ref     - selected input reference voltage.
+ * @param[in]   divider - selected scaling coefficient.(%25,%50,%75,%100)
+ * @return      none.
+ */
+void lpc_gpio_vol_detect_init(lpc_mode_e mode, lpc_input_channel_e pin, lpc_reference_e ref,lpc_scaling_e divider);
+/**
+ * @brief       This function is used to initialize vbat low power detection.
+ * @param[in]   thres_vol   - the threshold voltage for vbat low power detection.
+ * @return      none.
+ * @note        -# When using the bat low power detection feature, the reference voltage can ONLY be set to BG, and this feature CANNOT be used in sleep mode.
+ */
+void lpc_vbat_vol_detect_init(lpc_vbat_threshold_vol_e thres_vol);

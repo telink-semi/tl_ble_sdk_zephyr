@@ -772,26 +772,25 @@ _attribute_ram_code_sec_ static inline void gpio_init(int anaRes_init_en)
                             ((PB4_DATA_OUT ? 0 : 1) << 4) | ((PB5_DATA_OUT ? 0 : 1) << 5) | ((PB6_DATA_OUT ? 0 : 1) << 6) | ((PB7_DATA_OUT ? 0 : 1) << 7);
     reg_gpio_pb_setting1 =
         (PB0_INPUT_ENABLE << 8) | (PB1_INPUT_ENABLE << 9) | (PB2_INPUT_ENABLE << 10) | (PB3_INPUT_ENABLE << 11) |
-        (PB4_INPUT_ENABLE << 12) | (PB5_INPUT_ENABLE << 13) | (PB6_INPUT_ENABLE << 14) | (PB7_INPUT_ENABLE << 15)  |
         ((PB0_OUTPUT_ENABLE ? 0 : 1) << 16) | ((PB1_OUTPUT_ENABLE ? 0 : 1) << 17) | ((PB2_OUTPUT_ENABLE ? 0 : 1) << 18) | ((PB3_OUTPUT_ENABLE ? 0 : 1) << 19) |
         ((PB4_OUTPUT_ENABLE ? 0 : 1) << 20) | ((PB5_OUTPUT_ENABLE ? 0 : 1) << 21) | ((PB6_OUTPUT_ENABLE ? 0 : 1) << 22) | ((PB7_OUTPUT_ENABLE ? 0 : 1) << 23);
     reg_gpio_pb_setting2 =
         (PB0_FUNC == AS_GPIO ? BIT(16) : 0) | (PB1_FUNC == AS_GPIO ? BIT(17) : 0) | (PB2_FUNC == AS_GPIO ? BIT(18) : 0) | (PB3_FUNC == AS_GPIO ? BIT(19) : 0) |
         (PB4_FUNC == AS_GPIO ? BIT(20) : 0) | (PB5_FUNC == AS_GPIO ? BIT(21) : 0) | (PB6_FUNC == AS_GPIO ? BIT(22) : 0) | (PB7_FUNC == AS_GPIO ? BIT(23) : 0);
+    analog_write_reg8(areg_gpio_pb_ie, (PB4_INPUT_ENABLE << 4) | (PB5_INPUT_ENABLE << 5) | (PB6_INPUT_ENABLE << 6) | (PB7_INPUT_ENABLE << 7));
 
     //PC group
     reg_gpio_pc_out_set = (PC0_DATA_OUT << 0) | (PC1_DATA_OUT << 1) | (PC2_DATA_OUT << 2) | (PC3_DATA_OUT << 3) |
                           (PC4_DATA_OUT << 4) | (PC5_DATA_OUT << 5) | (PC6_DATA_OUT << 6) | (PC7_DATA_OUT << 7);
     reg_gpio_pc_out_clear = ((PC0_DATA_OUT ? 0 : 1) << 0) | ((PC1_DATA_OUT ? 0 : 1) << 1) | ((PC2_DATA_OUT ? 0 : 1) << 2) | ((PC3_DATA_OUT ? 0 : 1) << 3) |
                             ((PC4_DATA_OUT ? 0 : 1) << 4) | ((PC5_DATA_OUT ? 0 : 1) << 5) | ((PC6_DATA_OUT ? 0 : 1) << 6) | ((PC7_DATA_OUT ? 0 : 1) << 7);
-    reg_gpio_pc_setting1 =
-        (PC0_INPUT_ENABLE << 8) | (PC1_INPUT_ENABLE << 9) | (PC2_INPUT_ENABLE << 10) | (PC3_INPUT_ENABLE << 11) |
-        (PC4_INPUT_ENABLE << 12) | (PC5_INPUT_ENABLE << 13) | (PC6_INPUT_ENABLE << 14) | (PC7_INPUT_ENABLE << 15) |
-        ((PC0_OUTPUT_ENABLE ? 0 : 1) << 16) | ((PC1_OUTPUT_ENABLE ? 0 : 1) << 17) | ((PC2_OUTPUT_ENABLE ? 0 : 1) << 18) | ((PC3_OUTPUT_ENABLE ? 0 : 1) << 19) |
-        ((PC4_OUTPUT_ENABLE ? 0 : 1) << 20) | ((PC5_OUTPUT_ENABLE ? 0 : 1) << 21) | ((PC6_OUTPUT_ENABLE ? 0 : 1) << 22) | ((PC7_OUTPUT_ENABLE ? 0 : 1) << 23);
+    reg_gpio_pc_oen =
+        ((PC0_OUTPUT_ENABLE ? 0 : 1) << 0) | ((PC1_OUTPUT_ENABLE ? 0 : 1) << 1) | ((PC2_OUTPUT_ENABLE ? 0 : 1) << 2) | ((PC3_OUTPUT_ENABLE ? 0 : 1) << 3) |
+        ((PC4_OUTPUT_ENABLE ? 0 : 1) << 4) | ((PC5_OUTPUT_ENABLE ? 0 : 1) << 5) | ((PC6_OUTPUT_ENABLE ? 0 : 1) << 6) | ((PC7_OUTPUT_ENABLE ? 0 : 1) << 7);
     reg_gpio_pc_gpio =
         (PC0_FUNC == AS_GPIO ? BIT(0) : 0) | (PC1_FUNC == AS_GPIO ? BIT(1) : 0) | (PC2_FUNC == AS_GPIO ? BIT(2) : 0) | (PC3_FUNC == AS_GPIO ? BIT(3) : 0) |
         (PC4_FUNC == AS_GPIO ? BIT(4) : 0) | (PC5_FUNC == AS_GPIO ? BIT(5) : 0) | (PC6_FUNC == AS_GPIO ? BIT(6) : 0) | (PC7_FUNC == AS_GPIO ? BIT(7) : 0);
+    analog_write_reg8(areg_gpio_pc_ie, (PC0_INPUT_ENABLE << 0) | (PC1_INPUT_ENABLE << 1) | (PC2_INPUT_ENABLE << 2) | (PC3_INPUT_ENABLE << 3) | (PC4_INPUT_ENABLE << 4) | (PC5_INPUT_ENABLE << 5) | (PC6_INPUT_ENABLE << 6) | (PC7_INPUT_ENABLE << 7));
 
     //PD group
     reg_gpio_pd_out_set = (PD0_DATA_OUT << 0) | (PD1_DATA_OUT << 1) | (PD2_DATA_OUT << 2) | (PD3_DATA_OUT << 3) |
