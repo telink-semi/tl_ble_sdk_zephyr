@@ -7,7 +7,10 @@ zephyr_compile_definitions(
 	# -D__PROJECT_ACL_CONN_DEMO__=1
 	-DAPP_FLASH_PROTECTION_ENABLE=1
 	-DFIX_AUX_CONN_SLOT_IDX_CAL=1
+	-DHARDWARE_CHANNEL_SOUNDING_SUPPORT_EN=0
 	-DVCD_EN=0
+	-DSCH_DEBUG_EN=0
+
 	-DCHIP_TYPE=CHIP_TYPE_${SOC}
 	-DBLC_ZEPHYR_BLE_INTEGRATION=1
 	-DLL_FEATURE_SUPPORT_LE_DATA_LENGTH_EXTENSION=1
@@ -40,6 +43,11 @@ zephyr_compile_definitions(
 	-DSTACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2=0
 	-DBLC_PM_RETENTION_DRIVERS_ONLY=1
 	-DRF_RX_DCOC_SOFTWARE_CAL_EN=0
+
+	#todo: hci should be enabled after test
+	-DLL_FEATURE_ENABLE_CONNECTION_PARA_REQUEST_PROCEDURE=0
+	#used for short connection application, for example, 7.5ms keyboard/mouse
+	-DBLC_ZEPHYR_BLE_INTEGRATION_SHORT_CONNECTION_APPLICATION=0
 )
 
 if(CONFIG_PM)
@@ -61,11 +69,11 @@ else()
 endif()
 
 if(CONFIG_TELINK_TL322X_ENABLE_N22)
-zephyr_compile_options(
-        -DTLK_ONLY_BLE_HOST=1
-        -DTLK_MAILBOX_MESSAGE_HOST_EN=1
-        -DDUAL_CORE_MODE_ENABLED=1
-)
+	zephyr_compile_options(
+			-DTLK_ONLY_BLE_HOST=1
+			-DTLK_MAILBOX_MESSAGE_HOST_EN=1
+			-DDUAL_CORE_MODE_ENABLED=1
+	)
 endif()
 
 if(CONFIG_TELINK_TL322X_ENABLE_N22 AND CONFIG_PM)
@@ -80,6 +88,7 @@ file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/flash/*.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/watchdog.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/dma.c
+	${TL_BLE_SRC_DIR}/drivers/${SOC}/lpd.c
 	${TL_BLE_SRC_DIR}/vendor/common/flash_prot.c
 	${TL_BLE_SRC_DIR}/vendor/common/ble_flash.c
 )
@@ -159,10 +168,10 @@ endif()
 
 if(CONFIG_BT OR CONFIG_IEEE802154)
 	if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
-		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
 	endif()
 	if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
-		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
 	endif()
 endif()
 
@@ -174,11 +183,11 @@ endif()
 if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
 	if(CONFIG_SOC_RISCV_TELINK_TL322X)
-		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb0hw.c)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb0hw.c)
 	elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
 		message(STATUS "no usbhw module for TELINK_TL323X")
 	else()
-		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
 	endif()
 endif()
 

@@ -24,6 +24,7 @@
 #pragma once
 
 #include "lib/include/analog.h"
+#include "lib/include/pm/pm.h"
 
 /**
  * define input IO.
@@ -103,7 +104,12 @@ typedef enum
  */
 static inline void lpc_power_down(void)
 {
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 |= FLD_PD_LC_COMP_3V;
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
     analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) | FLD_PD_LC_COMP_3V);
+#endif
 }
 
 /**
@@ -112,7 +118,12 @@ static inline void lpc_power_down(void)
  */
 static inline void lpc_power_on(void)
 {
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 &= ~(FLD_PD_LC_COMP_3V);
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
     analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) & ~(FLD_PD_LC_COMP_3V));
+#endif
 }
 
 /**

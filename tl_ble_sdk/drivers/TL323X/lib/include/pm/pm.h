@@ -28,6 +28,7 @@
 #include "gpio.h"
 #include "lib/include/clock.h"
 
+#define PM_POWER_OPTIMIZATION  1
 
 /**
  * @brief these analog register can store data in deep sleep mode or deep sleep with SRAM retention mode.
@@ -69,17 +70,17 @@ typedef enum
 typedef enum
 {
     //available mode for customer
-    SUSPEND_MODE   = 0x00,
-    DEEPSLEEP_MODE = 0xf8,                  //when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
+    SUSPEND_MODE                    = 0x00,
+    DEEPSLEEP_MODE                  = 0xf8, //when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
                                             //system will not enter sleep and go to below of pm API, will reboot by core_6f = 0x20.
                                             //deep retention also had this issue, but not to reboot.
     DEEPSLEEP_MODE_RET_SRAM_LOW32K  = 0x61, //for boot from sram
     DEEPSLEEP_MODE_RET_SRAM_LOW96K  = 0x43, //for boot from sram
     DEEPSLEEP_MODE_RET_SRAM_LOW160K = 0x07, //for boot from sram
-    SHUTDOWN_MODE = 0x80,
+    SHUTDOWN_MODE                   = 0x80,
 
     //not available mode
-    DEEPSLEEP_RETENTION_FLAG = 0x07,
+    DEEPSLEEP_RETENTION_FLAG        = 0x07,
 } pm_sleep_mode_e;
 
 /**
@@ -124,7 +125,7 @@ typedef enum
  */
 typedef enum
 {
-    MCU_POWER_ON = BIT(0), /**< power on, vbus detect or reset pin */
+    MCU_POWER_ON                 = BIT(0), /**< power on, vbus detect or reset pin */
     //BIT(1) RSVD
     MCU_SW_REBOOT_BACK           = BIT(2), /**< Clear the watchdog status flag in time, otherwise, the system reboot may be wrongly judged as the watchdog.*/
     MCU_DEEPRET_BACK             = BIT(3),
@@ -135,10 +136,10 @@ typedef enum
                                               - but software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the status remains;
                                               */
 
-    MCU_STATUS_POWER_ON     = MCU_POWER_ON,
-    MCU_STATUS_REBOOT_BACK  = MCU_SW_REBOOT_BACK,
-    MCU_STATUS_DEEPRET_BACK = MCU_DEEPRET_BACK,
-    MCU_STATUS_DEEP_BACK    = MCU_DEEP_BACK,
+    MCU_STATUS_POWER_ON          = MCU_POWER_ON,
+    MCU_STATUS_REBOOT_BACK       = MCU_SW_REBOOT_BACK,
+    MCU_STATUS_DEEPRET_BACK      = MCU_DEEPRET_BACK,
+    MCU_STATUS_DEEP_BACK         = MCU_DEEP_BACK,
 } pm_mcu_status;
 
 /**
@@ -152,7 +153,7 @@ typedef enum
 } pm_power_sel_e;
 
 /**
- * @brief   early wakeup time
+ * @brief   early wake up time
  */
 typedef struct
 {
@@ -190,8 +191,12 @@ typedef struct
 
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 
-extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
 extern unsigned char                                g_areg_aon_7f;
+extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
+extern _attribute_data_retention_sec_ unsigned char g_areg_aon_0a;
+#if (PM_POWER_OPTIMIZATION)
+extern _attribute_data_retention_sec_ unsigned char g_areg_aon_06;
+#endif
 
 /**
  * @brief       This function serves to get wakeup source.
@@ -242,7 +247,12 @@ static _always_inline void pm_set_vbat_type(vbat_type_e vbat_v)
      * ---------------------------------------------------------------------------
      * <3>:pd_vbat_sw  default:1,->vbat_v Power down of bypass switch(VBAT LDO).
      */
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 = (g_areg_aon_06 | FLD_PD_VBAT_SW) & ~(vbat_v);
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
     analog_write_reg8(areg_aon_0x06, (analog_read_reg8(areg_aon_0x06) | FLD_PD_VBAT_SW) & ~(vbat_v));
+#endif
 }
 
 /**
@@ -310,7 +320,11 @@ void pm_set_suspend_power_cfg(pm_pd_module_e value, unsigned char on_off);
  * @return      indicate whether the cpu is wake up successful.
  * @attention   Must ensure that all GPIOs cannot be floating status before going to sleep to prevent power leakage.
  */
+#if PM_POWER_OPTIMIZATION
+_attribute_ram_code_sec_optimize_o2_noinline_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick);
+#else
 _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick);
+#endif
 
 /**
  * @brief       This function is used to obtain the cause of software reboot.
@@ -335,7 +349,7 @@ _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_e
 
 /**
  * @brief       This function serves to set system power mode.
- * @param[in]   power_mode  - power mode(LDO/LDO_DCDC).
+ * @param[in]   power_mode  - power mode(LDO_LDO/LDO_DCDC).
  * @return      none.
  * @note        pd_dcdc_ldo_sw<1:0>, dcdc & bypass ldo status bits:
                     dcdc_1p25   dcdc_1p8     ldo_1p25    ldo_1p8
@@ -364,4 +378,4 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_
  * @param[in]   power_sel - power up or power down.
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_  void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);

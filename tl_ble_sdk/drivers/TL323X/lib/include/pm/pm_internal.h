@@ -48,7 +48,7 @@
 /*
  * @note    This is for internal stability debugging use only.
  */
-#define PM_DEBUG 0
+#define PM_DEBUG                 0
 //1 PB4, 2 PB5
 #define PM_SUSPEND_WHILE_DEBUG   0
 #define PM_SUSPEND_WHILE_DEBUG_2 0
@@ -149,16 +149,6 @@ _always_inline void sys_reset_all(void)
 }
 
 /**
- * @brief       This function serves to trim dig ldo voltage
- * @param[in]   dig_ldo_trim - dig ldo trim voltage
- * @return      none
- */
-static _always_inline void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim)
-{
-    analog_write_reg8(0x27, (analog_read_reg8(0x27) & 0xf0) | (dig_ldo_trim));
-}
-
-/**
  * @brief       This function serves to get dig ldo voltage
  * @param[in]   dig_ldo_trim - dig ldo trim voltage
  * @return      none
@@ -208,6 +198,17 @@ static _always_inline void pm_set_ret_ldo_voltage(pm_ret_ldo_trim_e ret_ldo_trim
 }
 
 /**
+ * @brief       This function serves to trim dig ldo voltage
+ * @param[in]   dig_ldo_trim - dig ldo trim voltage
+ * @return      none
+ */
+static _always_inline void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim)
+{
+    analog_write_reg8(0x27, (analog_read_reg8(0x27) & 0xf0) | dig_ldo_trim);
+}
+
+#if (!PM_POWER_OPTIMIZATION)
+/**
  * @brief   This function is used to enable native LDO.
  * @return  none.
  */
@@ -224,6 +225,7 @@ static _always_inline void pm_disable_native_ldo(void)
 {
     analog_write_reg8(areg_aon_0x0b, (analog_read_reg8(areg_aon_0x0b) | (FLD_PD_NVT_1P25 | FLD_PD_NVT_1P8)));
 }
+#endif
 
 /**
  * @brief   This function is used to enable suspend LDO.
@@ -231,7 +233,12 @@ static _always_inline void pm_disable_native_ldo(void)
  */
 static _always_inline void pm_enable_spd_ldo(void)
 {
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 &= ~(FLD_PD_SPD_LDO);
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
     analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) & ~(FLD_PD_SPD_LDO));
+#endif
 }
 
 /**
@@ -240,7 +247,12 @@ static _always_inline void pm_enable_spd_ldo(void)
  */
 static _always_inline void pm_disable_spd_ldo(void)
 {
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 |= FLD_PD_SPD_LDO;
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
     analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) | FLD_PD_SPD_LDO);
+#endif
 }
 
 /**

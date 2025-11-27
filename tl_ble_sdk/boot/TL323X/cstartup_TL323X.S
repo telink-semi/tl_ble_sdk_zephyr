@@ -49,6 +49,8 @@
 
 .extern gpio_shutdown_flashcode_for_asm
 .extern gpio_shutdown_ramcode_for_asm
+.extern lpd_power_down_protect_enable
+.extern lpd_power_down_protect_enable_for_deep_ret
 
 //According to the current internal seal flash model of Telink RISC-V MCU, the maximum time between the flash awakening and the operating flash is 20us, which leaves some margin and is set to 25us.
 //When adding flash later, if tRES1 is greater than 25us, this waiting time needs to be updated. (flash tRES1, which can be viewed in the comments of the variable flash_support_mid.)
@@ -286,9 +288,16 @@ _FILL_STK_BEGIN:
     j      _FILL_STK_BEGIN
 #endif
 
+
     /* Jump to the main function */
 _MAIN_FUNC:
     nop
+
+#if 1
+    //Flash Configuration for Chip Power-Down Protection
+    la     t0, lpd_power_down_protect_enable
+    jalr   t0
+#endif
 
     la     t0, main
     jalr   t0
@@ -525,9 +534,16 @@ _IDATA_INIT_BEGIN:
     addi   t2, t2, 4
     j      _IDATA_INIT_BEGIN
 
+
     /* Jump to the main function */
 _IMAIN_FUNC:
     nop
+
+#if 1
+    //Flash Configuration for Chip Power-Down Protection
+    la     t0, lpd_power_down_protect_enable_for_deep_ret
+    jalr   t0
+#endif
 
     la     t0, main
     jalr   t0

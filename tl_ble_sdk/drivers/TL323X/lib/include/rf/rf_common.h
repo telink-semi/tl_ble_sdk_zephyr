@@ -53,7 +53,23 @@
 /**********************************************************************************************************************
  *                                       RF global data type                                                          *
  *********************************************************************************************************************/
-
+/**
+ *  @brief  set the modulation index.
+ */
+typedef enum
+{
+    RF_MI_P0p00  = 0,    /**< MI = 0 */
+    RF_MI_P0p076 = 76,   /**< MI = 0.076 */
+    RF_MI_P0p32  = 320,  /**< MI = 0.32 */
+    RF_MI_P0p50  = 500,  /**< MI = 0.5 */
+    RF_MI_P0p60  = 600,  /**< MI = 0.6 */
+    RF_MI_P0p70  = 700,  /**< MI = 0.7 */
+    RF_MI_P0p80  = 800,  /**< MI = 0.8 */
+    RF_MI_P0p90  = 900,  /**< MI = 0.9 */
+    RF_MI_P1p20  = 1200, /**< MI = 1.2 */
+    RF_MI_P1p30  = 1300, /**< MI = 1.3 */
+    RF_MI_P1p40  = 1400, /**< MI = 1.4 */
+} rf_mi_value_e;
 
 /**
  *  @brief  RX fast settle time
@@ -412,13 +428,25 @@ typedef enum
     RF_48M_MODEM_RATE = 1,
 } rf_modem_rate_e;
 
+/**
+ * @brief Define RX performance modes, RF_RX_LOW_POWER and RF_RX_HIGH_PERFORMANCE
+ * @note  Defaults to RF_RX_LOW_POWER for A1.
+ *        RF_RX_HIGH_PERFORMANCE mode can improve performance by 1dBm, but the rx power consumption will increase
+ */
+typedef enum
+{
+    RF_RX_LOW_POWER        = 0,
+    RF_RX_HIGH_PERFORMANCE = 1,
+} rf_rx_performance_e;
+
+
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
  *********************************************************************************************************************/
 extern const rf_power_level_e rf_power_Level_list[60];
 extern rf_mode_e              g_rfmode;
 extern rf_crc_config_t        rf_crc_config[3];
-extern _attribute_data_retention_sec_ unsigned char  g_rf_hp_mode;
+extern _attribute_data_retention_sec_ unsigned char g_rf_rx_high_performance;
 
 /**********************************************************************************************************************
  *                                         RF function declaration                                                    *
@@ -1197,14 +1225,17 @@ void rf_tx_fast_settle_update_cal_val(rf_tx_fast_settle_time_e tx_settle_time, u
 void rf_rx_fast_settle_update_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn);
 
 /**
- * @brief       This function is used to set the MODEM side to high-performance mode for rx.
- * @param[in]   hp_en - hp mode enable. 1  hp mode enable;0 hp mode disable(aura path);
- * @return      none.
- * @note        Attention:
- *              (1)Must be called before rf mode initialization(e.g. before rf_set_ble_1M_mode)
- *              (2)Zigbee related modes cannot use high-performance mode
+ * @brief     This function is used to select the rx performance mode.
+ * @param[in] rx_performance - rx performance mode.
+ * @return    none.
+ * @note      There are two types of RX performance modes, RF_RX_LOW_POWER and RX_HIGH_PERFORMANCE
+ *            The default is RF_RX_LOW_POWER, and in this mode, the rx performance can reach -96dBm
+ *            RX_HIGH_PERFORMANCE mode can improve performance by 1dBm, but the rx power consumption will increase
+ *            Attention:
+ *                (1)If the user calls this function to change the RX performance mode, the RF MODE must be initialized again.(e.g. rf_set_ble_1M_mode)
+ *              (2)Since the RSSI values of the chip in the two RX performance modes are quite different,the g_rf_rx_high_performance global variable is used to indicate the current performance mode.
  */
-void rf_modem_hp_path(unsigned char hp_en);
+void rf_rx_performance_mode(rf_rx_performance_e rx_performance);
 
 /**
  * @brief       This function serves to set rf fpga channel for all mode.The actual channel set by this function is 2400+chn.
@@ -1225,6 +1256,51 @@ void rf_turn_off_internal_cap(void);
  * @note       Call this function after the RF is powered on.
  */
 void rf_zb_init(void);
+
+/**
+ * @brief       This function is used to enable the ldo rxtxlf bypass function, and the calibration value
+ *              written by the software will take effect after enabling.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_en(void);
+
+/**
+ * @brief       This function is used to close the ldo rxtxlf bypass function, and the hardware will
+ *              automatically perform the calibration function after closing.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_dis(void);
+
+/**
+ * @brief      This function serves to optimize RF performance
+ *             This function must be called every time rx is turned on,
+ *             and is called by an internal function.
+ *             If there are other requirements that need to be called,
+ *             turn off rx first, then call it again to make sure the Settings take effect
+ * @param[in]  none
+ * @return     none
+ * @note       1.Call this function after turning on rx 30us, and the calibration value set by the function
+ *                will take effect after calling rf_ldot_ldo_rxtxlf_bypass_en;if automatic calibration is
+ *                required, you can use rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function; how to
+ *                use it can refer to bqb.c file or rf_emi_rx in emi.c
+ *             2. After using rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function and enter tx/rx
+ *                automatic calibration, to use this function again, you need to call the rf_set_rxpara function
+ *                again after entering rx 30us.
+ *
+ */
+void rf_set_rxpara(void);
+
+/**
+  * @brief      This function is used to  set the modulation index of the sender.
+  *              This function is common to all modes,the order of use requirement:configure mode first,
+  *              then set the the modulation index,default is 0.5 in drive,both sides need to be consistent
+  *              otherwise performance will suffer,if don't specifically request,don't need to call this function.
+  * @param[in]  mi_value- the value of modulation_index*100.
+  * @return     none.
+  */
+void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
 
 #endif
 

@@ -59,7 +59,7 @@ enum
     FLD_ANA_LDO_PD_3V     = BIT(7), //power down ana LDO
 };
 
-#define areg_aon_0x06 0x06
+#define areg_aon_0x06 0x06  //When using, please remember to update the variable g_areg_aon_06.
 
 enum
 {
@@ -83,7 +83,7 @@ enum
     FLD_PD_VDD_DCORE = BIT(7), //power down the supply to dcore
 };
 
-#define areg_aon_0x0a 0x0a
+#define areg_aon_0x0a 0x0a  //When using, please remember to update the variable g_areg_aon_0a.
 #define areg_aon_0x0b 0x0b
 
 enum
@@ -238,7 +238,7 @@ typedef enum
 
 #define areg_aon_0x7e 0x7e
 
-#define areg_aon_0x7f 0x7f
+#define areg_aon_0x7f 0x7f  //When using, please remember to update the variable g_areg_aon_7f.
 
 enum
 {
