@@ -51,13 +51,23 @@ zephyr_compile_definitions(
 )
 
 if(CONFIG_PM)
-	zephyr_compile_definitions(
-		-DBLMS_PM_ENABLE=1
-		-DBLC_PM_EN=1
-		-DMAILBOX_PM_VALUE_SYNC=1
-		-DBLC_PM_DEEP_RETENTION_MODE_EN=0	# disable for tl322x for now
-		-DPM_DEEPSLEEP_RETENTION_ENABLE=0	# disable for tl322x for now
-	)
+	if(CONFIG_SOC_RISCV_TELINK_TLX_RETENTION)
+		zephyr_compile_definitions(
+			-DBLMS_PM_ENABLE=1
+			-DBLC_PM_EN=1
+			-DMAILBOX_PM_VALUE_SYNC=1
+			-DBLC_PM_DEEP_RETENTION_MODE_EN=1
+			-DPM_DEEPSLEEP_RETENTION_ENABLE=0
+		)
+	else()
+		zephyr_compile_definitions(
+			-DBLMS_PM_ENABLE=1
+			-DBLC_PM_EN=1
+			-DMAILBOX_PM_VALUE_SYNC=1
+			-DBLC_PM_DEEP_RETENTION_MODE_EN=0
+			-DPM_DEEPSLEEP_RETENTION_ENABLE=0
+		)
+	endif()
 else()
 	zephyr_compile_definitions(
 		-DBLMS_PM_ENABLE=0

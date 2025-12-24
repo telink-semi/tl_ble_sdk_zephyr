@@ -93,7 +93,11 @@
         #define _attribute_ble_data_retention_   __attribute__((section(".retention_data_ble")))    // used for ble
     #endif
 #else
-    #define _attribute_data_retention_sec_
+    #ifndef BLC_ZEPHYR_BLE_INTEGRATION
+        #define _attribute_data_retention_sec_
+    #else
+        #define _attribute_data_retention_sec_   __attribute__((section(".retention_data")))
+    #endif
     #define _attribute_data_retention_
     #define _attribute_ble_data_retention_
 #endif
