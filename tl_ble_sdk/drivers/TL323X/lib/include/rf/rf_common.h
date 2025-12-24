@@ -22,6 +22,65 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+ /**
+ * @page RF RF Module Configuration Guide
+ * 
+ * @brief This page provides detailed usage notes, power configuration instructions, and key precautions for the RF module.
+ * 
+ * @par Header File
+ *      rf_common.h
+ * 
+ * @section rf_pm_precautions RF and PM Usage Precautions
+ * When using RF and Power Management (PM) functions in combination, note the following requirements for different low-power modes:
+ * 
+ * - <b>Suspend mode</b>:
+ *   RF-related digital registers will be lost. After waking up from suspend mode, re-invoke all RF-related function interfaces to restore functionality.
+ *   <br>
+ *   If you don't want to re-invoke RF-related function interfaces after waking up, you can use the <code>pm_set_suspend_power_cfg</code> function 
+ *   to set <code>PM_POWER_BASEBAND</code> to maintain power during suspend sleep. 
+ *   <b>Note:</b> This will increase power consumption during suspend.
+ * 
+ * - <b>Deep retention mode</b>:
+ *   RF-related digital registers will be lost. After waking up from deep retention mode, re-invoke all RF-related function interfaces to restore functionality.
+ * 
+ * - <b>Deep mode</b>:
+ *   RF-related digital registers will be lost. After waking up from deep mode, re-invoke all RF-related function interfaces to restore functionality.
+ * 
+ * @section rf_power_explanation RF Transmit Power Configuration
+ * 
+ * @subsection rf_power_supply Power Supply Modes of RF PA Module
+ * The RF Power Amplifier (PA) module supports two power supply modes, with key characteristics as follows:
+ * 
+ * | Power Supply Mode | Power Source                          | Output Power Characteristics                                                                 | Advantage                                  |
+ * |-------------------|---------------------------------------|------------------------------------------------------------------------------------------------|-------------------------------------------|
+ * | VBAT mode         | Directly powered by VBAT              | Maximum output power varies with VBAT voltage (higher VBAT → higher available power)          | Simple power path, suitable for high-power scenarios |
+ * | VANT mode         | Powered by embedded DCDC + LDO        | Output power is stable (independent of VBAT voltage)                                          | Lower power consumption at the same transmit power |
+ * 
+ * @subsection rf_power_table TX Power Table (Driver-Provided)
+ * - The default <code>rf_power_level_e</code> enumeration is tested based on the largest package, providing typical reference values for both VBAT and VANT modes.
+ * - Power levels exceeding the maximum VANT power are automatically mapped to VBAT mode (driver handles mode switching internally).
+ * 
+ * @subsection rf_power_adjust Power Level Adjustment Instructions
+ * #### 3.1 Basic Configuration Rules
+ * - Both VBAT and VANT modes support 64 configurable power levels (range: 0 ~ 63).
+ * - The mapping relationship between level numbers and hardware registers is fixed (package-independent); only the actual transmit power differs by package.
+ * 
+ * #### 3.2 Configuration Methods (via <code>rf_set_power_level</code> Interface)
+ * Two configuration approaches are supported:
+ * a) Use predefined values from the <code>rf_power_level_e</code> enumeration (recommended for most scenarios).
+ * b) Write custom level values (for scenario-specific power optimization), following mode-specific formatting rules.
+ * 
+ * #### 3.3 Mode-Specific Level Format
+ * | Mode       | Level Format                          | Valid Range |
+ * |------------|---------------------------------------|-------------|
+ * | VBAT mode  | <code>level = power_level</code>      | 0 ~ 63      |
+ * | VANT mode  | <code>level = BIT(7) \| power_level</code> | 0 ~ 63      |
+ * 
+ * @subsection rf_power_notes Supplementary Notes
+ * 1. For package-specific detailed power data (e.g., actual power values corresponding to each level), refer to the <cite>[Chip Model] RF Test Report</cite>.
+ * 2. Actual transmit power is affected by antenna matching, PCB layout, and hardware design. Mandatory hardware calibration is required for mass production or high-precision applications.
+ */
+
 #ifndef RF_COMMON_H
 #define RF_COMMON_H
 
@@ -53,6 +112,16 @@
 /**********************************************************************************************************************
  *                                       RF global data type                                                          *
  *********************************************************************************************************************/
+/**
+ *  @brief  An enumeration variable used to control the time interval of PA ramp step.
+ */
+ typedef enum
+{
+    RF_PA_RAMP_STEP_P250p0 = 5,
+    RF_PA_RAMP_STEP_P500p0 = 6,
+    RF_PA_RAMP_STEP_P1000p0 = 7,
+}rf_pa_ramp_step_e;
+
 /**
  *  @brief  set the modulation index.
  */
@@ -369,14 +438,7 @@ typedef enum
     RF_MODE_PRI_GENERIC_500K,         /**< private generic 500K mode */
     RF_MODE_PRI_GENERIC_1M,           /**< private generic 1M mode */
     RF_MODE_PRI_GENERIC_2M,           /**< private generic 2M mode */
-    RF_MODE_BLE_4M_NO_PN,             /**< ble 4M close pn mode */
-    RF_MODE_BLE_6M_NO_PN,             /**< ble 6M close pn mode */
-    RF_MODE_BLE_4M,                   /**< ble 4M mode */
-    RF_MODE_BLE_6M,                   /**< ble 6M mode */
-    RF_MODE_PRIVATE_4M,               /**< private 4M mode */
-    RF_MODE_PRIVATE_6M,               /**< private 6M mode */
-    RF_MODE_PRI_GENERIC_4M,           /**< private generic 4M mode */
-    RF_MODE_PRI_GENERIC_6M,           /**< private generic 6M mode */
+#if (0)
     RF_MODE_HYBEE_1M_OLD,             /**< hybee 1M mode old*/
     RF_MODE_HYBEE_2M_OLD,             /**< hybee 2M mode old*/
     RF_MODE_HYBEE_500K_NEW,           /**< hybee 500k mode new*/
@@ -389,7 +451,7 @@ typedef enum
     RF_MODE_HYBEE_1M_2BYTE_SFD_NEW,   /**< hybee 1M 2byte sfd mode new*/
     RF_MODE_HYBEE_500K_2BYTE_SFD_NEW, /**< hybee 500K 2byte sfd mode new*/
     RF_MODE_HR_2M,                    /**< hr 2M mode*/
-
+#endif
 } rf_mode_e;
 
 /**
@@ -445,7 +507,7 @@ typedef enum
  *********************************************************************************************************************/
 extern const rf_power_level_e rf_power_Level_list[60];
 extern rf_mode_e              g_rfmode;
-extern rf_crc_config_t        rf_crc_config[3];
+extern rf_crc_config_t        rf_crc_config[4];
 extern _attribute_data_retention_sec_ unsigned char g_rf_rx_high_performance;
 
 /**********************************************************************************************************************
@@ -1301,6 +1363,47 @@ void rf_set_rxpara(void);
   * @return     none.
   */
 void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
+
+/**
+ *@brief      This function is primarily used to set the threshold value for modem sync in private 2M PHY HP mode.
+ *@param[in]  byte_len   - Specify the synchronization word length to be set for the modem, measured in bytes.
+ *@return     none.
+ *@note       1.byte_len:range 0~6.
+ */
+void rf_pri_hp_set_modem_sync_byte_len(unsigned char byte_len);
+
+/**
+ * @brief        This function is used to set whether or not to use the rx DCOC software calibration in rf_mode_init();
+ * @param[in]    en:This value is used to set whether or not rx DCOC software calibration is performed.
+ *                -#1:enable the DCOC software calibration;
+ *                -#0:disable the DCOC software calibration;
+ * @return        none.
+ * @note        Attention:
+ *                 1.Driver default enable to solve the problem of poor receiver sensitivity performance of some chips with large DC offset
+ *                 2.The following conditions should be noted when using this function:
+ *                   If you use the RX function, it must be enabled, otherwise it will result in a decrease in RX sensitivity.
+ *                   If you only use tx and not rx, and want to save code execution time for rf_mode_init(), you can disable it
+ */
+void rf_set_rx_dcoc_cali_by_sw(unsigned char en);
+
+/**
+ * @brief        This function is used to update the rx DCOC calibration value.
+ * @param[in]   calib_code - Value of iq_code after calibration.(The code is a combination value,you need to fill in the combined iq value)
+ *                 <0> is used to control the switch of bypass dcoc calibration iq code, the value should be 1;
+ *                 <7-1>:the value of I code, the range of value is 0~127;
+ *                 <14-8>:the value of Q code, the range of value is 0~127.
+ * @return         none.
+ * @note         This interface is for internal use only, the SDK needs to use extern when using it
+ */
+void rf_update_rx_dcoc_calib_code(unsigned short calib_code);
+
+/**
+  * @brief      This function is mainly used to set the interval time of the PA ramp step.
+  * @param[in]  step_value- Enumeration variables are used to set the interval time for each step – for example, 
+  *             RF_PA_RAMP_STEP_P250p0 represents an interval of 250 ns per step.
+  * @return     none.
+  */
+void rf_set_pa_ramp_step(rf_pa_ramp_step_e step_value);
 
 #endif
 

@@ -24,9 +24,7 @@
 #ifndef VENDOR_COMMON_BOARDS_TL322X_C1T371A20_H_
 #define VENDOR_COMMON_BOARDS_TL322X_C1T371A20_H_
 
-#ifndef CONFIG_BT_ID_FOR_KMD
 #define N22_FW_DOWNLOAD_FLASH_ADDR  0x20080000
-#endif
 #define N22_FW_DOWNLOAD_NVM_ADDR    0x00500000
 #define N22_IRAM_STARTUP_ADDR       0x50000000
 
@@ -104,10 +102,10 @@
     /**
      *  @brief  Definition gpio for led
      */
-    #define GPIO_LED_RED      GPIO_PC7
-    #define GPIO_LED_GREEN    GPIO_PC4
-    #define GPIO_LED_BLUE     GPIO_PC6
-    #define GPIO_LED_WHITE    GPIO_PC5
+    #define GPIO_LED_RED      GPIO_PC4
+    #define GPIO_LED_GREEN    GPIO_PC5
+    #define GPIO_LED_BLUE     GPIO_PC7
+    #define GPIO_LED_WHITE    GPIO_PC6
 
 
     #define PC4_FUNC          AS_GPIO
@@ -157,7 +155,7 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN_P SD_ADC_GPIO_PB4P
+        #define ADC_INPUT_PIN_CHN SD_ADC_GPIO_PC1P
         #define ADC_INPUT_PIN_CHN_N SD_ADC_GNDN
     #endif
 #endif

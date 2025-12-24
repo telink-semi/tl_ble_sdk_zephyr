@@ -178,12 +178,8 @@
     #if VBAT_CHANNEL_EN
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
-        /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define GPIO_BAT_DETECT   GPIO_PB1
-        #define PB1_FUNC          AS_GPIO
-        #define PB1_INPUT_ENABLE  0
-        #define PB1_DATA_OUT      0
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB1
+        #define ADC_INPUT_PIN_CHN_P ADC_GPIO_PB1
+        #define ADC_INPUT_PIN_CHN_N 0
     #endif
 #endif
 

@@ -1060,6 +1060,29 @@ typedef struct __attribute__((packed))
     u16 Max_Procedure_Len;
 } hci_le_csProcedureEnableCompleteEvt_t;
 
+typedef enum
+{
+    CS_DISABLED_REACH_MAX_PROCEDURE_COUNT = 1,
+    CS_DISABLED_RECEIVE_TERMINATE = 2,
+    CS_DISABLED_DUE_TO_ACL_DISCONN = 3,
+} cs_procedure_disable_reason_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  subevent_code;
+    u16 connection_handle;
+    u16 disabled_procedure_count;
+    u8  disabled_config_id;
+    u8  disabled_reason; // refer to cs_procedure_disable_reason_t
+}hci_le_csProcedureDisabledCompleteEvt_t;
+
+typedef struct __attribute__((packed))
+{
+    u8 subevent_code;
+    u16 connection_handle;
+    u8  configID;
+}hci_le_csHandleDataEvt_t;
+
 typedef struct __attribute__((packed))
 {
     u8 mode;
@@ -1267,6 +1290,8 @@ int hci_le_csConfigComplete_evt(u8 status, u16 connHandle, u8 *data);
 int hci_le_csSecurityEnableComplete_evt(u8 status, u16 connHandle);
 int hci_le_csSubeventResult_evt(u16 connhandle, u8 config_id, u8 *data, u32 data_length);
 int hci_le_csSubeventResultContinue_evt(u16 connhandle, u8 config_id, u8 *dtat, u32 data_length);
+int hci_le_csProcedureDisabledComplete_evt(u16 connHandle, u8 config_Id, u8 reason);
+int hci_le_csHandleData_evt(u16 conn_handle, u8 configID, u8 subevent_code);
 int hci_le_csTestEndComplete_evt(u8 status);
 
 int hci_le_monitoredAdvertisersReport_evt(u8 addr_type, u8* addr, u8 condition);

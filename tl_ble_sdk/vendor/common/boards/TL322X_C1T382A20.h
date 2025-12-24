@@ -156,7 +156,7 @@
  *  @brief  Battery_check Configuration
  */
 #if (BATT_CHECK_ENABLE)
-    #define VBAT_CHANNEL_EN 0
+    #define VBAT_CHANNEL_EN 1
 
     #if VBAT_CHANNEL_EN
         /**     The battery voltage sample range is 1.8~3.5V    **/

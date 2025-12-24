@@ -40,10 +40,10 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
+#include "dma.h"
 #include "lib/include/analog.h"
 #include "gpio.h"
 #include "reg_include/register.h"
-#include "dma.h"
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
@@ -73,22 +73,32 @@ typedef enum
     TIMER_MODE_TICK         = 3,
 } timer_mode_e;
 
+/**
+ *  @brief  Define timer capture mode
+ */
+typedef enum
+{
+    TMR_CAPT_RISING_EDGE         = 0,
+    TMR_CAPT_FALLING_EDGE        = 1,
+    TMR_CAPT_RISING_FALLING_EDGE = 2,
+} timer_capt_mode_e;
+
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
 
 /**
- * @brief       This function refer to get timer irq status.
- * @param[in]   status - variable of enum to select the timer interrupt source.
- * @retval      non-zero  -  the interrupt occurred.
- * @retval      zero      -  the interrupt did not occur.
+ * @brief    This function refer to get timer irq status.
+ * @param[in] status - variable of enum to select the timer interrupt source.
+ * @retval      non-zero      -  the interrupt occurred.
+ * @retval      zero  -  the interrupt did not occur.
  */
 static inline unsigned char timer_get_irq_status(timer_irq_e status)
 {
     return reg_tmr_sta1 & status;
 }
 
-/**
+/*
  * @brief     This function refer to clear timer0 irq status.
  * @param[in] status - variable of enumeration to select the timer interrupt source.
  * @return    none
@@ -117,9 +127,9 @@ static inline unsigned int timer1_get_gpio_width(void)
 }
 
 /**
- * @brief     This function refer to set timer0 tick .
+ * @brief   This function refer to set timer0 tick .
  * @param[in] tick - the tick of timer0
- * @return    none
+ * @return  none
  */
 static inline void timer0_set_tick(unsigned int tick)
 {
@@ -136,9 +146,9 @@ static inline unsigned int timer0_get_tick(void)
 }
 
 /**
- * @brief     This function refer to set timer1 tick.
+ * @brief   This function refer to set timer1 tick.
  * @param[in] tick - the tick of timer1
- * @return    none
+ * @return  none
  */
 static inline void timer1_set_tick(unsigned int tick)
 {
@@ -178,7 +188,6 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 
 /**
  * @brief     This function set timer irq mask.
- * @param[in] mask - variable of enumeration to select the timer interrupt mask.
  * @return    none.
  */
 static inline void timer_set_irq_mask(timer_irq_e mask)
@@ -188,7 +197,6 @@ static inline void timer_set_irq_mask(timer_irq_e mask)
 
 /**
  * @brief     This function clear timer irq mask.
- * @param[in] mask - variable of enumeration to select the timer interrupt mask.
  * @return    none.
  */
 static inline void timer_clr_irq_mask(timer_irq_e mask)
@@ -228,28 +236,43 @@ void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol);
 void timer_stop(timer_type_e type);
 
 /**
- * @brief     This function serves to set timer rx_dam channel and config dma rx default.
+ * @brief     This function set timer wrap mode.
  * @param[in] type - TIMER0 or TIMER1.
- * @param[in] chn  - dma channel.
- * @return    none
+ * @return    none.
  */
+static inline void timer_set_wrap(timer_type_e type)
+{
+    switch (type) {
+    case TIMER0:
+        BM_CLR(reg_tmr_ctrl0, FLD_TMR0_NOWRAP);
+        break;
+    case TIMER1:
+        BM_CLR(reg_tmr_ctrl0, FLD_TMR1_NOWRAP);
+        break;
+    default:
+        break;
+    }
+}
+
+void timer_set_input_capture_mode(timer_type_e type, timer_capt_mode_e capt_mode, gpio_pin_e pin);
+
+void timer_input_capture_en(timer_type_e type);
+
+void timer_reset_tick(timer_type_e type, unsigned char reset);
+
+/*
+ * @brief     This function performs to get  timer capture value.
+ * @return    timer capture value.
+ */
+static inline unsigned int timer_get_capture_value(timer_type_e type)
+{
+    return reg_tmr_ccapt(type);
+}
+
+void timer_receive_dma(timer_type_e type, unsigned char *addr, unsigned int rev_size);
 void timer_set_rx_dma_config(timer_type_e type, dma_chn_e chn);
 
-/**
- * @brief       This function serves to receive data function by DMA, this function tell the DMA to get data from the timer data fifo.
- *              1. if the receiving length information of DMA is set to 0xFFFFFC byte(max_value), and write_num is turned on,
- *                 then The length of the data received by dma will be written back to the first four bytes of addr.
- *              2. if the receiving length information of DMA is set to less than 0xFFFFFC byte, and write_num is turned on,
- *                 then the length of data received by DMA will not be written to the first four bytes of addr.
- * @param[in]   type     - TIMER0 or TIMER1.
- * @param[in]   addr     - pointer to the buffer receive data.
- * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
- * @return      none
- */
-void timer_receive_dma(timer_type_e type, unsigned char *addr, unsigned int rev_size);
-
-
-/**
+/*
  * @brief     This function servers to configure DMA head node,the chain function only applies to data_len = 0xFFFFFC.
  * @param[in] type - TIMER0/TIMER1.
  * @param[in] chn          - to select the DMA channel.
@@ -260,9 +283,8 @@ void timer_receive_dma(timer_type_e type, unsigned char *addr, unsigned int rev_
  */
 void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
-/**
+/*
  * @brief     This function servers to configure DMA cycle chain node.
- * @param[in] type - TIMER0/TIMER1.
  * @param[in] chn - to select the DMA channel.
  * @param[in] config_addr  - to servers to configure the address of the current node.
  * @param[in] llpoint - to configure the address of the next node configure.
@@ -271,6 +293,4 @@ void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn, unsigned char *ds
  * @return    none
  */
 void timer_set_rx_dma_add_list_element(timer_type_e type, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpoint, unsigned short *dst_addr, unsigned int data_len);
-
-
 #endif /* TIMER_H_ */

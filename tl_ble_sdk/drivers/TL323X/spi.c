@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    spi.c
  *
- * @brief   This is the source file for TL323X
+ * @brief   This is the source file for tl323x
  *
  * @author  Driver Group
  * @date    2025
@@ -1023,8 +1023,6 @@ void spi_master_write_read_full_duplex(spi_sel_e spi_sel, unsigned char *write_d
         } else {
             spi_read(spi_sel, read_data + i - 1, chunk_size + 1);
         }
-        spi_rx_fifo_clr(spi_sel);
-        spi_tx_fifo_clr(spi_sel);
     }
 }
 

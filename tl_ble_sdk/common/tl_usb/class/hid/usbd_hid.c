@@ -37,6 +37,14 @@ typedef struct usbd_hid
 
 static usbd_hid_interface_t usbd_hid[USBD_HID_INTERFACE_NUM];
 
+void usbd_hid_reset_interface_data(void)
+{
+    for(int i=0;i<USBD_HID_INTERFACE_NUM;i++)
+    {
+        usbd_hid[i].protocol_mode=1;
+    }
+    
+}
 _attribute_ram_code_sec_ unsigned char usbd_hid_request_descriptor(unsigned char bus, usb_control_request_t const *setup)
 {
     (void)bus;
@@ -241,6 +249,8 @@ _attribute_ram_code_sec_ WEAK void usbd_hid_set_report(unsigned char bus, unsign
     //printf("set_report=%d,%d",report_len,report[0]);
     #if APP_CHANGE_HID_NABLE 
     app_usb_status_set(REPORT_SET_FLAG_APP);
+
+    extern void app_hid_set_report(unsigned char bus, unsigned char hid_itf, unsigned char report_id, unsigned char report_type, unsigned char *report, unsigned short report_len);
     app_hid_set_report(bus,  hid_itf,report_id,report_type,report, report_len);
     #endif
     

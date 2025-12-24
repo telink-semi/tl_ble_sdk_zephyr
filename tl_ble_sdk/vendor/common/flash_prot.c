@@ -85,7 +85,7 @@ void flash_protection_init(void)
         break;
     #endif
 
-    #if (FLASH_GD25LE80E_SUPPORT_EN)
+    #if (FLASH_GD25LE80E_SUPPORT_EN || FLASH_GD25LQ80E_SUPPORT_EN)
     case MID1460C8:
         flash_lock_mid            = flash_lock_mid1460c8;
         flash_unlock_mid          = flash_unlock_mid1460c8;
@@ -127,15 +127,6 @@ void flash_protection_init(void)
         flash_unlock_mid          = flash_unlock_mid182085;
         flash_get_lock_status_mid = (flash_get_lock_status_t)(size_t)flash_get_lock_block_mid182085;
         flash_unlock_status       = FLASH_LOCK_NONE_MID182085;
-        break;
-    #endif
-
-    #if (FLASH_GD25LQ80E_SUPPORT_EN)
-    case MID1460C8:
-        flash_lock_mid            = flash_lock_mid1460c8;
-        flash_unlock_mid          = flash_unlock_mid1460c8;
-        flash_get_lock_status_mid = (flash_get_lock_status_t)(size_t)flash_get_lock_block_mid1460c8;
-        flash_unlock_status       = FLASH_LOCK_NONE_MID1460C8;
         break;
     #endif
 
@@ -194,7 +185,7 @@ u16 flash_change_app_lock_block_to_flash_lock_block(flash_app_lock_e app_lock_bl
         break;
     #endif
 
-    #if (FLASH_GD25LE80E_SUPPORT_EN) //1M capacity
+    #if (FLASH_GD25LE80E_SUPPORT_EN || FLASH_GD25LQ80E_SUPPORT_EN) //1M capacity
     case MID1460C8:
         if (app_lock_block == FLASH_LOCK_FW_LOW_256K) {
             flash_lock_block_size = FLASH_LOCK_LOW_256K_MID1460C8;
@@ -323,32 +314,6 @@ u16 flash_change_app_lock_block_to_flash_lock_block(flash_app_lock_e app_lock_bl
             blc_flashProt.init_err = 1;
         }
 
-
-        break;
-    #endif
-
-    #if (FLASH_GD25LQ80E_SUPPORT_EN) //1M capacity
-    case MID1460C8:
-        if (app_lock_block == FLASH_LOCK_FW_LOW_256K) {
-            flash_lock_block_size = FLASH_LOCK_LOW_256K_MID1460C8;
-            tlkapi_printf(APP_FLASH_PROT_LOG_EN, "[FLASH][PROT] flash lock low 256K block!\n");
-        } else if (app_lock_block == FLASH_LOCK_FW_LOW_512K) {
-            flash_lock_block_size = FLASH_LOCK_LOW_512K_MID1460C8;
-            tlkapi_printf(APP_FLASH_PROT_LOG_EN, "[FLASH][PROT] flash lock low 512K block!\n");
-        } else if (app_lock_block == FLASH_LOCK_FW_LOW_1M) {
-            /* attention 1: use can change this value according to application
-                     * attention 2: can not lock stack SMP data storage area
-                     * attention 3: firmware size under protection is not 1M, user should calculate
-                     * demo code: choose 960K, leave at 64K for system data(SMP storage data & calibration data & MAC address) and user data,
-                     * if this demo can not meet your requirement, you should change !!!*/
-            flash_lock_block_size = FLASH_LOCK_LOW_960K_MID1460C8;
-            tlkapi_printf(APP_FLASH_PROT_LOG_EN, "[FLASH][PROT] flash lock low 960K block!\n");
-        } else if (app_lock_block == FLASH_LOCK_ALL_AREA) {
-            flash_lock_block_size = FLASH_LOCK_ALL_1M_MID1460C8;
-            tlkapi_printf(APP_FLASH_PROT_LOG_EN, "[FLASH][PROT] flash lock all area!\n");
-        } else {
-            blc_flashProt.init_err = 1;
-        }
 
         break;
     #endif

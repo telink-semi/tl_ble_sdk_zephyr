@@ -48,5 +48,6 @@
 #include "sha512_224.h"
 #include "sha512_256.h"
 #include "sm3.h"
+#include "soft_sha384_sha512.h"
 
 #endif

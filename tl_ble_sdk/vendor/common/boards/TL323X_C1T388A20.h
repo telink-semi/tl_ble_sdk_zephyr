@@ -21,8 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_
-#define VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_
+#ifndef VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_
+#define VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_
 
 /**
  *  @brief  Antenna Switch Configuration
@@ -58,37 +58,37 @@
      *  @brief  Normal keyboard map
      */
     #define KB_MAP_NORMAL {     \
-        {BTN_UNPAIR, BTN_PAIR }, \
-        {CR_VOL_UP,  CR_VOL_DN}, \
-}
+        {CR_VOL_UP, BTN_PAIR }, \
+        {CR_VOL_DN,  BTN_UNPAIR}, \
+    }
 
     //////////////////// KEY CONFIG (EVK board) ///////////////////////////
-    #define KB_DRIVE_PINS {GPIO_PD4, GPIO_PD6}
-    #define KB_SCAN_PINS  {GPIO_PD5, GPIO_PD7}
+    #define KB_DRIVE_PINS {GPIO_PC4, GPIO_PC5}
+    #define KB_SCAN_PINS  {GPIO_PC6, GPIO_PC7}
 
     //scan pin as gpio
-    #define PD4_FUNC AS_GPIO
-    #define PD6_FUNC AS_GPIO
+    #define PC4_FUNC AS_GPIO
+    #define PC5_FUNC AS_GPIO
 
     //scan  pin need 10K pullup
-    #define PULL_WAKEUP_SRC_PD4 MATRIX_ROW_PULL
-    #define PULL_WAKEUP_SRC_PD6 MATRIX_ROW_PULL
+    #define PULL_WAKEUP_SRC_PC4 MATRIX_ROW_PULL
+    #define PULL_WAKEUP_SRC_PC5 MATRIX_ROW_PULL
 
     //scan pin open input to read gpio level
-    #define PD4_INPUT_ENABLE 1
-    #define PD6_INPUT_ENABLE 1
+    #define PC4_INPUT_ENABLE 1
+    #define PC5_INPUT_ENABLE 1
 
     //drive pin as gpio
-    #define PD5_FUNC AS_GPIO
-    #define PD7_FUNC AS_GPIO
+    #define PC6_FUNC AS_GPIO
+    #define PC7_FUNC AS_GPIO
 
     //drive pin need 100K pulldown
-    #define PULL_WAKEUP_SRC_PD5 MATRIX_COL_PULL
-    #define PULL_WAKEUP_SRC_PD7 MATRIX_COL_PULL
+    #define PULL_WAKEUP_SRC_PC6 MATRIX_COL_PULL
+    #define PULL_WAKEUP_SRC_PC7 MATRIX_COL_PULL
 
     //drive pin open input to read gpio wakeup level
-    #define PD5_INPUT_ENABLE 1
-    #define PD7_INPUT_ENABLE 1
+    #define PC6_INPUT_ENABLE 1
+    #define PC7_INPUT_ENABLE 1
 
 #endif
 
@@ -99,10 +99,10 @@
     /**
      *  @brief  Definition gpio for led
      */
-    #define GPIO_LED_BLUE     GPIO_PC0
-    #define GPIO_LED_GREEN    GPIO_PC2
-    #define GPIO_LED_WHITE    GPIO_PC3
-    #define GPIO_LED_RED      GPIO_PC1
+    #define GPIO_LED_BLUE     GPIO_PC3
+    #define GPIO_LED_GREEN    GPIO_PC1
+    #define GPIO_LED_WHITE    GPIO_PC0
+    #define GPIO_LED_RED      GPIO_PC2
 
     #define PC0_FUNC          AS_GPIO
     #define PC2_FUNC          AS_GPIO
@@ -126,20 +126,20 @@
  */
 #if (JTAG_DEBUG_DISABLE)
     //JTAG will cost some power
-    #define PC4_FUNC            AS_GPIO
-    #define PC5_FUNC            AS_GPIO
-    #define PC6_FUNC            AS_GPIO
-    #define PC7_FUNC            AS_GPIO
+    #define PD4_FUNC            AS_GPIO
+    #define PD5_FUNC            AS_GPIO
+    #define PD6_FUNC            AS_GPIO
+    #define PD7_FUNC            AS_GPIO
 
-    #define PC4_INPUT_ENABLE    0
-    #define PC5_INPUT_ENABLE    0
-    #define PC6_INPUT_ENABLE    0
-    #define PC7_INPUT_ENABLE    0
+    #define PD4_INPUT_ENABLE    0
+    #define PD5_INPUT_ENABLE    0
+    #define PD6_INPUT_ENABLE    0
+    #define PD7_INPUT_ENABLE    0
 
-    #define PULL_WAKEUP_SRC_PC4 0
-    #define PULL_WAKEUP_SRC_PC5 0
-    #define PULL_WAKEUP_SRC_PC6 0
-    #define PULL_WAKEUP_SRC_PC7 0
+    #define PULL_WAKEUP_SRC_PD4 0
+    #define PULL_WAKEUP_SRC_PD5 0
+    #define PULL_WAKEUP_SRC_PD6 0
+    #define PULL_WAKEUP_SRC_PD7 0
 
 #endif
 
@@ -153,7 +153,7 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN SD_ADC_GPIO_PB0P
     #endif
 #endif
 
@@ -203,4 +203,4 @@
 
 #define TLKAPI_DEBUG_GPIO_PIN GPIO_PA0
 
-#endif /* VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_ */
+#endif /* VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_ */

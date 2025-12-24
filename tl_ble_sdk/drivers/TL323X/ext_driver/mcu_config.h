@@ -50,7 +50,7 @@
 #define FLASH_P25Q80U_SUPPORT_EN                                0
 #define FLASH_P25Q80SU_SUPPORT_EN                               1
 #define FLASH_P25Q16SU_SUPPORT_EN                               1
-#define FLASH_P25Q32SU_SUPPORT_EN                               0
+#define FLASH_P25Q32SU_SUPPORT_EN                               1
 #define FLASH_P25Q128L_SUPPORT_EN                               0
 #define FLASH_P25Q128H_SUPPORT_EN                               0
 #define FLASH_GD25LQ80E_SUPPORT_EN                              0

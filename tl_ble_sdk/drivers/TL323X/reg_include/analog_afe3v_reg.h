@@ -137,6 +137,7 @@ typedef enum
     XTAL_UNSTABLE            = 0x01,
     PM_CLR_PLIC_REQUEST_FAIL = 0x02,
     WAIT_TIMEOUT             = 0x03,
+    PLL_DONE                 = 0x04,
 } pm_sw_reboot_reason_e;
 
 #define areg_aon_0x3d 0x3d
@@ -208,9 +209,18 @@ typedef enum
     FLD_WAKEUP_STATUS_INUSE_ALL = 0x0f,
 } pm_wakeup_status_e;
 
-#define areg_aon_0x65 0x65 //read only
+#define areg_aon_0x65                0x65
+enum {
+    //RSVD
+    FLD_RESET_XTAL_QICK_START        = BIT(6),
+    FLD_RESET_32K_TIMER_CNT          = BIT(7),
+};
 
-#define areg_aon_0x69 0x69
+#define areg_aon_0x69                0x69
+enum
+{
+    FLD_32K_WD_OVERFLOW_STATUS       = BIT(7),
+};
 
 #define areg_aon_0x70 0x70
 

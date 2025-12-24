@@ -26,16 +26,14 @@
 
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
-#include "lib/include/pm/pm_internal.h"
+
 #include "lib/include/rf/rf_common.h"
-#include "lib/include/swire.h"
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
 #include "lib/include/ske/ske_algorithm.h"
 #include "lib/include/hash/hash_algorithm.h"
 #include "lib/include/crypto_common/common_config.h"
-#include "lib/include/emi.h"
 #include "lib/include/analog.h"
 #include "dma.h"
 #include "gpio.h"
@@ -52,10 +50,9 @@
 
 #include "lib/include/clock.h"
 #include "lib/include/mspi.h"
-#include "adc.h"
-#include "qdec.h"
 #include "plic_sw.h"
 #include "plmt.h"
 #include "flash/flash_type.h"
 #include "flash/flash_common.h"
+#include "sd_adc.h"
 

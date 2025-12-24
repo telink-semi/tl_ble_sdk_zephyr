@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    watchdog.h
  *
- * @brief   This is the header file for TL323X
+ * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
  * @date    2025
@@ -76,7 +76,7 @@ static inline void wd_start(void)
  */
 static inline void wd_stop(void)
 {
-//    BM_CLR(reg_tmr_wd_en, FLD_TMR_WD_EN);
+    BM_CLR(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
 /**

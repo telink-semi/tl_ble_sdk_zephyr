@@ -49,8 +49,6 @@
 
 .extern gpio_shutdown_flashcode_for_asm
 .extern gpio_shutdown_ramcode_for_asm
-.extern lpd_power_down_protect_enable
-.extern lpd_power_down_protect_enable_for_deep_ret
 
 //According to the current internal seal flash model of Telink RISC-V MCU, the maximum time between the flash awakening and the operating flash is 20us, which leaves some margin and is set to 25us.
 //When adding flash later, if tRES1 is greater than 25us, this waiting time needs to be updated. (flash tRES1, which can be viewed in the comments of the variable flash_support_mid.)
@@ -61,15 +59,15 @@
 //D25 ILM, D25 DLM made into software sharing, The driver is configured to 160k by default, can choose the corresponding size according to the chip specification.
 //SRAM_160K:the total size is 160k (32k*5), a total of 5 copies of 32k;
 //SRAM_96K:the total size is 96k (32k*3), a total of 3 copies of 32k;
-//which can be divided to d25f ILM and DLM, limit: d25f ILM at least 32K, d25f DLM can be 0K.
+//which can be divided to d25f ILM and DLM, limit: d25f ILM at least 32K, d25f DLM at least 32K.
 //Note: d25f/cstartup_flash.S, d25f/cstartup_ram.S configurations are consistent and need to be modified together.
 #define  SRAM_160K     0
 #define  SRAM_96K      1
 #define  SRAM_SIZE     SRAM_160K
 
 #if(SRAM_SIZE  ==   SRAM_160K)
-    .equ __D25F_IRAM_SIZE,   3 //96KB
-    .equ __D25F_DRAM_SIZE,   2 //64KB
+    .equ __D25F_IRAM_SIZE,   3 //96KB   note: configuration Options: 1/2/3
+    .equ __D25F_DRAM_SIZE,   2 //64KB   note: configuration Options: 4/3/2
 #elif(SRAM_SIZE  ==   SRAM_96K)
     .equ __D25F_IRAM_SIZE,   2 //64KB
     .equ __D25F_DRAM_SIZE,   1 //32KB
@@ -98,6 +96,12 @@ _RESET_ENTRY:
     .org 0x10
     .word(_RF_CERTIFICATION_CFG_ADDR_OFFSET)
 #endif
+/* used to check flash protection function consistency between the old and new  firmware when OTA upgrading */
+#if APP_FLASH_PROTECTION_ENABLE
+    .org 0x15    //correspond to "FIRMWARE_FLASH_PROTECTION_FLAG_ADDR" in mcu_boot.h
+    .byte (0x5A)
+#endif
+
     .org 0x18
     .word (BIN_SIZE)
 
@@ -239,9 +243,12 @@ _RETENTION_DATA_INIT_BEGIN:
 
     /* Move ramcode from flash to sram */
 _RAMCODE_INIT:
+    .option push
+    .option norelax
     la     t1, _RAMCODE_LMA_START
     la     t2, _RAMCODE_VMA_START
     la     t3, _RAMCODE_VMA_END
+    .option pop
 _RAMCODE_INIT_BEGIN:
     bleu   t3, t2, _DATA_INIT
     lw     t0, 0(t1)
@@ -292,12 +299,6 @@ _FILL_STK_BEGIN:
     /* Jump to the main function */
 _MAIN_FUNC:
     nop
-
-#if 1
-    //Flash Configuration for Chip Power-Down Protection
-    la     t0, lpd_power_down_protect_enable
-    jalr   t0
-#endif
 
     la     t0, main
     jalr   t0
@@ -538,12 +539,6 @@ _IDATA_INIT_BEGIN:
     /* Jump to the main function */
 _IMAIN_FUNC:
     nop
-
-#if 1
-    //Flash Configuration for Chip Power-Down Protection
-    la     t0, lpd_power_down_protect_enable_for_deep_ret
-    jalr   t0
-#endif
 
     la     t0, main
     jalr   t0

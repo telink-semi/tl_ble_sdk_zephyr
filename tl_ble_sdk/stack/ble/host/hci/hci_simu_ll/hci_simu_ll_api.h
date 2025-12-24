@@ -28,6 +28,8 @@
 #ifndef STACK_BLE_HOST_V1_HCI_SIM_LL_API_H_
 #define STACK_BLE_HOST_V1_HCI_SIM_LL_API_H_
 
+// #include "stack/ble/ble_config.h" // BLE USED, remove for cleaning warnings
+
 #if defined(TLK_ONLY_BLE_HOST)
 
 #include "stack/ble/hci/hci.h"

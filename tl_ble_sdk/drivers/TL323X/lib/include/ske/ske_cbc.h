@@ -34,38 +34,95 @@ extern "C"
 #endif
 
 
-    //APIs
     /**
- * @brief       for GMAC mode to input message blocks(just for AES/SM4, block size is 16 bytes).
- * @param[in]   alg                  - ske_lp algorithm.
- * @param[in]   crypto               - SKE_CRYPTO_ENCRYPT or SKE_CRYPTO_DECRYPT.
- * @param[in]   key                  - TDES key, 24 bytes.
- * @param[in]   sp_key_idx           - key id.
- * @param[in]   iv                   - iv in word buffer.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.hw DES must be set already.
-      -# 2.hw ECB must be set already.
-  @endverbatim
+ * @brief           APIs
  */
-    unsigned int ske_lp_cbc_init(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv);
 
+    /**
+ * @brief           Initializes CBC mode configuration
+ * @param[in]       alg                  - SKE algorithm
+ * @param[in]       crypto               - Encrypt or decrypt operation
+ * @param[in]       key                  - Key data
+ * @param[in]       sp_key_idx           - Secure port key index
+ * @param[in]       iv                   - Initialization vector
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
+    unsigned int ske_lp_cbc_init(ske_alg_e alg, ske_crypto_e crypto, const unsigned char *key, unsigned short sp_key_idx, unsigned char *iv);
+
+    /**
+ * @brief           Updates multiple blocks in CBC mode
+ * @param[in]       in                   - Input data
+ * @param[out]      out                  - Output data
+ * @param[in]       bytes                - Data length in bytes
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
     unsigned int ske_lp_cbc_update_blocks(unsigned char *in, unsigned char *out, unsigned int bytes);
 
+    /**
+ * @brief           Finalizes CBC mode operation
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
     unsigned int ske_lp_cbc_final(void);
 
-    unsigned int ske_lp_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned char *in, unsigned char *out, unsigned int bytes);
+    /**
+ * @brief           Performs one-shot encryption/decryption in CBC mode
+ * @param[in]       alg                  - SKE algorithm
+ * @param[in]       crypto               - Encrypt or decrypt operation
+ * @param[in]       key                  - Key data
+ * @param[in]       sp_key_idx           - Secure port key index
+ * @param[in]       iv                   - Initialization vector
+ * @param[in]       in                   - Input data
+ * @param[out]      out                  - Output data
+ * @param[in]       bytes                - Data length in bytes
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
+    unsigned int ske_lp_cbc_crypto(ske_alg_e alg, ske_crypto_e crypto, const unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned char *in,
+                                   unsigned char *out, unsigned int bytes);
 
 
 #ifdef SKE_LP_DMA_FUNCTION
-    unsigned int ske_lp_dma_cbc_init(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv);
+    /**
+ * @brief           Initializes CBC mode configuration for DMA
+ * @param[in]       alg                  - SKE algorithm
+ * @param[in]       crypto               - Encrypt or decrypt operation
+ * @param[in]       key                  - Key data
+ * @param[in]       sp_key_idx           - Secure port key index
+ * @param[in]       iv                   - Initialization vector
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
+    unsigned int ske_lp_dma_cbc_init(ske_alg_e alg, ske_crypto_e crypto, const unsigned char *key, unsigned short sp_key_idx, unsigned char *iv);
 
+    /**
+ * @brief           Updates multiple blocks in CBC mode using DMA
+ * @param[in]       in                   - Input data
+ * @param[out]      out                  - Output data
+ * @param[in]       words                - Data length in words
+ * @param[in]       callback             - Callback function pointer
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
     unsigned int ske_lp_dma_cbc_update_blocks(unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback);
 
+    /**
+ * @brief           Finalizes CBC mode operation for DMA
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
     unsigned int ske_lp_dma_cbc_final(void);
 
-    unsigned int ske_lp_dma_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback);
+    /**
+ * @brief           Performs one-shot encryption/decryption in CBC mode using DMA
+ * @param[in]       alg                  - SKE algorithm
+ * @param[in]       crypto               - Encrypt or decrypt operation
+ * @param[in]       key                  - Key data
+ * @param[in]       sp_key_idx           - Secure port key index
+ * @param[in]       iv                   - Initialization vector
+ * @param[in]       in                   - Input data
+ * @param[out]      out                  - Output data
+ * @param[in]       words                - Data length in words
+ * @param[in]       callback             - Callback function pointer
+ * @return          SKE_SUCCESS if successful, otherwise error code
+ */
+    unsigned int ske_lp_dma_cbc_crypto(ske_alg_e alg, ske_crypto_e crypto, const unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int *in,
+                                       unsigned int *out, unsigned int words, SKE_CALLBACK callback);
 #endif
 
 

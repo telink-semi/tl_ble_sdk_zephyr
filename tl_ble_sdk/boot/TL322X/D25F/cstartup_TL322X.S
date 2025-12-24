@@ -106,6 +106,16 @@
         .equ __D25F_DRAM_SIZE,   2 //64KB
         .equ __N22_IRAM_SIZE,    5 //160KB
         .equ __N22_DRAM_SIZE,    2 //64KB
+    #elif __PROJECT_SNIF_MAIN_NODE__ || defined(__CHANNEL_SOUNDING_EN__)
+        .equ __D25F_IRAM_SIZE,   7 //224KB
+        .equ __D25F_DRAM_SIZE,   5 //160KB
+        .equ __N22_IRAM_SIZE,    0
+        .equ __N22_DRAM_SIZE,    0
+    #elif !defined(TLK_ONLY_BLE_HOST)
+        .equ __D25F_IRAM_SIZE,   7 //128KB
+        .equ __D25F_DRAM_SIZE,   5 //96KBd
+        .equ __N22_IRAM_SIZE,    0 //96KB
+        .equ __N22_DRAM_SIZE,    0 //64KB
     #else
         .equ __D25F_IRAM_SIZE,   2 //128KB
         .equ __D25F_DRAM_SIZE,   3 //96KBd
@@ -169,11 +179,11 @@ _RESET_ENTRY:
     .word ('T'<<24 | 'L'<<16 | 'N'<<8 | 'K')
 
     .org 0x24
-/* in the original configuration, set bit[22] to 1, enable timeout:
+/* set bit[22] to 1, enable timeout:
  * when xip reaches a certain time without fetching instructions, cs will not be pulled down, saving power consumption.
  */
-    .word (0x3B0097A9)           //DREAD:   cmd:1x, addr:1x, data:2x, dummy:8
-//    .word (0xEB0095BA)           //X4READ:  cmd:1x, addr:4x, data:4x, dummy:6
+      .word (0x3B4097A9)           //DREAD:   cmd:1x, addr:1x, data:2x, dummy:8
+//    .word (0xEB4095BA)           //X4READ:  cmd:1x, addr:4x, data:4x, dummy:6
 //    .word (0xEB4493BA)           //X4READ:  cmd:1x, addr:4x, data:4x, token:0x00, dummy:4
 
     .option pop
@@ -196,11 +206,11 @@ _START:
     sb      t2, 0x484(t0)       //0x80140c14  PB output  =  0x10
 #endif
 
-#if 0
+#if 1
     /* timer rst enable. */
     li      t0, 0x80140822 /* reg_rst2 register address. */
-    li      t1, 0x39       /* bit0=1 timer enable(reset velue 0x38). */
-    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140822))= 0x39. */
+    li      t1, 0xb9       /* bit0=1 timer enable(reset velue 0xb8). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140822))= 0xb9. */
 
     /* timer clk enable. */
     li      t0, 0x80140826 /* tim_ctrl2 register address. */
@@ -215,7 +225,7 @@ _START:
     /* start timer watchdog. */
     li      t0, 0x80140162 /* reg_tmr_wd_en register address. */
     li      t1, 0x01       /* bit0=1 watchdog enable(reset velue 0x00). */
-    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140162))= 0x80. */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140162))= 0x01. */
 #endif
     /* Initialize global pointer */
     .option push
@@ -389,11 +399,11 @@ _ISTART:
     sb      t1, 0x482(t0)       //0x80140c12  PB oen     =  0xef
     sb      t2, 0x484(t0)       //0x80140c14  PB output  =  0x10
 #endif
-#if 0
+#if 1
     /* timer rst enable. */
     li      t0, 0x80140822 /* reg_rst2 register address. */
-    li      t1, 0x39       /* bit0=1 timer enable(reset velue 0x38). */
-    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140822))= 0x39. */
+    li      t1, 0xb9       /* bit0=1 timer enable(reset velue 0xb8). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140822))= 0xb9. */
 
     /* timer clk enable. */
     li      t0, 0x80140826 /* tim_ctrl2 register address. */
@@ -408,12 +418,19 @@ _ISTART:
     /* start timer watchdog. */
     li      t0, 0x80140162 /* reg_tmr_wd_en register address. */
     li      t1, 0x01       /* bit0=1 watchdog enable(reset velue 0x00). */
-    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140162))= 0x80. */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140162))= 0x01. */
 #endif
     /* Initialize global pointer */
     la     gp, __global_pointer$
     .option pop
 
+
+#if DP_THROUGH_SWIRE_DIS
+    lui     t0, 0x80100
+    addi    t0 , t0 , 0x700
+    li      t1, 0x00
+    sb      t1, 0x501(t0)  //0x80100c01 -> 0x00  <7>: 0 swire_usb_dis 
+#endif
     /* Initialize stack pointer */
     la     t0, _STACK_TOP
     mv     sp, t0

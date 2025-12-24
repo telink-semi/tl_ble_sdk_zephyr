@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -29,78 +29,112 @@
 #include "reg_include/pke_reg.h"
 
 
-//ECC point conversion form
-#define POINT_COMPRESSED   (0x02U) //pc||x, pc = 0x02|LSB(y)
-#define POINT_UNCOMPRESSED (0x04U) //pc||x||y, pc=0x04
-typedef unsigned char EC_POINT_FORM;
-
-
-//define KDF
-typedef void *(*KDF_FUNC)(void *input, unsigned int byteLen, unsigned char *key, unsigned int keyByteLen);
-
-
-//APIs
+/**
+ * @brief           ECC point conversion form
+ */
+#define POINT_COMPRESSED   (0x02U) /**< pc||x, pc = 0x02|LSB(y) */
+#define POINT_UNCOMPRESSED (0x04U) /**< pc||x||y, pc=0x04 */
+typedef unsigned char ec_point_form_e;
 
 /**
- * @brief       load input operand to baseaddr
- * @param[out]  baseaddr     - destination data
- * @param[in]   data         - source data
- * @param[in]   wordLen      - word length of data
- * @return      0:success     other:error
+ * @brief           define KDF
  */
-void pke_load_operand(unsigned int *baseaddr, unsigned int *data, unsigned int wordLen);
+typedef void *(*KDF_FUNC)(const void *input, unsigned int byteLen, unsigned char *key, unsigned int key_len);
+
+// APIs
+/**
+ * @brief           Load input operand to baseaddr
+ * @param[out]      baseaddr             - destination data
+ * @param[in]       data                 - source data
+ * @param[in]       wlen                 - word length of data
+ * @return          None
+ * @note            
+ *        1. Operands are both unsigned int little-endian.
+ */
+void pke_load_operand(unsigned int *baseaddr, const unsigned int *data, unsigned int wlen);
 
 /**
- * @brief       get result operand from baseaddr
- * @param[out]  baseaddr     - source data
- * @param[in]   data         - destination data
- * @param[in]   wordLen      - word length of data
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.operands are both U32 little-endian
-  @endverbatim
+ * @brief           Load input operand of 256 bits to baseaddr
+ * @param[out]      baseaddr             - destination data
+ * @param[in]       data                 - source data
+ * @return          None
+ * @note            
+ *        1. Operands are both unsigned int little-endian.
+ *        2. Operands are both of 256 bits for SM2, SM9, etc.
  */
-void pke_read_operand(unsigned int *baseaddr, unsigned int *data, unsigned int wordLen);
+void pke_load_operand_256bits(unsigned int *baseaddr, const unsigned int *data);
 
 /**
- * @brief       load input operand(U8 big-endian) to baseaddr
- * @param[out]  baseaddr     - destination data
- * @param[in]   data         - source data, U8 big-endian
- * @param[in]   byteLen      - byte length of data
- * @return      0:success     other:error
+ * @brief           Get result operand from baseaddr
+ * @param[in]       baseaddr             - source data
+ * @param[out]      data                 - destination data
+ * @param[in]       wlen                 - word length of data
+ * @return          None
+ * @note            
+ *        1. Operands are both unsigned int little-endian.
  */
-void pke_load_operand_U8(unsigned int *baseaddr, unsigned char *data, unsigned int byteLen);
-/**
- * @brief       get result operand(U8 big-endian) from baseaddr
- * @param[in]   baseaddr     - source data
- * @param[out]  data         - destination data, U8 big-endian
- * @param[in]   byteLen      - byte length of data
- * @return      0:success     other:error
- */
-void pke_read_operand_U8(unsigned int *baseaddr, unsigned char *data, unsigned int byteLen);
+void pke_read_operand(const unsigned int *baseaddr, unsigned int *data, unsigned int wlen);
 
 /**
- * @brief       set operand with an unsigned int value
- * @param[out]  baseaddr      - operand
- * @param[in]   wordLen       - word length of operand
- * @param[in]   b             - unsigned int value b
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.wordLen can not be 0
-  @endverbatim
+ * @brief           Get result operand of 256 bits from baseaddr
+ * @param[in]       baseaddr             - source data
+ * @param[out]      data                 - destination data
+ * @return          None
+ * @note            
+ *        1. Operands are both unsigned int little-endian.
+ *        2. Operands are both of 256 bits for SM2, SM9, etc.
  */
-void pke_set_operand_uint32_value(unsigned int *baseaddr, unsigned int wordLen, unsigned int b);
-
+void pke_read_operand_256bits(const unsigned int *baseaddr, unsigned int *data);
 
 /**
- * @brief     decode X25519 scalar for point multiplication
- * @param[in]  k                - null.
- * @param[out] out              - big scalar in little-endian
- * @param[in]  bytes            - byte length of k and out
- * @return     none
+ * @brief           Load input operand (unsigned char big-endian) to baseaddr
+ * @param[in]       baseaddr             - destination data
+ * @param[out]      data                 - source data, unsigned char big-endian
+ * @param[in]       byteLen              - byteLen Input, byte length of data
+ * @return          None
  */
-void x25519_decode_scalar(unsigned char *k, unsigned char *out, unsigned int bytes);
+void pke_load_operand_U8(unsigned int *baseaddr, const unsigned char *data, unsigned int byteLen);
+
+/**
+ * @brief           Get result operand (unsigned char big-endian) from baseaddr
+ * @param[in]       baseaddr             - source data
+ * @param[out]      data                 - destination data, unsigned char big-endian
+ * @param[in]       byteLen              - byte length of data
+ * @return          None
+ */
+void pke_read_operand_U8(const unsigned int *baseaddr, unsigned char *data, unsigned int byteLen);
+
+/**
+ * @brief           Set operand with an unsigned int value
+ * @param[out]      baseaddr             - operand
+ * @param[in]       wlen                 - word length of operand
+ * @param[in]       b                    - unsigned int value b
+ * @return          None
+ * @note            
+ *        1. wlen cannot be 0.
+ */
+void pke_set_operand_uint32_value(unsigned int *baseaddr, unsigned int wlen, unsigned int b);
+
+/**
+ * @brief           Set operand of 256 bits with an unsigned int value
+ * @param[out]      baseaddr             - operand
+ * @param[in]       b                    - unsigned int value b
+ * @return          None
+ * @note            
+ *        1. Operand is unsigned int little-endian.
+ *        2. Operand is of 256 bits for SM2, SM9, etc.
+ */
+void pke_set_operand_uint32_value_256bits(unsigned int *baseaddr, unsigned int b);
+
+/**
+ * @brief           Check whether k is equal to (n-1), here n is odd.
+ * @param[in]       k                    - big number k
+ * @param[in]       n                    - big number n
+ * @param[in]       words                - word length of k and n
+ * @return          0 if k is n-1, other value if k is not n-1
+ * @note            
+ *        1. n must be odd.
+ */
+unsigned int is_k_equal_to_n_minus_1(const unsigned int *k, const unsigned int *n, unsigned int words);
 
 #endif

@@ -32,7 +32,6 @@
 #include "types.h"
 
 #include <string.h>
-#include "watchdog.h"               //BLE SDK use
 
 _attribute_data_retention_sec_ flash_handler_t flash_read_page  = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
@@ -91,7 +90,6 @@ void flash_plic_preempt_config(unsigned char preempt_en, unsigned char threshold
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
-    wd_clear(); //BLE SDK use
     DISABLE_BTB;
     flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
     ENABLE_BTB;

@@ -181,6 +181,17 @@ void HCI_TxHandler(void)
             return;
         }
     }
+    else
+    {
+       extern u32 btc_hci_vendor_change_baudrate ;  //hci vendor has internally defined ,
+        if(btc_hci_vendor_change_baudrate != 0)
+       {
+           void HCI_Tr_H4ChangeBaudrate(hci_fifo_t *pHciRxFifo,u32 baudrate);
+           HCI_Tr_H4ChangeBaudrate(&bltHci_rxfifo,btc_hci_vendor_change_baudrate);
+           btc_hci_vendor_change_baudrate = 0;
+        }
+     }
+
 
     #elif HCI_TR_MODE == HCI_TR_H5
         //TX handle has been taken over by H5 protocol.

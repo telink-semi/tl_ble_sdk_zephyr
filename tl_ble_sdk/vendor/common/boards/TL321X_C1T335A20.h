@@ -140,7 +140,8 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_P ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_N 0
     #endif
 #endif
 
@@ -148,6 +149,8 @@
  *  @brief  GPIO definition for debug_io
  */
 #if (DEBUG_GPIO_ENABLE)
+
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
     #define GPIO_CHN0         GPIO_PE0
     #define GPIO_CHN1         GPIO_PE1
     #define GPIO_CHN2         GPIO_PE2
@@ -184,6 +187,44 @@
     #define PB1_OUTPUT_ENABLE 1
     #define PB2_OUTPUT_ENABLE 1
     #define PC2_OUTPUT_ENABLE 1
+#else
+    #define GPIO_CHN0         GPIO_PA1
+    #define GPIO_CHN1         GPIO_PE7
+    #define GPIO_CHN2         GPIO_PD5
+    #define GPIO_CHN3         GPIO_PE2
+    #define GPIO_CHN4         GPIO_PE3
+    #define GPIO_CHN5         GPIO_PA0
+    #define GPIO_CHN6         GPIO_PA2
+    #define GPIO_CHN7         GPIO_PA3
+
+    #define GPIO_CHN8         GPIO_PA4
+    #define GPIO_CHN9         GPIO_PA5
+    #define GPIO_CHN10        GPIO_PA6
+    #define GPIO_CHN11        GPIO_PE4
+    #define GPIO_CHN12        GPIO_PE5
+    #define GPIO_CHN13        GPIO_PE6
+    #define GPIO_CHN14        GPIO_PC4
+    #define GPIO_CHN15        GPIO_PC5
+
+
+    #define PA1_OUTPUT_ENABLE 1
+    #define PE7_OUTPUT_ENABLE 1
+    #define PD5_OUTPUT_ENABLE 1
+    #define PE2_OUTPUT_ENABLE 1
+    #define PE3_OUTPUT_ENABLE 1
+    #define PA0_OUTPUT_ENABLE 1
+    #define PA2_OUTPUT_ENABLE 1
+    #define PA3_OUTPUT_ENABLE 1
+
+    #define PA4_OUTPUT_ENABLE 1
+    #define PA5_OUTPUT_ENABLE 1
+    #define PA6_OUTPUT_ENABLE 1
+    #define PE4_OUTPUT_ENABLE 1
+    #define PE5_OUTPUT_ENABLE 1
+    #define PE6_OUTPUT_ENABLE 1
+    #define PC4_OUTPUT_ENABLE 1
+    #define PC5_OUTPUT_ENABLE 1
+#endif /* BLC_ZEPHYR_BLE_INTEGRATION */
 
 #endif //end of DEBUG_GPIO_ENABLE
 

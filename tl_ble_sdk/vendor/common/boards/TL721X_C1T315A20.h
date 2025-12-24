@@ -64,19 +64,19 @@
 }
 
     //////////////////// KEY CONFIG (EVK board) ///////////////////////////
-    #define KB_DRIVE_PINS {GPIO_PD4, GPIO_PD6}
+    #define KB_DRIVE_PINS {GPIO_PB7, GPIO_PD6}  //In the hardware design of TL7218X_C1T315A20_V1_5 and earlier versions, the PD4 pin used for KEY1 does not support I/O functionality. As a result, it has been replaced with the fully functional PB7 pin after adjustment.
     #define KB_SCAN_PINS  {GPIO_PD5, GPIO_PD7}
 
     //scan pin as gpio
-    #define PD4_FUNC AS_GPIO
+    #define PB7_FUNC AS_GPIO
     #define PD6_FUNC AS_GPIO
 
     //scan  pin need 10K pullup
-    #define PULL_WAKEUP_SRC_PD4 MATRIX_ROW_PULL
+    #define PULL_WAKEUP_SRC_PB7 MATRIX_ROW_PULL
     #define PULL_WAKEUP_SRC_PD6 MATRIX_ROW_PULL
 
     //scan pin open input to read gpio level
-    #define PD4_INPUT_ENABLE 1
+    #define PB7_INPUT_ENABLE 1
     #define PD6_INPUT_ENABLE 1
 
     //drive pin as gpio
@@ -154,7 +154,8 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_P ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_N 0
     #endif
 #endif
 
@@ -202,6 +203,47 @@
 
 #endif //end of DEBUG_GPIO_ENABLE
 
-#define TLKAPI_DEBUG_GPIO_PIN GPIO_PB7
+#if (DEBUG_CS_GPIO_ENABLE || DEBUG_HDT_GPIO_ENABLE)
+    #define GPIO_CHN0         GPIO_PE0
+    #define GPIO_CHN1         GPIO_PF1
+    #define GPIO_CHN2         GPIO_PE1
+    #define GPIO_CHN3         GPIO_PF2
+    #define GPIO_CHN4         GPIO_PE2
+    #define GPIO_CHN5         GPIO_PF3
+    #define GPIO_CHN6         GPIO_PF0
+    #define GPIO_CHN7         GPIO_PF4
+
+    #define GPIO_CHN8         GPIO_PF5
+    #define GPIO_CHN9         GPIO_PE3
+    #define GPIO_CHN10        GPIO_PF6
+    #define GPIO_CHN11        GPIO_PE4
+    #define GPIO_CHN12        GPIO_PF7
+    #define GPIO_CHN13        GPIO_PE5
+    #define GPIO_CHN14        GPIO_PA0
+    #define GPIO_CHN15        GPIO_PE6
+
+
+    #define PE0_OUTPUT_ENABLE 1
+    #define PE1_OUTPUT_ENABLE 1
+    #define PE2_OUTPUT_ENABLE 1
+    #define PE3_OUTPUT_ENABLE 1
+    #define PE4_OUTPUT_ENABLE 1
+    #define PE5_OUTPUT_ENABLE 1
+    #define PE6_OUTPUT_ENABLE 1
+    #define PF0_OUTPUT_ENABLE 1
+
+    #define PF1_OUTPUT_ENABLE 1
+    #define PF2_OUTPUT_ENABLE 1
+    #define PF3_OUTPUT_ENABLE 1
+    #define PF4_OUTPUT_ENABLE 1
+    #define PF5_OUTPUT_ENABLE 1
+    #define PF6_OUTPUT_ENABLE 1
+    #define PF7_OUTPUT_ENABLE 1
+    #define PA0_OUTPUT_ENABLE 1
+
+#endif
+
+
+#define TLKAPI_DEBUG_GPIO_PIN GPIO_PB6
 
 #endif /* VENDOR_COMMON_BOARDS_TL721X_C1T315A20_H_ */

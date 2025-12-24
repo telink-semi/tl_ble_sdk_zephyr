@@ -143,7 +143,8 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_P ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_N 0
     #endif
 #endif
 

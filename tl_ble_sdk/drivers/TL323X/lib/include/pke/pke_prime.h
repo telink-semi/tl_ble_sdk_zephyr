@@ -32,7 +32,9 @@ extern "C"
 #endif
 
 
-//1:use hardware;  2:use software
+/**
+ * @brief           1:use hardware;  2:use software
+ */
 #define BIGINT_DIV_CHOICE (2U)
 
 #if (BIGINT_DIV_CHOICE == 1U)
@@ -43,32 +45,41 @@ extern "C"
     } double_uint32_t;
 #elif (BIGINT_DIV_CHOICE == 2U)
 typedef unsigned int double_uint32_t;
-//#define BIGINT_DIV_UINT32
+// #define BIGINT_DIV_UINT32
 #endif
 
-
-//1:use Fermat primality test;  2:use MillerCRabin primality test
+    /**
+ * @brief           1:use Fermat primality test;  2:use Miller-Rabin primality test
+ */
 #define PRIMALITY_TEST_CHOICE (1U)
 
 #if (PRIMALITY_TEST_CHOICE == 1U)
-    #define FERMAT_ROUND (3U)
+#define FERMAT_ROUND (3U)
 #elif (PRIMALITY_TEST_CHOICE == 2U)
-    #define MILLER_RABIN_ROUND (3U)
+#define MILLER_RABIN_ROUND (3U)
 #endif
 
-
-//prime table level(total number of small prime numbers)
-#define PTL_MAX     (400U) //the max PTL value
-#define PTL_512     (400U) //the best PTL value for prime bit length 512 (RSA1024)
-#define PTL_1024    (400U) //the best PTL value for prime bit length 1024 (RSA2048)
-
+/**
+ * @brief           prime table level(total number of small prime numbers)
+  */
+#define PTL_MAX  (400U) /**< the max PTL value */
+#define PTL_512  (400U) /**< the best PTL value for prime bit length 512 (RSA1024) */
+#define PTL_1024 (400U) /**< the best PTL value for prime bit length 1024 \ */
+                        /**< (RSA2048) */
 
 #define NOT_PRIME   (0xFFFFFFFFU)
 #define MAYBE_PRIME (0U)
 
-
-    unsigned int get_prime(unsigned int p[], unsigned int pBitLen);
-
+    /**
+ * @brief           Get a prime number of specified bit length
+ * @param[out]      p                    - Pointer to unsigned int big prime number
+ * @param[in]       p_bitlen             - Bit length of the prime number
+ * @return          
+ *        0 (success), p is a prime number with high probability other (error)
+ * @note            
+ *           p_bitlen must be bigger than 32, but less than 2048.
+ */
+    unsigned int get_prime(unsigned int p[], unsigned int p_bitlen);
 
 #ifdef __cplusplus
 }

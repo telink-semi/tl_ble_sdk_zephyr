@@ -1,3 +1,4 @@
+
 /********************************************************************************************************
  * @file    utility.h
  *
@@ -33,26 +34,93 @@ extern "C"
 {
 #endif
 
+#ifndef SUPPORT_STATIC_ANALYSIS
+#define cast2uint32(a)       ((unsigned int)(a))
+#define get_max_len(a, b)    (((a) > (b)) ? (a) : (b))
+#define get_min_len(a, b)    (((a) > (b)) ? (b) : (a))
+#define get_word_len(bitLen) (((bitLen) + 31u) >> 5)
+#define get_byte_len(bitLen) (((bitLen) + 7u) >> 3)
+#else
+unsigned int get_max_len(unsigned int a, unsigned int b);
+unsigned int get_word_len(unsigned int bit_len);
+unsigned int get_byte_len(unsigned int bit_len);
+#endif
 
-//#ifndef SUPPORT_STATIC_ANALYSIS
-#define CAST2UINT32(a)       ((unsigned int)(a))
-#define GET_MAX_LEN(a, b)    (((a) > (b)) ? (a) : (b))
-#define GET_MIN_LEN(a, b)    (((a) > (b)) ? (b) : (a))
-#define GET_WORD_LEN(bitLen) (((bitLen) + 31u) >> 5)
-#define GET_BYTE_LEN(bitLen) (((bitLen) + 7u) >> 3)
-    //#else
-    //unsigned int GET_MAX_LEN(unsigned int a, unsigned int b);
-    //unsigned int GET_WORD_LEN(unsigned int bit_len);
-    //unsigned int GET_BYTE_LEN(unsigned int bit_len);
-    //#endif
 
+#define print_BN_buf_U32         print_bn_buf_u32
+#define print_buf_U32            print_buf_u32
+#define print_buf_U8             print_buf_u8
+#define uint8_BigNum_Check_Zero  uint8_bignum_check_zero
+#define uint32_BigNum_Check_Zero uint32_bignum_check_zero
+#define Bigint_Check_p_1         bigint_check_p_1
+#define Big_Div2n                big_div_2n
+#define Bigint_Check_1           bigint_check_1
+#define Get_Multiple2_Number     get_multiple2_number
+#define uint32_BigNumCmp         uint32_big_num_cmp
+#define uint8_XOR                uint8_xor
+#define uint32_XOR               uint32_xor
 
-    //APIs
+    static inline unsigned int cast2uint32(unsigned int a)
+    {
+        return a;
+    }
+
+    // Maintenance API
+    /**
+ * @brief           Compare big integer a and b
+ * @param[in]       a                    - big integer a
+ * @param[in]       a_wlen               - Word length of a
+ * @param[in]       b                    - big integer b
+ * @param[in]       b_wlen               - Word length of b
+ * @return          0 (a = b), 1 (a > b), -1 (a < b)
+ * @note            Ensure that neither of a or b is NULL.
+ */
+    int big_integer_compare(const unsigned int *a, unsigned int a_wlen, const unsigned int *b, unsigned int b_wlen);
+
+    /**
+ * @brief           a = a / (2^n)
+ * @param[in,out]   a                    - Big integer a, will be modified in place
+ * @param[in]       a_wlen               - Word length of a
+ * @param[in]       n                    - Exponent of 2^n
+ * @return          Word length of a after division by 2^n
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. Ensure that a_wlen is the real word length of a.
+ *        3. Ensure that a_wlen * 32 is not less than n. a_wlen
+ */
+    unsigned int div2n_u32(unsigned int *a, unsigned int a_wlen, unsigned int n);
+    /**
+ * @brief           APIs
+ */
+
 
 #ifdef UTILITY_PRINT_BUF
-    extern void print_buf_U8(const unsigned char *buf, unsigned int byteLen, char *name);
-    extern void print_buf_U32(const unsigned int *buf, unsigned int wordLen, char *name);
-    extern void print_BN_buf_U32(const unsigned int *buf, unsigned int wordLen, char *name);
+    /**
+ * @brief           Prints a buffer of unsigned 8-bit integers.
+ * @param[in]       buf                  - Pointer to the buffer of unsigned 8-bit integers.
+ * @param[in]       byteLen              - Length of the buffer in bytes.
+ * @param[in]       name                 - Name or description of the buffer for printing purposes.
+ * @return          None
+ */
+    extern void print_buf_u8(const unsigned char *buf, unsigned int byteLen, char *name);
+
+    /**
+ * @brief           Prints a buffer of unsigned 32-bit integers.
+ * @param[in]       buf                  - Pointer to the buffer of unsigned 32-bit integers.
+ * @param[in]       wlen                 - Length of the buffer in terms of number of unsigned 32-bit integers.
+ * @param[in]       name                 - Name or description of the buffer for printing purposes.
+ * @return          None
+  */
+    extern void print_buf_u32(const unsigned int *buf, unsigned int wlen, char *name);
+
+    /**
+ * @brief           Prints a buffer of unsigned 32-bit integers representing a big number (BN).
+ * @param[in]       buf                  - Pointer to the buffer of unsigned 32-bit integers.
+ * @param[in]       wlen                 - Length of the buffer in terms of number of unsigned 32-bit integers.
+ * @param[in]       name                 - Name or description of the buffer for printing purposes.
+ * @return          None
+  */
+    extern void print_bn_buf_u32(const unsigned int *buf, unsigned int wlen, char *name);
 #endif
 
 #define memcpy_ memcpy
@@ -60,421 +128,317 @@ extern "C"
 #define memcmp_ memcmp
 
 #if 0
-/**
- * @brief       memory copy, like memcpy()
- * @param[in]   dst         - output, output buffer.
- * @param[in]   src         - input, input buffer.
- * @param[in]   size        - input, bytes of src or dst buffer.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure neither of dst,src is NULL.
-      -# 2. 2. please make sure dst buffer and src buffer do not have common part.
-   @endverbatim
+    /**
+ * @brief           Memory copy, like memcpy()
+ * @param[out]      dst                  - buffer
+ * @param[in]       src                  - buffer
+ * @param[in]       size                 - Number of bytes to copy (size of src or dst buffer)
+ * @return          None
+ * @note            
+ *        1. Ensure that neither of dst nor src is NULL.
+ *        2. Ensure that the dst and src buffers do not overlap.
  */
-void memcpy_(void *dst, const void *src, unsigned int size);
+    void memcpy_(void *dst, const void *src, unsigned int size);
 
-/**
- * @brief       memory set, like memset()
- * @param[in]   dst         - output, output buffer.
- * @param[in]   value       - input, unsigned char value.
- * @param[in]   size        - input, bytes of dst buffer.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure dst is not NULL.
-   @endverbatim
+    /**
+ * @brief           Memory set, like memset()
+ * @param[out]      dst                  - buffer
+ * @param[in]       value                - Unsigned char value to set
+ * @param[in]       size                 - Number of bytes to set in the dst buffer
+ * @return          None
+ * @note            Ensure that dst is not NULL.
  */
-void memset_(void *dst, unsigned char value, unsigned int size);
+    void memset_(void *dst, unsigned char value, unsigned int size);
 
-/**
- * @brief       memory set, like memset()
- * @param[in]   m1         - input, unsigned char buffer m1.
- * @param[in]   m2         - input, unsigned char buffer m2
- * @param[in]   size       - input, bytes of buffer m1 or m2.
- * @return      0(m1 = m2), other(m1 != m2)
- * @note
-   @verbatim
-      -# 1. please make sure neither of m1,m2 is NULL.
-   @endverbatim
+    /**
+ * @brief           Memory compare, like memcmp()
+ * @param[in]       m1                   - Unsigned char buffer m1
+ * @param[in]       m2                   - Unsigned char buffer m2
+ * @param[in]       size                 - Number of bytes to compare in buffers m1 or m2
+ * @return          0 (m1 = m2), non-zero (m1 != m2)
+ * @note            
+ *        1.Ensure that neither of m1 nor m2 is NULL.
  */
-unsigned char memcmp_(const void *m1, const void *m2, unsigned int size);
-
+    unsigned char memcmp_(const void *m1, const void *m2, unsigned int size);
 #endif
 
     /**
- * @brief       set uint32 buffer
- * @param[in]   a             - output, output word buffer.
- * @param[in]   value         - input, input word value.
- * @param[in]   wordLen       - input, word length of buffer a.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Set uint32 buffer
+ * @param[out]      a                    - word buffer
+ * @param[in]       value                - word value to set
+ * @param[in]       wlen                 - Word length of buffer a
+ * @return          None
+ * @note            
+ *        1.Ensure that a is not NULL.
  */
-    void uint32_set(unsigned int *a, unsigned int value, unsigned int wordLen);
+    void uint32_set(unsigned int *a, unsigned int value, unsigned int wlen);
 
     /**
- * @brief       copy uint32 buffer
- * @param[in]   dst             - output, output word buffer.
- * @param[in]   src             - input, input word buffer.
- * @param[in]   wordLen         - input, word length of buffer dst or src.
- * @return      none
- * @note
-   @verbatim
-      -#  please make sure neither of dst,src is NULL.
-   @endverbatim
+ * @brief           Copy uint32 buffer
+ * @param[out]      dst                  - word buffer
+ * @param[in]       src                  - word buffer
+ * @param[in]       wlen                 - Word length of buffer dst or src
+ * @return          None
+ * @note            
+ *        1. Ensure that neither of dst nor src is NULL.
  */
-    void uint32_copy(unsigned int *dst, const unsigned int *src, unsigned int wordLen);
+    void uint32_copy(unsigned int *dst, const unsigned int *src, unsigned int wlen);
 
     /**
- * @brief       copy uint32 buffer
- * @param[in]   dst             - output, output word buffer.
- * @param[in]   src             - input, input word buffer.
- * @param[in]   wordLen         - input, word length of buffer dst or src.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure neither of dst,src is NULL.
-   @endverbatim
+ * @brief           Copy uint32 buffer of 8 words
+ * @param[out]      dst                  - word buffer
+ * @param[in]       src                  - word buffer
+ * @return          None
+ * @note            
+ *        1. Ensure that neither of dst nor src is NULL.
  */
     void uint32_copy_8_words(unsigned int *dst, const unsigned int *src);
 
     /**
- * @brief       clear uint32 buffer
- * @param[in]   a             - input&output, word buffer a.
- * @param[in]   wordLen      - input, word length of buffer a.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Clear uint32 buffer
+ * @param[in,out]   a                    - Word buffer a, will be cleared in place
+ * @param[in]       a_wlen               - Word length of buffer a
+ * @return          None
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
-    void uint32_clear(unsigned int *a, unsigned int wordLen);
+    void uint32_clear(unsigned int *a, unsigned int a_wlen);
 
     /**
- * @brief       clear uint32 buffer of 8 words
- * @param[in]   a             - input&output, word buffer a.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Clear uint32 buffer of 8 words
+ * @param[in,out]   a                    - Word buffer a, will be cleared in place
+ * @return          None
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
     void uint32_clear_8_words(unsigned int *a);
 
     /**
- * @brief       sleep for a while
- * @param[in]   count             - input, count.
- * @param[in]   rand_bit          - input, random bit, only the LSB works.
- * @return      none
+ * @brief           Sleep for a while
+ * @param[in]       count                - Count for sleeping
+ * @param[in]       rand_bit             - Random bit, only the LSB works
+ * @return          None
  */
     void uint32_sleep(unsigned int count, unsigned char rand_bit);
 
     /**
- * @brief       convert 0x1122334455667788 to 0x4433221188776655
- * @param[in]   in             - source address.
- * @param[out]  out            - destination address.
- * @param[in]   wordLen        - word length of in/out.
- * @return      none
- */
-    void uint32_endian_reverse(unsigned char *in, unsigned char *out, unsigned int wordLen);
-
-#if 0
-/**
- * @brief       reverse word array
- * @param[in]   in             - input, input buffer.
- * @param[out]  out            - output, output buffer.
- * @param[in]   wordLen        - input, word length of in or out.
- * @return      none
- * @note
-   @verbatim
-      -# 1. in and out could point the same buffer.
-   @endverbatim
- */
-void reverse_word_array(unsigned char *in, unsigned int *out, unsigned int wordLen)
-#endif
-
-    /**
- * @brief       reverse byte array
- * @param[in]   in             - input, input buffer.
- * @param[out]  out            - output, output buffer.
- * @param[in]   wordLen        - input, word length of in or out.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure neither of in,out is NULL.
-      -# 2. in and out could point the same buffer
-   @endverbatim
+ * @brief           Reverse byte array
+ * @param[in]       in                   - buffer
+ * @param[out]      out                  - buffer
+ * @param[in]       byteLen              - Byte length of input or output buffer
+ * @return          None
+ *        1. Ensure that neither of in nor out is NULL.
+ *        2. in and out could point to the same buffer.
  */
     void reverse_byte_array(const unsigned char *in, unsigned char *out, unsigned int byteLen);
 
-#if 0
-/**
- * @brief      reverse byte order in every unsigned int word
- * @param[in]   in             - input, input byte buffer.
- * @param[out]  out            - output, output word buffer.
- * @param[in]   bytelen        - input, byte length of buffer in or out.
- * @return      none
- * @note
-   @verbatim
-      -# 1. byteLen must be a multiple of 4.
-   @endverbatim
+    /**
+ * @brief           Reverse byte array
+ * @param[in]       data_in              - buffer (32 bytes)
+ * @param[out]      data_out             - buffer (8 words)
+ * @return          None
+ * @note            
+ *        1. Ensure that neither of in nor out is NULL.
+ *        2. in and out cannot point to the same buffer.
+ *        3. This is for big numbers of 256 bits in SM2, SM9, etc.
  */
-void reverse_word(unsigned char *in, unsigned char *out, unsigned int bytelen);
-
-/**
- * @brief     reverse word order
- * @param[in]   in             - input, input word buffer.
- * @param[out]  out            - output, output word buffer.
- * @param[in]   bytelen        - input, word length of buffer in or out.
- * @param[in]   reverse_word   - input, whether to reverse byte order in every word, 0:no, other:yes.
- * @return      none
- * @note
-   @verbatim
-      -# 1. in DAM mode, the memory may be accessed by words, not by bytes, this function is designed for the case.
-   @endverbatim
- */
-void dma_reverse_word_array(unsigned int *in, unsigned int *out, unsigned int wordlen, unsigned int reverse_word);
-#endif
+    void u8big_to_u32little_256bits(const unsigned char *data_in, unsigned int *data_out);
 
     /**
- * @brief     reverse byte array
- * @param[in]   in             - input, input buffer, 32 bytes.
- * @param[out]  out            - output, output buffer, 8 words.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure neither of in,out is NULL.
-      -# 2. in and out can not point the same buffer.
-      -# 3. this is for big number of 256 bits in SM2, SM9, etc.
-   @endverbatim
- */
-    void u8big_to_u32little_256bits(const unsigned char *in, unsigned int *out);
-
-    /**
- * @brief     reverse byte array
- * @param[in&out]   a             - input&output, 8 words.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. this is for big number of 256 bits in SM2, SM9, etc.
-   @endverbatim
+ * @brief           Reverse byte array
+ * @param[in,out]   a                    - buffer (8 words)
+ * @return          None
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. This is for big numbers of 256 bits in SM2, SM9, etc.
  */
     void u8big_to_u32little_256bits_self(unsigned int *a);
 
     /**
- * @brief     reverse byte array
- * @param[in]   a             - input, input buffer, 8 words.
- * @param[out]  output        - output, output buffer, 32 bytes.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure neither of in,out is NULL.
-      -# 2. in and out can not point the same buffer.
-      -# 3. this is for big number of 256 bits in SM2, SM9, etc.
-   @endverbatim
+ * @brief           Reverse byte array
+ * @param[in]       in                   - buffer (8 words)
+ * @param[out]      out                  - buffer (32 bytes)
+ * @return          None
+ * @note            
+ *        1. Ensure that neither of in nor out is NULL.
+ *        2. in and out cannot point to the same buffer.
+ *        3. This is for big numbers of 256 bits in SM2, SM9, etc.
  */
     void u32little_to_u8big_256bits(const unsigned int *in, unsigned char *out);
 
     /**
- * @brief    C = A XOR B
- * @param[in]   A             - input, byte buffer a.
- * @param[in]   B             - input, byte buffer b.
- * @param[in]   C             - output, C = A XOR B.
- * @param[in]   byteLen       - input, byte length of A,B,C.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure none of A,B,C is NULL.
-   @endverbatim
+ * @brief           C = A XOR B
+ * @param[in]       A                    - byte buffer a
+ * @param[in]       B                    - byte buffer b
+ * @param[out]      C                    - byte buffer, C = A XOR B
+ * @param[in]       byteLen              - Byte length of buffers A, B, and C
+ * @return          None
+ * @note            
+ *        1. Ensure that none of A, B, or C is NULL.
  */
-    void uint8_XOR(const unsigned char *A, const unsigned char *B, unsigned char *C, unsigned int byteLen);
+    void uint8_xor(const unsigned char *A, const unsigned char *B, unsigned char *C, unsigned int byteLen);
 
     /**
- * @brief    C = A XOR B
- * @param[in]   A             - input, word buffer a.
- * @param[in]   B             - input, word buffer b.
- * @param[in]   C             - output, C = A XOR B.
- * @param[in]   byteLen       - input, word length of A,B,C.
- * @return      none
- * @note
-   @verbatim
-      -# 1. please make sure none of A,B,C is NULL.
-   @endverbatim
+ * @brief           C = A XOR B
+ * @param[in]       A                    - word buffer a
+ * @param[in]       B                    - word buffer b
+ * @param[out]      C                    - word buffer, C = A XOR B
+ * @param[in]       wlen                 - Word length of buffers A, B, and C
+ * @return          None
+ * @note            
+ *        1. Ensure that none of A, B, or C is NULL.
  */
-    void uint32_XOR(const unsigned int *A, const unsigned int *B, unsigned int *C, unsigned int wordLen);
+    void uint32_xor(const unsigned int *A, const unsigned int *B, unsigned int *C, unsigned int wlen);
 
     /**
- * @brief   get aimed bit value of big integer a
- * @param[in]   a             - input, big integer a.
- * @param[in]   bit_index     - input, aimed bit location.
- * @return      bit value of aimed bit
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. for the LSB, bit index is 0.
-   @endverbatim
+ * @brief           Get aimed bit value of big integer a
+ * @param[in]       a                    - big integer a
+ * @param[in]       bit_index            - aimed bit location
+ * @return          Bit value of aimed bit (0 or 1)
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. For the LSB, bit index is 0.
  */
     unsigned int get_bit_value_by_index(const unsigned int *a, unsigned int bit_index);
 
     /**
- * @brief   get real bit length of big number a of wordLen words
- * @param[in]   a             - input, big integer a.
- * @param[in]   wordLen       - input, word length of a.
- * @return      real bit length of big number a
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Get real bit length of big number a of wlen words
+ * @param[in]       a                    - Input, big integer a
+ * @param[in]       wlen                 - Input, word length of a
+ * @return          Real bit length of big number a
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
-    unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen);
+    unsigned int get_valid_bits(const unsigned int *a, unsigned int wlen);
 
     /**
- * @brief   get real word length of big number a of max_words words
- * @param[in]   a             - input, big integer a.
- * @param[in]   max_words     - input, max word length of a.
- * @return     real word length of big number a.
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Get real word length of big number a of max_words words
+ * @param[in]       a                    - big integer a
+ * @param[in]       max_words            - maximum word length of a
+ * @return          Real word length of big number a
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
     unsigned int get_valid_words(const unsigned int *a, unsigned int max_words);
 
     /**
- * @brief   check whether big number or unsigned char buffer a is all zero or not
- * @param[in]   a             - input, byte buffer a.
- * @param[in]   aByteLen      - input, byte length of a.
- * @return    0(a is not zero),1(a is all zero)
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Check whether big number or unsigned char buffer a is all zero or not
+ * @param[in]       a                    - Input, byte buffer a
+ * @param[in]       a_len                - Input, byte length of a
+ * @return          0 (a is not zero), 1 (a is all zero)
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
-    unsigned int uint8_BigNum_Check_Zero(const unsigned char *a, unsigned int aByteLen);
+    unsigned int uint8_bignum_check_zero(const unsigned char *a, unsigned int a_len);
 
     /**
- * @brief   check whether big number or unsigned int buffer a is all zero or not
- * @param[in]   a             - input, big integer or word buffer a.
- * @param[in]   aByteLen      - input, word length of a.
- * @return     0(a is not zero), 1(a is all zero)
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Check whether big number or unsigned int buffer a is all zero or not
+ * @param[in]       a                    - big integer or word buffer a
+ * @param[in]       a_wlen               - word length of a
+ * @return          0 (a is not zero), 1 (a is all zero)
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
-    unsigned int uint32_BigNum_Check_Zero(const unsigned int *a, unsigned int aWordLen);
+    unsigned int uint32_bignum_check_zero(const unsigned int *a, unsigned int a_wlen);
 
     /**
- * @brief   a = a + b
- * @param[in]   a             - input, big number a, unsigned char big-endian.
- * @param[in]   a_bytes       - input, byte length of a.
- * @param[in]   b             - input, unsigned char integer b.
- * @param[in]   is_secure     - input, is secure implementation, 0(not), other(yes).
- * @return     0(not overflow),1(overflow)
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. this is mainly used for counter++ in SKE, KDF, etc.
-   @endverbatim
+ * @brief           a = a + b
+ *                  @param[in,out] a big number a, unsigned char big-endian
+ * @param[in]       a_bytes              - byte length of a
+ * @param[in]       b                    - unsigned char integer b
+ * @param[in]       is_secure            - is secure implementation, 0 (not), other (yes)
+ * @return          0 (no overflow), 1 (overflow)
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. This is mainly used for counter++ in SKE, KDF, etc.
  */
     unsigned int uint8_big_num_big_endian_add_little(unsigned char *a, unsigned int a_bytes, unsigned char b, unsigned char is_secure);
 
     /**
- * @brief   a = a + b
- * @param[in]   a             - input, big number a, unsigned int big-endian.
- * @param[in]   a_words       - input, word length of a.
- * @param[in]   b             - input, unsigned int integer b.
- * @param[in]   is_secure     - input, is secure implementation, 0(not), other(yes).
- * @return     0(not overflow),1(overflow)
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. this is mainly used for public key algorithm implementation.
-   @endverbatim
+ * @brief           a = a + b
+ *                  @param[in,out] a big number a, unsigned int little-endian
+ * @param[in]       a_words              - word length of a
+ * @param[in]       b                    - unsigned int integer b
+ * @param[in]       is_secure            - is secure implementation, 0 (not), other (yes)
+ * @return          0 (no overflow), 1 (overflow)
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. This is mainly used for public key algorithm implementation.
  */
     unsigned int uint32_big_num_little_endian_add_little(unsigned int *a, unsigned int a_words, unsigned int b, unsigned char is_secure);
 
     /**
- * @brief   compare big integer a and b
- * @param[in]   a             - input, big integer a.
- * @param[in]   aWordLen      - input, word length of a.
- * @param[in]   b             - input, big integer b.
- * @param[in]   bWordLen      - input, word length of b.
- * @return     0:a=b,   1:a>b,   -1: a<b
- * @note
-   @verbatim
-      -# 1. please make sure neither of a,b is NULL.
-   @endverbatim
+ * @brief           Compare big integer a and b
+ * @param[in]       a                    - big integer a
+ * @param[in]       a_wlen               - word length of a
+ * @param[in]       b                    - big integer b
+ * @param[in]       b_wlen               - word length of b
+ * @return          0 (a = b), 1 (a > b), -1 (a < b)
+ * @note            
+ *        1. Ensure that neither a nor b is NULL.
  */
-    int32_t uint32_BigNumCmp(const unsigned int *a, unsigned int aWordLen, const unsigned int *b, unsigned int bWordLen);
+    int uint32_big_num_cmp(const unsigned int *a, unsigned int a_wlen, const unsigned int *b, unsigned int b_wlen);
 
     /**
- * @brief   for a = b*2^t, b is odd, get t
- * @param[in]   a             - big integer a.
- * @return     number of multiple by 2, for a
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. make sure a != 0.
-   @endverbatim
+ * @brief           For a = b*2^t, where b is odd, get t
+ * @param[in]       a                    - big integer a
+ * @return          Number of multiples by 2 for a
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. Ensure that a != 0.
  */
-    unsigned int Get_Multiple2_Number(const unsigned int *a);
+    unsigned int get_multiple2_number(const unsigned int *a);
 
     /**
- * @brief   a = a/(2^n)
- * @param[in]   a             - big integer a.
- * @param[in]   aWordLen      - word length of a.
- * @param[in]   n             - exponent of 2^n.
- * @return     word length of a = a/(2^n),
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-      -# 2. make sure aWordLen is real word length of a.
-      -# 3. please make sure aWordLen*32 is not less than n.
-   @endverbatim
+ * @brief           a = a / (2^n)
+ * @param[in]       a                    - big integer a
+ * @param[in]       a_wlen               - Word length of a
+ * @param[in]       n                    - Exponent of 2^n
+ * @return          Word length of a after division by 2^n
+ * @note            
+ *        1. Ensure that a is not NULL.
+ *        2. Ensure that a_wlen is the real word length of a.
+ *        3. Ensure that a_wlen * 32 is not less than n.
  */
-    unsigned int Big_Div2n(unsigned int *a, unsigned int aWordLen, unsigned int n);
+    unsigned int big_div_2n(unsigned int *a, unsigned int a_wlen, unsigned int n);
 
     /**
- * @brief   check whether a is equal to 1 or not
- * @param[in]   a             - pointer to unsigned int big integer a.
- * @param[in]   aWordLen      - word length of big integer a.
- * @return     1(a is 1), 0(a is not 1)
- * @note
-   @verbatim
-      -# 1. please make sure a is not NULL.
-   @endverbatim
+ * @brief           Check whether a is equal to 1 or not
+ * @param[in]       a                    - Pointer to unsigned int big integer a
+ * @param[in]       a_wlen               - Word length of big integer a
+ * @return          1 (a is 1), 0 (a is not 1)
+ * @note            
+ *        1. Ensure that a is not NULL.
  */
-    unsigned int Bigint_Check_1(const unsigned int *a, unsigned int aWordLen);
+    unsigned int bigint_check_1(const unsigned int *a, unsigned int a_wlen);
 
     /**
- * @brief   check whether a is equal to p-1 or not
- * @param[in]   a             - pointer to unsigned int big integer a.
- * @param[in]   p             - pointer to unsigned int big integer p, p must be odd.
- * @param[in]   wordLen       - word length of a and p.
- * @return     1(a is p-1), 0(a is not p-1)
- * @note
-   @verbatim
-      -# 1. please make sure neither of a,p is NULL.
-      -# 2. please make sure p is odd.
-   @endverbatim
+ * @brief           Check whether a is equal to p-1 or not
+ * @param[in]       a                    - Pointer to unsigned int big integer a
+ * @param[in]       p                    - Pointer to unsigned int big integer p, p must be odd
+ * @param[in]       wlen                 - Word length of a and p
+ * @return          1 (a is p-1), 0 (a is not p-1)
+ * @note            
+ *        1. Ensure that neither a nor p is NULL.
+ *        2. Ensure that p is odd.
  */
-    unsigned int Bigint_Check_p_1(const unsigned int *a, const unsigned int *p, unsigned int wordLen);
+    unsigned int bigint_check_p_1(const unsigned int *a, const unsigned int *p, unsigned int wlen);
 
     /**
- * @brief   check whether integer k is in [1, n-1]
- * @param[in]   k             - input, big number k.
- * @param[in]   n             - input, big number n.
- * @param[in]   wordLen       - input, word length of k and n.
- * @return     ret_zero      k is zero
- *             ret_big       k is greater/bigger than or equal to n
- *             ret_success   k is in [1, n-1]
+ * @brief           Check if integer k is in range [1, n-1]
+ * @param[in]       k                    - Big integer k 
+ * @param[in]       n                    - Big integer n 
+ * @param[in]       wlen                 - Word length of k and n
+ * @param[in]       ret_zero             - Return value if k is zero
+ * @param[in]       ret_big              - Return value if k >= n
+ * @param[in]       ret_success          - Return value if k is in [1, n-1]
+ * @return          One of the provided return values based on k's value
+ * @note            
+ *        1. ret_zero: k is zero
+ *        2. ret_big: k is greater than or equal to n
+ *        3. ret_success: k is in [1, n-1]
  */
-    unsigned int uint32_integer_check(const unsigned int *k, const unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big, unsigned int ret_success);
+    unsigned int uint32_integer_check(const unsigned int *k, const unsigned int *n, unsigned int wlen, unsigned int ret_zero, unsigned int ret_big, unsigned int ret_success);
 
 #ifdef __cplusplus
 }

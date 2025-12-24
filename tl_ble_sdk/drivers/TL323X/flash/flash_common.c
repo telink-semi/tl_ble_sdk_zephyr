@@ -34,6 +34,7 @@
     |              | P25Q16SU   |   0x4b  | 0x156085 |  PUYA   |           8us                   |                   16ms               |
     |              | GD25LQ16E  |   0x4b  | 0x1560c8 |    GD   |           20us                  | 300ms/500ms(85 Celsius/125 Celsius)  |
     |              | GD25LQ80E  |   0x4b  | 0x1460c8 |    GD   |           20us                  | 600ms/1000ms(85 Celsius/125 Celsius) |
+    |              | P25Q32SU   |   0x4b  | 0x166085 |  PUYA   |           8us                   |                   30ms               |
     +--------------+------------+---------+----------+---------+---------------------------------+--------------------------------------+
 
     Note:
@@ -47,6 +48,8 @@ const flash_hal_handler_t flash_list[] = {
     //2M
     {0x156085, flash_get_lock_block_mid156085, flash_unlock_mid156085, flash_lock_mid156085, FLASH_LOCK_LOW_1M_MID156085,   flash_write_status_mid156085, FLASH_WRITE_STATUS_QE_MID156085, FLASH_QE_ENABLE_MID156085, FLASH_QE_DISABLE_MID156085},
     {0x1560c8, flash_get_lock_block_mid1560c8, flash_unlock_mid1560c8, flash_lock_mid1560c8, FLASH_LOCK_LOW_1M_MID1560C8,   flash_write_status_mid1560c8, FLASH_WRITE_STATUS_QE_MID1560C8, FLASH_QE_ENABLE_MID1560C8, FLASH_QE_DISABLE_MID1560C8},
+   //4M
+    {0x166085, flash_get_lock_block_mid166085, flash_unlock_mid166085, flash_lock_mid166085, FLASH_LOCK_LOW_2M_MID166085,   flash_write_status_mid166085, FLASH_WRITE_STATUS_QE_MID166085, FLASH_QE_ENABLE_MID166085, FLASH_QE_DISABLE_MID166085},
 };
 const unsigned int FLASH_CNT = sizeof(flash_list) / sizeof(flash_hal_handler_t);
 

@@ -42,17 +42,6 @@ enum
     FLD_BBPLL_LOCK_DETECTOR = BIT(2),
 };
 
-#define areg_0x10c                       0x10c
-enum
-{
-    FLD_LDO_FORCE_ANA                   = BIT(0),
-    FLD_XO_EN_CLK_ANA                   = BIT(1), //xtal_24M clock to analog   0:turn off  1:turn on   default :0
-    FLD_L_DEM_EN                        = BIT(2),
-    FLD_L_PD_BUFFER                     = BIT_RNG(3,4),
-    FLD_PD_BPLL_OUT48M_1P05V            = BIT(5),
-    FLD_L_SEL_DIVOUT_P                  = BIT(6),
-    FLD_L_LV_EN                         = BIT(7), //Adjust output current in CODEC_BIAS
-};
 
 #define areg_0x146 0x146
 

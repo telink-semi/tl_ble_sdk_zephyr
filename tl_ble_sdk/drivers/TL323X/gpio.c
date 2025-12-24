@@ -468,6 +468,50 @@ _attribute_ram_code_sec_optimize_o2_ void gpio_shutdown_ramcode_for_asm(void)
     reg_rst1 &= ~(FLD_RST1_ALGM);
     reg_clk_en1 &= ~(FLD_CLK1_ALGM_EN);
 }
+
+/**
+ * @brief     This function set jtag or sdp function.
+ * @param[in] pin
+ * @return    none.
+ */
+void jtag_sdp_set_pin(gpio_pin_e pin)
+{
+    gpio_input_en(pin);
+    gpio_output_en(pin);
+    gpio_set_mux_function((gpio_func_pin_e)pin, 38);
+    gpio_function_dis(pin);
+}
+
+/**
+ * @brief     This function serves to set jtag(4 wires) pin . Where, PD[4]; PD[5]; PD[6]; PD[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ */
+void jtag_set_pin_en(void)
+{
+    jtag_sdp_set_pin(GPIO_PD4); //TDI
+    gpio_set_up_down_res(GPIO_PD4, GPIO_PIN_PULLDOWN_100K);
+    jtag_sdp_set_pin(GPIO_PD5); //TDO
+    jtag_sdp_set_pin(GPIO_PD6); //TMS
+    gpio_set_up_down_res(GPIO_PD6, GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PD7); //TCK
+    gpio_set_up_down_res(GPIO_PD7, GPIO_PIN_PULLUP_10K);
+}
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin . where, PD[6]; PD[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag,
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void sdp_set_pin_en(void)
+{
+    jtag_sdp_set_pin(GPIO_PD6); //TMS
+    gpio_set_up_down_res(GPIO_PD6, GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PD7); //TCK
+    gpio_set_up_down_res(GPIO_PD7, GPIO_PIN_PULLUP_10K);
+}
 /**********************************************************************************************************************
   *                                         local function implementation                                             *
   *********************************************************************************************************************/

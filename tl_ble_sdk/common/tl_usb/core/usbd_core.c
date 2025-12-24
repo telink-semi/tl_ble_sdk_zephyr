@@ -82,6 +82,8 @@ _attribute_ram_code_sec_ void usbd_bus_reset(unsigned char bus)
     usbd_info[bus].epin_cb[0] = usbd_ep0_in_complete_callback;
     usbd_info[bus].epout_cb[0] = usbd_ep0_out_complete_callback;
     #if APP_CHANGE_HID_NABLE
+
+    extern void app_usb_bus_reset_init(void);
     app_usb_bus_reset_init();
     #endif
 }

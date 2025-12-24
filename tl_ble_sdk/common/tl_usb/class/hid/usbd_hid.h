@@ -45,10 +45,11 @@ typedef enum
     MAP_GET_FLAG_APP=0X20,
     SUSPEND_MODE_FLAG_APP=0X40,
 }APP_HID_SET_FLAG_e;
-extern void app_usb_bus_reset_init(void);
+//extern void app_usb_bus_reset_init(void);
 extern void app_usb_status_set(unsigned int bit);
 extern void app_usb_status_clear(unsigned int bit);
-void app_hid_set_report(unsigned char bus, unsigned char hid_itf, unsigned char report_id, unsigned char report_type, unsigned char *report, unsigned short report_len);
+//void app_hid_set_report(unsigned char bus, unsigned char hid_itf, unsigned char report_id, unsigned char report_type, unsigned char *report, unsigned short report_len);
+extern void usbd_hid_reset_interface_data(void);
 
 #endif
 

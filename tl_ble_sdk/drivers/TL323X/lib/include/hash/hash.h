@@ -29,403 +29,358 @@ extern "C"
 {
 #endif
 
+#define CAST2UINT32(a) (unsigned int)(a)
+
 #include "hash_basic.h"
 
-    //HASH status
+    /**
+ * @brief           to calculate hash or hmac
+ */
+    typedef enum
+    {
+        HASH_MODE,
+        HMAC_MODE
+    } hfe_mode_e;
+
+    /**
+ * @brief           HASH status
+ */
     typedef struct
     {
         unsigned int busy : 1; // calculate busy flag
     } hash_status_t;
 
-    //HASH context
+    /**
+ * @brief           HASH context
+ */
     typedef struct
     {
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
-        unsigned int iterator[HASH_ITERATOR_MAX_WORD_LEN];  //keep current hash iterator value for multiple thread
+        unsigned int iterator[HASH_ITERATOR_MAX_WORD_LEN]; //keep current hash iterator value for multiple thread
 #endif
 
         unsigned char hash_buffer[HASH_BLOCK_MAX_BYTE_LEN]; //block buffer
         unsigned int  total[HASH_TOTAL_LEN_MAX_WORD_LEN];   //total byte length of the whole message
-        HASH_ALG      hash_alg;                             //current hash algorithm
+        hash_status_t status;                               //hash update status, .busy=1 means doing, .busy=0 means idle
+        hash_alg_e    alg;                                  //current hash algorithm
+#ifndef CONFIG_SUPPORT_STRUCTURE_OPTIMIZATION
+        hfe_mode_e hfe_mode; //actually no use
+#endif
         unsigned char block_byte_len;
         unsigned char iterator_word_len;
         unsigned char digest_byte_len;
-        hash_status_t status;            //hash update status, .busy=1 means doing .busy=0 means idle
         unsigned char first_update_flag; //whether first time to update message(1:yes, 0:no)
         unsigned char finish_flag;       //whether the whole message has been inputted(1:yes, 0:no)
-    } __attribute__((packed, aligned(4))) HASH_CTX;
+    } hash_ctx_t;
 
 
 #ifdef HASH_DMA_FUNCTION
-    //HASH DMA context
+    /**
+ * @brief           HASH DMA context
+ */
     typedef struct
     {
-    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+#ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
         unsigned int iterator[HASH_ITERATOR_MAX_WORD_LEN]; //keep current hash iterator value for multiple thread
-    #endif
+#endif
 
-        unsigned int  total[HASH_TOTAL_LEN_MAX_WORD_LEN];  //total byte length of the whole message
-        HASH_CALLBACK callback;
-        HASH_ALG      hash_alg;                            //current hash algorithm
+        unsigned int  total[HASH_TOTAL_LEN_MAX_WORD_LEN]; //total byte length of the whole message
+        hash_callback callback;
+        hash_alg_e    alg; //current hash algorithm
+#ifndef CONFIG_SUPPORT_STRUCTURE_OPTIMIZATION
+        hfe_mode_e hfe_mode; //actually no use
+#endif
         unsigned char block_word_len;
 
-    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+#ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
         unsigned char iterator_word_len;
         unsigned char first_update_flag; //whether first time to update message(1:yes, 0:no)
-    #endif
-        unsigned char digest_byte_len;   //just for hmac
-    } HASH_DMA_CTX;
+#endif
+        unsigned char digest_byte_len; //just for hmac
+    } hash_dma_ctx_t;
 #endif
 
 
 #ifdef SUPPORT_HASH_NODE
     typedef struct
     {
-        unsigned char *msg_addr;
-        unsigned int   msg_bytes;
-    } HASH_NODE;
+        const unsigned char *msg_addr;
+        unsigned int         msg_len;
+    } hash_node_t;
 #endif
 
 
 #ifdef SUPPORT_HASH_DMA_NODE
     typedef struct
     {
-    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
-        unsigned int msg_addr_h;
-        unsigned int msg_addr_l;
-    #else
-        unsigned int *msg_addr;
-    #endif
-        unsigned int msg_bytes;
-    } HASH_DMA_NODE;
+        const unsigned int *msg_addr;
+        unsigned int        msg_len;
+    } hash_dma_node_t;
 #endif
+
+
+    //fix to old project
+    typedef hash_status_t   hash_status_t;
+    typedef hfe_mode_e      HFE_MODE;
+    typedef hash_alg_e      HASH_ALG;
+    typedef hash_ctx_t      HASH_CTX;
+    typedef hash_dma_ctx_t  HASH_DMA_CTX;
+    typedef hash_node_t     HASH_NODE;
+    typedef hash_dma_node_t HASH_DMA_NODE;
 
 
     //APIs
     /**
- * @brief       check whether the hash algorithm is valid or not
- * @param[in]   hash_alg            - specific hash algorithm.
- * @return      0:success     other:error
+ * @brief           check whether the hash algorithm is valid or not
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          HASH_SUCCESS(valid), other(invalid)
  */
-    unsigned int check_hash_alg(HASH_ALG hash_alg);
+    unsigned int check_hash_alg(hash_alg_e alg);
 
     /**
- * @brief       get hash block word length
- * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      hash block word length
- * @note
-  @verbatim
-      -# 1. please make sure hash_alg is valid.
-  @endverbatim
+ * @brief           get hash block word length
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          hash block word length
+ * @note            
+ *        1. please make sure alg is valid
  */
-    unsigned char hash_get_block_word_len(HASH_ALG hash_alg);
+    unsigned char hash_get_block_word_len(hash_alg_e alg);
 
     /**
- * @brief       get hash digest word length
- * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      hash block word length
- * @note
-  @verbatim
-      -# 1. please make sure hash_alg is valid.
-  @endverbatim
+ * @brief           get hash iterator word length
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          hash iterator word length
+ * @note            
+ *        1. please make sure alg is valid
  */
-    unsigned char hash_get_digest_word_len(HASH_ALG hash_alg);
+    unsigned char hash_get_iterator_word_len(hash_alg_e alg);
 
     /**
- * @brief       get hash iterator word length
- * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      hash block word length
- * @note
-  @verbatim
-      -# 1. please make sure hash_alg is valid.
-  @endverbatim
+ * @brief           get hash digest word length
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          hash digest word length
+ * @note            
+ *        1. please make sure alg is valid
  */
-    unsigned char hash_get_iterator_word_len(HASH_ALG hash_alg);
+    unsigned char hash_get_digest_word_len(hash_alg_e alg);
 
     /**
- * @brief       get hash IV pointer
- * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      IV address
+ * @brief           get hash IV pointer
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          IV address
  */
-    unsigned int *hash_get_IV(HASH_ALG hash_alg);
+    const unsigned int *hash_get_iv(hash_alg_e alg);
 
     /**
- * @brief       input hash IV
- * @param[in]   hash_alg                    - specific hash algorithm.
- * @param[in]   hash_iterator_words         - iterator word length.
- * @return      none
+ * @brief           input hash IV
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       hash_iterator_words  - iterator word length
+ * @return          none
  */
-    void hash_set_IV(HASH_ALG hash_alg, unsigned int hash_iterator_words);
+    void hash_set_iv(hash_alg_e alg, unsigned int hash_iterator_words);
 
     /**
- * @brief       hash message total byte length a = a+b
- * @param[in]   a                - big number a, total byte length of hash message.
- * @param[in]   a_words          - word length of buffer a.
- * @param[in]   b                - integer to be added to a.
- * @return      0:success     other(error, hash total length overflow)
+ * @brief           hash message total byte length a = a+b
+ * @param[in,out]   a                    - big number a, total byte length of hash message
+ * @param[in]       a_words              - word length of buffer a
+ * @param[in]       b                    - integer to be added to a
+ * @return          0(success), other(error, hash total length overflow)
  */
     unsigned int hash_total_byte_len_add_uint32(unsigned int *a, unsigned int a_words, unsigned int b);
 
-    /**
- * @brief       start HASH iteration calc
- * @param[in]   ctx              - HASH_CTX context pointer
- * @return      none
- */
-    void hash_start_calculate(HASH_CTX *ctx);
 
     /**
- * @brief       hash iterate calc with some blocks
- * @param[in]   ctx                     - HASH_CTX context pointer.
- * @param[in]   msg                    - message of some blocks.
- * @param[in]   block_count             - count of blocks.
- * @return      none
- * @note
-  @verbatim
-      -# 1.  please make sure the three parameters is valid.
-  @endverbatim
+ * @brief           start HASH iteration calc
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @return          none
  */
-    void hash_calc_blocks(HASH_CTX *ctx, const unsigned char *msg, unsigned int block_count);
+    void hash_start_calculate(hash_ctx_t *ctx);
 
     /**
- * @brief       hash iterate calc with padding
- * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[in]   msg               - message that contains the last block(maybe not full).
- * @param[in]   msg_bytes          - byte length of msg.
- * @return      none
- * @note
-  @verbatim
-      -# 1.  msg contains the last byte of the total message while the total message length is not a
-        multiple of hash block length, otherwise byte length of msg is zero.
-      -# 2.  at present this function does not support the case that byte length of msg is a multiple
-        of hash block length. actually msg_bytes here must be less than the hash block byte length,
-        namely, this function is just for the remainder message, and will do padding, finally get
-        digest.
-      -# 3.  before calling this function, some blocks(could be 0 block) must be calculated.
-  @endverbatim
+ * @brief           hash iterate calc with some blocks
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[in]       msg                  - message of some blocks
+ * @param[in]       block_count          - count of blocks
+ * @return          none
+ * @note            
+ *        1. please make sure the three parameters is valid
  */
-    void hash_calc_rand_len_msg(HASH_CTX *ctx, unsigned char *msg, unsigned int msg_bytes);
+    void hash_calc_blocks(hash_ctx_t *ctx, const unsigned char *msg, unsigned int block_count);
 
     /**
- * @brief       init HASH with iv and updated message length
- * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[in]   hash_alg           - specific hash algorithm.
- * @param[in]   iv                 - iv or iterator after updating some blocks.
- * @param[in]   byte_length_h        - high 32 bit of updated message byte length.
- * @param[in]   byte_length_l      - ow 32 bit of updated message byte length,
- *                                   this must be a multiple of block byte length
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid.
-      -# 2.  updated message byte length must be a multiple of block byte length
-  @endverbatim
+ * @brief           hash iterate calc with padding
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[in]       msg                  - message that contains the last block(maybe not full)
+ * @param[in]       msg_len              - byte length of msg
+ * @return          none
+ * @note            
+ *        1. msg contains the last byte of the total message while the total message length is not a
+ *           multiple of hash block length, otherwise byte length of msg is zero.
+ *        2. at present this function does not support the case that byte length of msg is a multiple
+ *           of hash block length. actually msg_len here must be less than the hash block byte length,
+ *           namely, this function is just for the remainder message, and will do padding, finally get
+ *           digest.
+ *        3. before calling this function, some blocks(could be 0 block) must be calculated
  */
-    unsigned int hash_init_with_iv_and_updated_length(HASH_CTX *ctx, HASH_ALG hash_alg, unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l);
+    void hash_calc_rand_len_msg(hash_ctx_t *ctx, const unsigned char *msg, unsigned int msg_len);
+
 
     /**
- * @brief       init HASH
- * @param[in]   ctx                     - HASH_CTX context pointer.
- * @param[in]   hash_alg                - specific hash algorithm.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure hash_alg is valid.
-  @endverbatim
+ * @brief           init HASH with iv and updated message length
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       iv                   - iv or iterator after updating some blocks
+ * @param[in]       byte_length_h        - high 32 bit of updated message byte length
+ * @param[in]       byte_length_l        - low 32 bit of updated message byte length,
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure alg is valid
+ *        2. updated message byte length must be a multiple of block byte length
  */
-    unsigned int hash_init(HASH_CTX *ctx, HASH_ALG hash_alg);
+    unsigned int hash_init_with_iv_and_updated_length(hash_ctx_t *ctx, hash_alg_e alg, const unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l);
 
     /**
- * @brief       hash iterate calc with some blocks
- * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[in]   msg                - message.
- * @param[in]   msg_bytes          - byte length of the input message.
- * @return      none
- * @note
-  @verbatim
-      -# 1.  please make sure the three parameters are valid, and ctx is initialized.
-  @endverbatim
+ * @brief           init HASH
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[in]       alg                  - specific hash algorithm
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure alg is valid
  */
-    unsigned int hash_update(HASH_CTX *ctx, const unsigned char *msg, unsigned int msg_bytes);
+    unsigned int hash_init(hash_ctx_t *ctx, hash_alg_e alg);
 
     /**
- * @brief       message update done, get the digest
- * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[out]  digest             - hash digest.
- * @return      none
- * @note
-  @verbatim
-      -# 1.  please make sure the ctx is valid and initialized.
-      -# 2.  please make sure the digest buffer is sufficient.
-  @endverbatim
+ * @brief           hash update message
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[in]       msg                  - message
+ * @param[in]       msg_len            - byte length of the input message
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the three parameters are valid, and ctx is initialize
  */
-    unsigned int hash_final(HASH_CTX *ctx, unsigned char *digest);
+    unsigned int hash_update(hash_ctx_t *ctx, const unsigned char *msg, unsigned int msg_len);
 
     /**
- * @brief       message update done, get the digest
- * @param[in]   hash_alg           - specific hash algorithm.
- * @param[in]   msg                - message.
- * @param[in]   msg_bytes          - byte length of the input message, it could be 0.
- * @param[out]  digest             - hash digest.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the digest buffer is sufficient.
-  @endverbatim
+ * @brief           message update done, get the digest
+ * @param[in]       ctx                  - hash_ctx_t context pointer
+ * @param[out]      digest               - hash digest
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the ctx is valid and initialized
+ *        2. please make sure the digest buffer is sufficient
  */
-    unsigned int hash(HASH_ALG hash_alg, unsigned char *msg, unsigned int msg_bytes, unsigned char *digest);
+    unsigned int hash_final(hash_ctx_t *ctx, unsigned char *digest);
+
+    /**
+ * @brief           input whole message and get its digest
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       msg                  - message
+ * @param[in]       msg_len            - byte length of the input message, it could be 0
+ * @param[out]      digest               - hash digest
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the digest buffer is sufficient
+ */
+    unsigned int hash(hash_alg_e alg, const unsigned char *msg, unsigned int msg_len, unsigned char *digest);
 
 #ifdef SUPPORT_HASH_NODE
     /**
- * @brief       input whole message and get its digest(node style)
- * @param[in]   hash_alg            - specific hash algorithm.
- * @param[in]   node                - message node pointer.
- * @param[in]   node_num            - number of hash nodes, i.e. number of message segments.
- * @param[in]   digest              - hash digest
- * @return      0:success     other:error
-   @verbatim
-      -# 1.  please make sure the digest buffer is sufficient.
-      -# 2.  if the whole message consists of some segments, every segment is a node, a node includes address and byte length.
-   @endverbatim
+ * @brief           input whole message and get its digest(node style)
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       node                 - message node pointer
+ * @param[in]       node_num             - number of hash nodes, i.e. number of message segments.
+ * @param[out]      digest               - hash digest
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the digest buffer is sufficient
+ *        2. if the whole message consists of some segments, every segment is a node, a node includes
+ *           address and byte length
  */
-    unsigned int hash_node_steps(HASH_ALG hash_alg, HASH_NODE *node, unsigned int node_num, unsigned char *digest);
+    unsigned int hash_node_steps(hash_alg_e alg, const hash_node_t *node, unsigned int node_num, unsigned char *digest);
 #endif
 
 
 #ifdef HASH_DMA_FUNCTION
     /**
- * @brief       dma hash digest calculate
- * @param[in]   ctx                 - HASH_DMA_CTX context pointer.
- * @param[in]   hash_alg            - specific hash algorithm.
- * @param[in]   iv                    - iv or iterator after updating some blocks.
- * @param[in]   byte_length_h       - high 32 bit of updated message byte length.
- * @param[in]   byte_length_l       - low 32 bit of updated message byte length,
- *                                    this must be a multiple of block byte length.
- * @param[in]   callback            - callback function pointer.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid.
-      -# 2. updated message byte length must be a multiple of block byte length
-  @endverbatim
+ * @brief           init dma hash with iv and updated message length
+ * @param[in]       ctx                  - hash_dma_ctx_t context pointer
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       iv                   - iv or iterator after updating some blocks
+ * @param[in]       byte_length_h        - high 32 bit of updated message byte length
+ * @param[in]       byte_length_l        - low 32 bit of updated message byte length,
+ * @param[in]       callback             - callback function pointer
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure alg is valid
+ *        2. updated message byte length must be a multiple of block byte length
  */
-    unsigned int hash_dma_init_with_iv_and_updated_length(HASH_DMA_CTX *ctx, HASH_ALG hash_alg, unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l, HASH_CALLBACK callback);
+    unsigned int hash_dma_init_with_iv_and_updated_length(hash_dma_ctx_t *ctx, hash_alg_e alg, const unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l,
+                                                          hash_callback callback);
 
     /**
- * @brief       message update done, get the digest
- * @param[in]   ctx           - HASH_DMA_CTX context pointer.
- * @param[in]   hash_alg      - specific hash algorithm.
- * @param[in]   callback      - callback function pointer.
- * @return      0:success     other:error
+ * @brief           init dma hash
+ * @param[in]       ctx                  - hash_dma_ctx_t context pointer
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       callback             - callback function pointer
+ * @return          HASH_SUCCESS(success), other(error)
  */
-    unsigned int hash_dma_init(HASH_DMA_CTX *ctx, HASH_ALG hash_alg, HASH_CALLBACK callback);
+    unsigned int hash_dma_init(hash_dma_ctx_t *ctx, hash_alg_e alg, hash_callback callback);
 
     /**
- * @brief       dma hash update some message blocks
- * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   msg               - message blocks.
- * @param[in]   msg_bytes           - word length of the input message, must be a multiple of hash block word length.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid, and ctx is initialized.
-  @endverbatim
+ * @brief           dma hash update some message blocks
+ * @param[in]       ctx                  - hash_dma_ctx_t context pointer
+ * @param[in]       msg                  - message blocks
+ * @param[in]       msg_len            - byte length of the input message, must be a multiple of hash block byte length
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the four parameters are valid, and ctx is initialize
  */
-    unsigned int hash_dma_update_blocks(HASH_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_bytes);
-    /**
- * @brief       dma hash final(input the remainder message and get the digest)
- * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   remainder_msg      - remainder message.
- * @param[in]   remainder_bytes    - byte length of the remainder message.
- * @param[out]  digest             - hash digest
- * @return      HASH_SUCCESS(success), other(error)
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid, and ctx is initialized.
-  @endverbatim
- */
-    unsigned int hash_dma_final(HASH_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *digest);
-    /**
- * @brief       dma hash digest calculate
- * @param[in]   hash_alg       - specific hash algorithm.
- * @param[in]   msg            - message.
- * @param[in]   msg_bytes      - byte length of the message, it could be 0.
- * @param[in]   digest           - hash digest.
- * @param[in]   callback       - callback function pointer.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid.
-  @endverbatim
- */
-    unsigned int hash_dma(HASH_ALG hash_alg, unsigned int *msg, unsigned int msg_bytes, unsigned int *digest, HASH_CALLBACK callback);
-    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
-    /**
- * @brief       dma hash update some message blocks
- * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   msg                - message blocks.
- * @param[in]   msg_words          - word length of the input message, must be a multiple of hash block word length.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid, and ctx is initialized.
-  @endverbatim
- */
-    unsigned int hash_dma_update_blocks(HASH_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_bytes);
+    unsigned int hash_dma_update_blocks(hash_dma_ctx_t *ctx, const unsigned int *msg, unsigned int msg_len);
 
     /**
- * @brief       dma hash update some message blocks
- * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   msg                - message blocks.
- * @param[in]   msg_words          - word length of the input message, must be a multiple of hash block word length.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid, and ctx is initialized.
-  @endverbatim
+ * @brief           dma hash final(input the remainder message and get the digest)
+ * @param[in]       ctx                  - hash_dma_ctx_t context pointer
+ * @param[in]       msg                  - remainder message
+ * @param[in]       msg_len              - byte length of the remainder message
+ * @param[out]      digest               - hash digest
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the four parameters are valid, and ctx is initialized
+ *        2. if remainder_msg is NULL, or remainder_bytes is zero, in this case input valid,
+ *           means the message is NULL
  */
-    unsigned int hash_dma_final(HASH_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *digest);
+    unsigned int hash_dma_final(hash_dma_ctx_t *ctx, const unsigned int *msg, unsigned int msg_len, unsigned int *digest);
 
     /**
- * @brief       dma hash digest calculate
- * @param[in]   hash_alg       - specific hash algorithm.
- * @param[in]   msg            - message.
- * @param[in]   msg_bytes      - byte length of the message, it could be 0.
- * @param[in]   digest         - hash digest.
- * @param[in]   callback       - callback function pointer.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid.
-  @endverbatim
+ * @brief           dma hash digest calculate
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       msg                  - message
+ * @param[in]       msg_len            - byte length of the message, it could be 0
+ * @param[out]      digest               - hash digest
+ * @param[in]       callback             - callback function pointer
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the four parameters are valid
  */
-    unsigned int hash_dma(HASH_ALG hash_alg, unsigned int *msg, unsigned int msg_bytes, unsigned int *digest, HASH_CALLBACK callback);
+    unsigned int hash_dma(hash_alg_e alg, unsigned int *msg, unsigned int msg_len, unsigned int *digest, hash_callback callback);
 
-
-        #ifdef SUPPORT_HASH_DMA_NODE
-    unsigned int hash_dma_node_steps(HASH_ALG hash_alg, HASH_DMA_NODE *node, unsigned int node_num, unsigned int digest_h, unsigned int digest_l, HASH_CALLBACK callback);
-        #endif
-    #else
-
-        #ifdef SUPPORT_HASH_DMA_NODE
+#ifdef SUPPORT_HASH_DMA_NODE
     /**
- * @brief       input whole message and get its digest(dma node style)
- * @param[in]   hash_alg       - specific hash algorithm.
- * @param[in]   node           - message node pointer.
- * @param[in]   node_num       - number of hash nodes, i.e. number of message segments.
- * @param[out]   digest           - hash digest.
- * @param[in]   callback       - callback function pointer.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.  please make sure the four parameters are valid.
-      -# 2.  if the whole message consists of some segments, every segment is a node, a node includes
-             address and byte length.
-      -# 3.  for every node or segment except the last, its message length must be a multiple of block length.
-  @endverbatim
+ * @brief           input whole message and get its digest(dma node style)
+ * @param[in]       alg                  - specific hash algorithm
+ * @param[in]       node                 - message node pointer
+ * @param[in]       node_num             - number of hash nodes, i.e. number of message segments.
+ * @param[out]      digest               - hash digest
+ * @param[in]       callback             - callback function pointer
+ * @return          HASH_SUCCESS(success), other(error)
+ * @note            
+ *        1. please make sure the digest buffer is sufficient
+ *        2. if the whole message consists of some segments, every segment is a node, a node includes
+ *           address and byte length.
+ *        3. for every node or segment except the last, its message length must be a multiple of block length
  */
-    unsigned int hash_dma_node_steps(HASH_ALG hash_alg, HASH_DMA_NODE *node, unsigned int node_num, unsigned int *digest, HASH_CALLBACK callback);
-        #endif
-    #endif
+    unsigned int hash_dma_node_steps(hash_alg_e alg, const hash_dma_node_t *node, unsigned int node_num, unsigned int *digest, hash_callback callback);
+#endif
 #endif
 
 

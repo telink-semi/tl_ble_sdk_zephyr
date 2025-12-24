@@ -24,11 +24,14 @@
 #pragma once
 
 #include "lib/include/analog.h"
+#include "lib/include/stimer.h"
 
 typedef enum
 {
-    LPD_FALLING_1P79V_RISING_1P88V  = 2,
-    LPD_FALLING_1P96V_RISING_2P06V,//default
+    LPD_FALLING_1P60V_RISING_1P70V,
+    LPD_FALLING_1P70V_RISING_1P80V,
+    LPD_FALLING_1P79V_RISING_1P88V = 2,//default
+    LPD_FALLING_1P96V_RISING_2P06V,
     LPD_FALLING_2P10V_RISING_2P20V,
     LPD_FALLING_2P28V_RISING_2P38V,
     LPD_FALLING_2P37V_RISING_2P47V,
@@ -49,16 +52,22 @@ typedef enum
  * @brief       This function is used to select the MSPI or MSPI and MCU that is reset hold(not release) when LPD is triggered.
  * @param[in]   mcu_reset_hold_en -Whether to enable MCU reset hold
  * @return      none.
+ * @note        lpd_trigger_reset_config() must be called at least 100 us after lpd_enable().
+ *              Otherwise, the LPD may be erroneously triggered during power-up or wake-up from sleep, causing the chip to crash.
  */
-static _always_inline void lpd_trigger_reset_config_and_enable(unsigned char mcu_reset_hold_en)
+static _always_inline void lpd_trigger_reset_config(unsigned char mcu_reset_hold_en)
 {
-    analog_write_reg8(0x14, (analog_read_reg8(0x14) & (~BIT(4))));//lpd analog configuration must be set before lpd digital configuration, otherwise lpd may be triggered abnormally.
     if(mcu_reset_hold_en)
     {
-         reg_pvd_config = (reg_pvd_config & 0xea) | BIT(0) | BIT(2) | BIT(4);//mspi and mcu reset hold, not release
+        reg_pvd_config = (reg_pvd_config & 0xea) | BIT(0) | BIT(2) | BIT(4);//mspi and mcu reset hold, not release
     } else {
-         reg_pvd_config = (reg_pvd_config & 0xfa) | BIT(0) | BIT(2);//mspi reset hold, not release
+        reg_pvd_config = (reg_pvd_config & 0xfa) | BIT(0) | BIT(2);//mspi reset hold, not release
     }
+}
+
+static _always_inline void lpd_enable(void)
+{
+    analog_write_reg8(0x14, (analog_read_reg8(0x14) & (~BIT(4))));//lpd analog configuration must be set before lpd digital configuration, otherwise lpd may be triggered abnormally.
 }
 
 static _always_inline void lpd_disable(void)

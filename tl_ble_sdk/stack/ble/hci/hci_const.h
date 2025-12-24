@@ -135,6 +135,13 @@
 #define HCI_SUB_EVT_LE_CREATE_BIG_COMPLETE_V2                         0xF9 //core_6.x higher data throughput
 
 
+///////////////////////// Vendor Defined HCI LE EVENT /////////////////////////////
+#define HCI_SUB_EVT_VENDOR_CS_PROCEDURE_DISABLED_COMPLETE             0x80
+/* Indicate cs start to handle data*/
+#define HCI_SUB_EVT_VENDOR_CS_START_HANDLE_DATA                       0x81
+/* Indicate cs stop to handle data*/
+#define HCI_SUB_EVT_VENDOR_CS_STOP_HANDLE_DATA                        0x82
+///////////////////////// Vendor Defined HCI LE EVENT /////////////////////////////
 
 //Event mask - last octet
 #define HCI_EVT_MASK_NONE                                     0x00000000

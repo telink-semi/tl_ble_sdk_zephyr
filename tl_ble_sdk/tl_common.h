@@ -37,7 +37,6 @@
 #include "common/utility.h"
 #include "common/usb_dbg/myudb.h"
 #include "common/sdk_version.h"
-#include "common/fifo.h"
 
 #include "vendor/common/user_config.h"
 #include "vendor/common/app_common.h"

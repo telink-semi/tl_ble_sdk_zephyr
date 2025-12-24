@@ -243,4 +243,39 @@ void rf_set_pri_generic_noack_start_bit(unsigned char noack_start_bit);
  */
 void rf_set_pri_generic_noack_en(void);
 
+/**
+ * @brief     This function is used to enable the 3bits header format packet.
+ * @param[in] none.
+ * @return    none.
+ * @note      1.The rf_set_pri_generic_3bit_header_dis function needs to be called when exiting 3bits header format packet mode.
+ *            2.The length of h0 in this mode must be 0bit, the length of h1 is 8bit, and the size of length must be 8bit.In 
+ *              this mode, only 3 bits of H1 are active. Refer to item 4 for details.
+ *            3.This mode requires a call to rf_set_crc_config(&rf_crc_config[3]); to initialize the crc-related configuration and
+ *              restore it on exit.(BLE:rf_crc_config[0];2.4G:rf_crc_config[1];zigbee/hybee:rf_crc_config[2];).If rf_set_pri_xx_xx_mode()
+ *              is called again after exiting, there is no need to call rf_crc_config again.
+ *            4.Packet format as fellow:
+ * @table
+ *           | DMA length | h0 len  |  header len   |            h1 len              |    payload   |    crc    | 
+ *           |------------|---------|---------------|--------------------------------|--------------|-----------|
+ *           |   4Bytes   |   0bit  |     8bits     |  8 (only low 3bits Effective)  |    n(bytes)  |   1bytes  |
+ * @endtable
+ */
+void rf_set_pri_generic_3bit_header_en(void);
+
+/**
+ * @brief     This function is used to disable the 3bits header format packet.
+ * @param[in] none.
+ * @return    none.
+ * @note      1.The rf_set_pri_generic_3bit_header_en function needs to be called when enable 3bits header format packet mode.
+ *            2.If this function is used to exit 3bits header mode, rf_set_crc_config needs to be called to restore the CRC-related
+ *            configuration.If rf_set_pri_xx_xx_mode() is called again after exiting, there is no need to call rf_crc_config again.
+ *            3.Packet format as fellow:
+ * @table
+ *           | DMA length | h0 len  |  header len   |            h1 len              |    payload   |    crc    | 
+ *           |------------|---------|---------------|--------------------------------|--------------|-----------|
+ *           |   4Bytes   |   0bit  |     8bits     |  8 (only low 3bits Effective)  |    n(bytes)  |   1bytes  |
+ * @endtable
+ */
+void rf_set_pri_generic_3bit_header_dis(void);
+
 #endif

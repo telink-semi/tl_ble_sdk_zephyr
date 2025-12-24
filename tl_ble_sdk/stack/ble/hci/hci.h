@@ -53,13 +53,6 @@ typedef int (*blc_hci_user_handler_t)(u8 *p, u32 len);
 
 #define HCI_ADV_REPORT_EVT_RSVD_FIFO       3
 
-#if defined(BLC_ZEPHYR_BLE_INTEGRATION) || defined(LL_RSSI_SNIFFER_MODE_ENABLE)
-typedef int (*blc_hci_rx_handler_t)(void);
-typedef int (*blc_hci_tx_handler_t)(void);
-extern blc_hci_rx_handler_t blc_hci_rx_handler;
-extern blc_hci_tx_handler_t blc_hci_tx_handler;
-#endif
-
 extern my_fifo_t hci_tx_iso_fifo;
 
 typedef struct __attribute__((packed))
@@ -179,6 +172,12 @@ typedef int (*hci_data_handler_t)(u16 conn, u8 *p);
 
 //Controller ISO data handler
 typedef int (*hci_iso_data_handle_t)(u8 *, int);
+
+typedef unsigned char hci_vendor_CmdParams_t;
+
+typedef unsigned char hci_vendor_EndStatusParam_t;
+
+typedef unsigned char (*hci_vendor_process_callback_t)(u8 pCmdparaLen, u8 opCode_ogf, u8 opCode_ocf, hci_vendor_CmdParams_t *pCmd, hci_vendor_EndStatusParam_t *pRetParam);
 
 #ifdef BLC_ZEPHYR_BLE_INTEGRATION
 /**
@@ -357,4 +356,6 @@ ble_sts_t blc_ll_initHciTxIsoDataFifo(u8 *pIsobuf, int fifo_size, int fifo_numbe
 
 ble_sts_t blc_setHciInBufferMaxOctets(u16 isoDataInFifo_size, u8 isoDataInFifo_num);
 
+
+void blc_hci_registerControllerVendorCmdProcess_Callback(hci_vendor_process_callback_t handler);
 #endif

@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #ifndef COMMON_CONFIG_H
 #define COMMON_CONFIG_H
 
-
 #include <stdint.h> //including definitions of int32_t, unsigned int, etc.
 
 #include <string.h> //including definition of NULL
@@ -34,31 +33,21 @@
  ******************************    common config    *********************************
  ************************************************************************************/
 
-//print buffer functions
+// print buffer functions
 #define UTILITY_PRINT_BUF
 
 #ifdef UTILITY_PRINT_BUF
-    #include <stdio.h>
+#include <stdio.h>
 #endif
 
 #define UTILITY_SEC
 
+// only one of the following two macro could be enabled
+// #define MEM_VOLATILE
+#define MEM_VOLATILE volatile
 
-//only one of the following two macro could be enabled
-#define MEM_VOLATILE
-//#define MEM_VOLATILE volatile
-
-
-//#define CONFIG_UNIT_TEST
-
-//C keyword static, keep it by default, or define it empty just for some testing.
-#ifdef CONFIG_UNIT_TEST
-    #define FLAG_STATIC
-#else
-    #define FLAG_STATIC static //default
-#endif
-
+// #define FLAG_STATIC
+#define FLAG_STATIC static // default
 
 #define SUPPORT_STATIC_ANALYSIS
-
 #endif

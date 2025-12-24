@@ -709,4 +709,27 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res);
  * @return    none.
  */
 void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk);
+
+/**
+ * @brief     This function set jtag or sdp function.
+ * @param[in] pin
+ * @return    none.
+ */
+void jtag_sdp_set_pin(gpio_pin_e pin);
+
+/**
+ * @brief     This function serves to set jtag(4 wires) pin . Where, PD[4]; PD[5]; PD[6]; PD[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ */
+void jtag_set_pin_en(void);
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin . where, PD[6]; PD[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag,
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void sdp_set_pin_en(void);
 #endif

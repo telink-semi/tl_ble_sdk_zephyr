@@ -187,6 +187,13 @@ void blc_ll_enOsPowerManagement_module(void);
  */
 void blc_ll_appAllowMCUstall(u8 en);
 
+/**
+ *@brief      for 2.4G to set application wake up tick
+ *@param[in]  wakeup_tick  - low power mode wake up time
+ *@return     none
+ */
+void p24g_pm_process_sleep_wakeup(uint32_t wakeup_tick);
+
 
 #endif //#if !defined(TLK_ONLY_BLE_HOST)
 

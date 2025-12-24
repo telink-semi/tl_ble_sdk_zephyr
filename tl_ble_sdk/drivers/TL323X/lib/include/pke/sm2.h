@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -34,16 +34,18 @@ extern "C"
 
 
 #if (defined(PKE_HP) || defined(PKE_UHP))
-    #define SM2_HIGH_SPEED //only available for PKE_HP, PKE_UHP
+#define SM2_HIGH_SPEED // only available for PKE_HP, PKE_UHP
 #endif
 
-
-//some sm2 length
+/**
+ * @brief           some sm2 length
+ */
 #define SM3_DIGEST_BYTE_LEN SM2_BYTE_LEN
-#define SM2_MAX_ID_BYTE_LEN (0x1FFFU) //((1U<<13)-1U)
+#define SM2_MAX_ID_BYTE_LEN (0x1FFFU) // this is from ((1U<<13)-1U)
 
-
-//SM2 return code
+/**
+ * @brief           SM2 return code
+ */
 #define SM2_SUCCESS               PKE_SUCCESS
 #define SM2_BUFFER_NULL           (PKE_SUCCESS + 0x40U)
 #define SM2_NOT_ON_CURVE          (PKE_SUCCESS + 0x41U)
@@ -54,230 +56,179 @@ extern "C"
 #define SM2_VERIFY_FAILED         (PKE_SUCCESS + 0x46U)
 #define SM2_DECRYPT_VERIFY_FAILED (PKE_SUCCESS + 0x47U)
 
-    //SM2 key exchange role
+    /**
+ * @brief           SM2 key exchange role
+ */
     typedef enum
     {
         SM2_Role_Sponsor = 0,
         SM2_Role_Responsor
     } sm2_exchange_role_e;
 
-    // SM2 ciphertext order
+    /**
+ * @brief           SM2 ciphertext order
+ */
     typedef enum
     {
         SM2_C1C3C2 = 0,
         SM2_C1C2C3,
     } sm2_cipher_order_e;
 
-    //APIs
+    /**
+ * @brief           APIs
+ */
 
     /**
- * @brief       get SM2 Z value = SM3(bitLenofID||ID||a||b||Gx||Gy||Px||Py).
- * @param[in]   ID           - User ID
- * @param[in]   byteLenofID  - byte length of ID, must be less than 2^13
- * @param[in]   pubKey       - public key(0x04 + x + y), 65 bytes, big-endian
- * @param[out]  Z            - Z value, SM3 digest, 32 bytes.
- * @return      0:success     other:error
- * @note
-  @verbatim
-      -# 1.bit length of ID must be less than 2^16, thus byte length must be less than 2^13
-      -# 2.if ID is NULL, then replace it with sm2 default ID
-      -# 3.please make sure the pubKey is valid
-  @endverbatim
+ * @brief           get SM2 Z value = SM3(bitLenofID||ID||a||b||Gx||Gy||px||Py).
+ * @param[in]       ID                   - User ID
+ * @param[in]       byteLenofID          - byte length of ID, must be less than 2^13
+ * @param[in]       pubKey               - public key(0x04 + x + y), 65 bytes, big-endian
+ * @param[out]      Z                    - Z value, SM3 digest, 32 bytes.
+ * @return          0:success     other:error
+ * @note            
+ *        1.bit length of ID must be less than 2^16, thus byte length must be less than 2^13
+ *        2.if ID is NULL, then replace it with sm2 default ID
+ *        3.please make sure the pubKey is valid
  */
-    unsigned int sm2_getZ(unsigned char *ID, unsigned int byteLenofID, unsigned char pubKey[65], unsigned char Z[32]);
+    unsigned int sm2_getZ(const unsigned char *ID, unsigned int byteLenofID, const unsigned char pubKey[65], unsigned char Z[32]);
 
     /**
- * @brief       get SM2 E value = SM3(Z||M) (one-off style)
- * @param[in]   M             - Message
- * @param[in]   byteLen       - byte length of M
- * @param[in]   Z             - Z value, 32 bytes
- * @param[out]  E             - E value, 32 bytes
- * @return      0:success     other:error
+ * @brief           get SM2 E value = SM3(Z||M) (one-off style)
+ * @param[in]       M                    - Message
+ * @param[in]       byteLen              - byte length of M
+ * @param[in]       Z                    - Z value, 32 bytes
+ * @param[out]      E                    - E value, 32 bytes
+ * @return          0:success     other:error
  */
-    unsigned int sm2_getE(unsigned char *M, unsigned int byteLen, unsigned char Z[32], unsigned char E[32]);
+    unsigned int sm2_getE(const unsigned char *M, unsigned int byteLen, const unsigned char Z[32], unsigned char E[32]);
 
-//#define SM2_GETE_BY_STEPS
-#ifdef SM2_GETE_BY_STEPS
-
-    /**
- * @brief       step 1 of getting SM2 E value(stepwise style), init
- * @param[in]   ctx     - input, HASH_CTX context pointer
- * @param[in]   Z       - input, Z value, 32 bytes
- * @return      SM2_SUCCESS(success), other(error)
- */
-    unsigned int sm2_getE_init(HASH_CTX *ctx, unsigned char Z[32]);
-
-    /**
- * @brief       step 2 of getting SM2 E value(stepwise style), update message
- * @param[in]   ctx           - input, HASH_CTX context pointer
- * @param[in]   msg           - input, message
- * @param[in]   msg_bytes     - input, byte length of the input message
- * @return      SM2_SUCCESS(success), other(error)
- *  @note
-  @verbatim
-      -# 1. please make sure the three parameters are valid, and ctx is initialized.
-  @endverbatim
- */
-    unsigned int sm2_getE_update(HASH_CTX *ctx, unsigned char *msg, unsigned int msg_bytes);
-
-    /**
- * @brief       step 3 of getting SM2 E value(stepwise style), message update done, get the digest(SM2 E value)
- * @param[in]   ctx           - input, HASH_CTX context pointer
- * @param[in]   E             - input, message
- * @return      SM2_SUCCESS(success), other(error)
- *  @note
-  @verbatim
-      -# 1. please make sure the ctx is valid and initialized.
-      -# 2. please make sure the digest buffer E is sufficient.
-  @endverbatim
- */
-    unsigned int sm2_getE_final(HASH_CTX *ctx, unsigned char E[32]);
+#if 1
+#define SM2_GETE_BY_STEPS
 #endif
-
+#ifdef SM2_GETE_BY_STEPS
     /**
- * @brief       Generate SM2 public key from private key
- * @param[in]   priKey           - private key, 32 bytes, big-endian
- * @param[out]  pubKey           - public key(0x04 + x + y), 65 bytes, big-endian
- * @return      0:success     other:error
+ * @brief           Step 1 of getting SM2 E value (stepwise style) - initialization
+ * @param[in]       ctx                  - Hash context structure pointer
+ * @param[in]       Z                    - Z value, 32 bytes
+ * @return          SM2_SUCCESS on success, other values indicate error
  */
-    unsigned int sm2_get_pubkey_from_prikey(unsigned char priKey[32], unsigned char pubKey[65]);
+    unsigned int sm2_getE_init(hash_ctx_t *ctx, const unsigned char Z[32]);
 
     /**
- * @brief       Generate SM2 random Key pair
- * @param[in]   priKey           - private key, 32 bytes, big-endian
- * @param[out]  pubKey           - public key(0x04 + x + y), 65 bytes, big-endian
- * @return      0:success     other:error
+ * @brief           Step 2 of getting SM2 E value (stepwise style) - update message
+ * @param[in]       ctx                  - Hash context structure pointer
+ * @param[in]       msg                  - Message to be hashed
+ * @param[in]       msg_len              - Byte length of the message
+ * @return          SM2_SUCCESS on success, other values indicate error
+ * @note            Ensure all parameters are valid and ctx is initialized
+ */
+    unsigned int sm2_getE_update(hash_ctx_t *ctx, const unsigned char *msg, unsigned int msg_len);
+
+    /**
+ * @brief           Step 3 of getting SM2 E value (stepwise style) - finalize and get digest
+ * @param[in]       ctx                  - Hash context structure pointer (must be valid and initialized)
+ * @param[out]      E                    - Output hash digest (SM2 E value)
+ * @return          SM2_SUCCESS on success, other values indicate error
+ * @note            Ensure the digest buffer E is sufficient (32 bytes)
+ */
+    unsigned int sm2_getE_final(hash_ctx_t *ctx, unsigned char E[32]);
+#endif
+    /**
+ * @brief           Generate SM2 public key from private key
+ * @param[in]       priKey               - private key, 32 bytes, big-endian
+ * @param[out]      pubKey               - public key(0x04 + x + y), 65 bytes, big-endian
+ * @return          0:success     other:error
+ */
+    unsigned int sm2_get_pubkey_from_prikey(const unsigned char priKey[32], unsigned char pubKey[65]);
+
+    /**
+ * @brief           Generate SM2 random Key pair
+ * @param[in]       priKey               - private key, 32 bytes, big-endian
+ * @param[out]      pubKey               - public key(0x04 + x + y), 65 bytes, big-endian
+ * @return          0:success     other:error
  */
     unsigned int sm2_getkey(unsigned char priKey[32], unsigned char pubKey[65]);
 
     /**
- * @brief       Generate SM2 Signature
- * @param[in]   E          - input, E value, 32 bytes, big-endian
- * @param[in]   rand_k     - input, random big integer k in signing, 32 bytes, big-endian,
- *                               if you do not have this integer, please set this parameter to be NULL,
- *                               it will be generated inside.
- * @param[in]   priKey     - private key, 32 bytes, big-endian
- * @param[out]  signature  - Signature r and s, 64 bytes, big-endian
- * @return      SM2_SUCCESS(success)     other:error
- * @note
-  @verbatim
-      -# 1.if you do not have rand_k, please set the parameter to be NULL, it will be generated inside.
-  @endverbatim
+ * @brief           Generate SM2 Signature
+ * @param[in]       E                    - input, E value, 32 bytes, big-endian
+ * @param[in]       rand_k               - input, random big integer k in signing, 32bytes, big-endian,
+ *                                         if you do not have this integer, please set this parameter to be NULL,
+ *                                         it will be generated inside.
+ * @param[in]       priKey               - private key, 32 bytes, big-endian
+ * @param[out]      signature            - Signature r and s, 64 bytes, big-endian
+ * @return          SM2_SUCCESS(success)     other:error
+ * @note            
+ *        1.if you do not have rand_k, please set the parameter to be NULL, it will be generated inside.
  */
-    unsigned int sm2_sign(unsigned char E[32], unsigned char rand_k[32], unsigned char priKey[32], unsigned char signature[64]);
+    unsigned int sm2_sign(const unsigned char E[32], const unsigned char rand_k[32], const unsigned char priKey[32], unsigned char signature[64]);
 
     /**
- * @brief       Verify SM2 Signature
- * @param[in]   E          - E value, 32 bytes, big-endian
- * @param[in]   pubKey     - public key(0x04 + x + y), 65 bytes, big-endian
- * @param[in]   signature  - Signature r and s, 64 bytes, big-endian
- * @return      SM2_SUCCESS(success)     other:error
+ * @brief           Verify SM2 Signature
+ * @param[in]       E                    - E value, 32 bytes, big-endian
+ * @param[in]       pubKey               - public key(0x04 + x + y), 65 bytes, big-endian
+ * @param[in]       signature            - Signature r and s, 64 bytes, big-endian
+ * @return          SM2_SUCCESS(success)     other:error
  */
-    unsigned int sm2_verify(unsigned char E[32], unsigned char pubKey[65], unsigned char signature[64]);
+    unsigned int sm2_verify(const unsigned char E[32], const unsigned char pubKey[65], const unsigned char signature[64]);
 
     /**
- * @brief       SM2 Encryption
- * @param[in]   M              - plaintext, MByteLen bytes, big-endian
- * @param[in]   MByteLen       - byte length of M
- * @param[in]   rand_k     - input, random big integer k in encrypting, 32 bytes, big-endian,
- *                               if you do not have this integer, please set this parameter to be NULL,
- *                               it will be generated inside.
- * @param[in]   pubKey     - public key, 65 bytes, big-endian
- * @param[in]   order          - either SM2_C1C3C2 or SM2_C1C2C3
- * @param[out]   C              - ciphertext, CByteLen bytes, big-endian
- * @param[out]  CByteLen       - byte length of C, should be MByteLen+97 if success
- * @return      SM2_SUCCESS(success)     other:error
- * @note
-  @verbatim
-      -# 1.M and C can be the same buffer.
-      -# 2.if you do not have rand_k, please set the parameter to be NULL, it will be generated inside.
-      -# 3.please make sure pubKey is valid
-  @endverbatim
+ * @brief           SM2 Encryption
+ * @param[in]       M                    - plaintext, m_len bytes, big-endian
+ * @param[in]       m_len                - byte length of M
+ * @param[in]       rand_k               - input, random big integer k in encrypting, 32 bytes, big-endian,
+ *                                         if you do not have this integer, please set this parameter to be NULL,
+ *                                         it will be generated inside.
+ * @param[in]       pubKey               - public key, 65 bytes, big-endian
+ * @param[in]       order                - either SM2_C1C3C2 or SM2_C1C2C3
+ * @param[out]      C                    - ciphertext, c_len bytes, big-endian
+ * @param[out]      c_len                - byte length of C, should be m_len+97 if success
+ * @return          SM2_SUCCESS(success)     other:error
+ * @note            
+ *        1.M and C can be the same buffer.
+ *        2.if you do not have rand_k, please set the parameter to be NULL, it will be generated inside.
+ *        3.please make sure pubKey is valid
  */
-    unsigned int sm2_encrypt(unsigned char *M, unsigned int MByteLen, unsigned char rand_k[32], unsigned char pubKey[65], sm2_cipher_order_e order, unsigned char *C, unsigned int *CByteLen);
+    unsigned int sm2_encrypt(const unsigned char *M, unsigned int m_len, const unsigned char rand_k[32], const unsigned char pubKey[65], sm2_cipher_order_e order, unsigned char *C,
+                             unsigned int *c_len);
 
     /**
- * @brief       SM2 Decryption
- * @param[in]   C             - ciphertext, CByteLen bytes, big-endian
- * @param[in]   CByteLen      - byte length of C, make sure MByteLen>97
- * @param[in]   priKey        - private key, 32 bytes, big-endian
- * @param[in]   order          - either SM2_C1C3C2 or SM2_C1C2C3
- * @param[out]  M             - plaintext, MByteLen bytes, big-endian
- * @param[out]  MByteLen      - byte length of M, should be CByteLen-97 if success
- * @return      SM2_SUCCESS(success)     other:error
- * @note
-  @verbatim
-      -# 1.M and C can be the same buffer.
-  @endverbatim
+ * @brief           SM2 Decryption
+ * @param[in]       C                    - ciphertext, c_len bytes, big-endian
+ * @param[in]       c_len                - byte length of C, make sure m_len>97
+ * @param[in]       priKey               - private key, 32 bytes, big-endian
+ * @param[in]       order                - either SM2_C1C3C2 or SM2_C1C2C3
+ * @param[out]      M                    - plaintext, m_len bytes, big-endian
+ * @param[out]      m_len                - byte length of M, should be c_len-97 if success
+ * @return          SM2_SUCCESS(success)     other:error
+ * @note            
+ *        1.M and C can be the same buffer.
  */
-    unsigned int sm2_decrypt(unsigned char *C, unsigned int CByteLen, unsigned char priKey[32], sm2_cipher_order_e order, unsigned char *M, unsigned int *MByteLen);
+    unsigned int sm2_decrypt(const unsigned char *C, unsigned int c_len, const unsigned char priKey[32], sm2_cipher_order_e order, unsigned char *M, unsigned int *m_len);
 
     /**
- * @brief       SM2 Key Exchange
- * @param[in]   role              - SM2_Role_Sponsor - sponsor, SM2_Role_Responsor - responsor
- * @param[in]   dA            - local's permanent private key7
- * @param[in]   PB            - peer's permanent public key
- * @param[in]   rA            - local's temporary private key
- * @param[in]   RA            - local's temporary public key
- * @param[in]   RB            - peer's temporary public key
- * @param[in]   ZA            - local's Z value
- * @param[in]   ZB            - peer's Z value
- * @param[in]   kByteLen      - byte length of output key, should be less than (2^32 - 1)bit
- * @param[out]  KA            - output key
- * @param[out]  S1            - sponsor's S1, or responsor's S2, this is optional
- * @param[out]  SA            - sponsor's SA, or responsor's SB, this is optional
- * @return      SM2_SUCCESS(success)     other:error
- * @note
-  @verbatim
-      -# 1.please make sure the inputs are valid
-      -# 2.S1 and SA are optional, if you don't need, please set S1 and SA as NULL
-      -# 3.in case that S1(S2) and SA(SB) exist, if S1=SB,S2=SA, then exchange success.
-  @endverbatim
- */
-    unsigned int sm2_exchangekey(sm2_exchange_role_e role,
-                                 unsigned char      *dA,
-                                 unsigned char      *PB,
-                                 unsigned char      *rA,
-                                 unsigned char      *RA,
-                                 unsigned char      *RB,
-                                 unsigned char      *ZA,
-                                 unsigned char      *ZB,
-                                 unsigned int        kByteLen,
-                                 unsigned char      *KA,
-                                 unsigned char      *S1,
-                                 unsigned char      *SA);
-
-
-#ifdef SM2_SEC
-
-    //SM2 return code(secure version)
-    #define SM2_SUCCESS_S (0x3E2FDB1AU)
-    #define SM2_ERROR_S   (0xCBAD735EU)
-
-
-    unsigned int sm2_sign_s(unsigned char E[32], unsigned char rand_k[32], unsigned char priKey[32], unsigned char signature[64]);
-
-    unsigned int sm2_verify_s(unsigned char E[32], unsigned char pubKey[65], unsigned char signature[64]);
-
-    unsigned int sm2_encrypt_s(unsigned char *M, unsigned int MByteLen, unsigned char rand_k[32], unsigned char pubKey[65], sm2_cipher_order_e order, unsigned char *C, unsigned int *CByteLen);
-
-    unsigned int sm2_decrypt_s(unsigned char *C, unsigned int CByteLen, unsigned char priKey[32], sm2_cipher_order_e order, unsigned char *M, unsigned int *MByteLen);
-
-    unsigned int sm2_exchangekey_s(sm2_exchange_role_e role,
-                                   unsigned char      *dA,
-                                   unsigned char      *PB,
-                                   unsigned char      *rA,
-                                   unsigned char      *RA,
-                                   unsigned char      *RB,
-                                   unsigned char      *ZA,
-                                   unsigned char      *ZB,
-                                   unsigned int        kByteLen,
-                                   unsigned char      *KA,
-                                   unsigned char      *S1,
-                                   unsigned char      *SA);
-
-#endif
-
+ * @brief           SM2 Key Exchange
+ * @param[in]       role                 - Exchange role (SM2_Role_Sponsor or SM2_Role_Responsor)
+ * @param[in]       dA                   - Local's permanent private key, 32 bytes
+ * @param[in]       PB                   - Peer's permanent public key, 65 bytes
+ * @param[in]       rA                   - Local's temporary private key, 32 bytes
+ * @param[in]       RA                   - Local's temporary public key, 65 bytes
+ * @param[in]       RB                   - Peer's temporary public key, 65 bytes
+ * @param[in]       ZA                   - Local's Z value, 32 bytes
+ * @param[in]       ZB                   - Peer's Z value, 32 bytes
+ * @param[in]       k_len                - Byte length of output key (must be less than 2^32 - 1 bits)
+ * @param[out]      KA                   - Output key, k_len bytes
+ * @param[out]      S1                   - Sponsor's S1 or responsor's S2 (optional)
+ * @param[out]      SA                   - Sponsor's SA or responsor's SB (optional)
+ * @return          SM2_SUCCESS on success, other values indicate error
+ * @note            
+ *        1. Ensure all inputs are valid
+ *        2. S1 and SA are optional parameters (set to NULL if not needed)
+ *        3. For verification: If S1=SB and S2=SA, the exchange is successful
+*/
+    unsigned int sm2_exchangekey(sm2_exchange_role_e role, const unsigned char *dA, const unsigned char *PB, const unsigned char *rA, const unsigned char *RA,
+                                 const unsigned char *RB, const unsigned char *ZA, const unsigned char *ZB, unsigned int k_len, unsigned char *KA, unsigned char *S1,
+                                 unsigned char *SA);
 
 #ifdef __cplusplus
 }

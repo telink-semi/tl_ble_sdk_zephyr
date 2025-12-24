@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2025
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -30,6 +30,11 @@
 #include <stdio.h>
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /************************************************************************************
  *******************************    TRNG config    **********************************
  ************************************************************************************/
@@ -40,7 +45,7 @@
 #define CONFIG_TRNG_GENERATE_BY_HARDWARE
 
 #define TRNG_RO_ENTROPY //enable Ring Oscillator entropy
-//#define TRNG_TERO_ENTROPY        //enable Transient Effect Ring Oscillator entropy
+    //#define TRNG_TERO_ENTROPY        //enable Transient Effect Ring Oscillator entropy
 
 #define TRNG_DELAY_COUNTER             (10U)
 #define TRNG_TIMEOUT_COUNTER_THRESHOLD (100000U)
