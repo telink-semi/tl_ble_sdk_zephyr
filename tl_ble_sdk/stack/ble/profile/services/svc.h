@@ -40,9 +40,9 @@
 
 
 #include "svc_gatt/svc_gatt.h"
-#include "svc_cs/svc_cs.h"
+// #include "svc_cs/svc_cs.h"
 #include "svc_telink/svc_telink.h"
-#include "svc_hid/svc_hid.h"
+// #include "svc_hid/svc_hid.h"
 #include "svc_esl/svc_esl.h"
 
 #include "svc_uuid.h"
