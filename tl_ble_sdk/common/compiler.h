@@ -95,11 +95,13 @@
 #else
     #ifndef BLC_ZEPHYR_BLE_INTEGRATION
         #define _attribute_data_retention_sec_
+        #define _attribute_data_retention_
+        #define _attribute_ble_data_retention_
     #else
         #define _attribute_data_retention_sec_   __attribute__((section(".retention_data")))
+        #define _attribute_data_retention_		 __attribute__((section(".retention_data")))
+        #define _attribute_ble_data_retention_	 __attribute__((section(".retention_data")))
     #endif
-    #define _attribute_data_retention_
-    #define _attribute_ble_data_retention_
 #endif
 
 #ifndef BLC_ZEPHYR_BLE_INTEGRATION
