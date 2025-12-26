@@ -1,21 +1,18 @@
 /********************************************************************************************************
  * @file    keyscan.c
  *
- * @brief   This is the source file for tl322x
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2024
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
  *          You may obtain a copy of the License at
  *
  *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *
- *
  *
  *          Unless required by applicable law or agreed to in writing, software
  *          distributed under the License is distributed on an "AS IS" BASIS,

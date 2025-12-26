@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    hci_simu_ll_acl_conn_internal.h
+ * @file    hci_simu_ll_internal.h
  *
  * @brief   This is the source file for TLSR/TL
  *

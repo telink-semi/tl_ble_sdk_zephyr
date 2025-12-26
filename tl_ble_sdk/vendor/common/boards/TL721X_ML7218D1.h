@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    TL721X_C1T315A20.h
+ * @file    TL721X_ML7218D1.h
  *
  * @brief   This is the header file for BLE SDK
  *
@@ -21,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef VENDOR_COMMON_BOARDS_TL721X_ML7218D1_H_
 #define VENDOR_COMMON_BOARDS_TL721X_ML7218D1_H_
 
