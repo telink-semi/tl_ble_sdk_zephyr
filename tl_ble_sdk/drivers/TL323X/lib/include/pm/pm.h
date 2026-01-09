@@ -379,3 +379,34 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_
  * @return      none.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
+
+#if BLC_ZEPHYR_BLE_INTEGRATION
+/**
+ * @brief trim dig ldo
+ * 
+ */
+typedef enum
+{
+    DIG_LDO_TRIM_0P750V = 0,
+    DIG_LDO_TRIM_0P775V,
+    DIG_LDO_TRIM_0P800V,
+    DIG_LDO_TRIM_0P825V,
+    DIG_LDO_TRIM_0P850V,
+    DIG_LDO_TRIM_0P875V,
+    DIG_LDO_TRIM_0P900V,
+    DIG_LDO_TRIM_0P925V,
+    DIG_LDO_TRIM_0P950V,
+    DIG_LDO_TRIM_0P975V,
+    DIG_LDO_TRIM_0P1000V, /**< DIG LDO output 1.00V (default) */
+    DIG_LDO_TRIM_0P1025V,
+    DIG_LDO_TRIM_0P1050V,
+    DIG_LDO_TRIM_0P1075V,
+    DIG_LDO_TRIM_0P1100V,
+    DIG_LDO_TRIM_0P1125V,
+} pm_dig_ldo_trim_e;
+
+static _always_inline void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim)
+{
+    analog_write_reg8(0x27, (analog_read_reg8(0x27) & 0xf0) | dig_ldo_trim);
+}
+#endif /* BLC_ZEPHYR_BLE_INTEGRATION */
