@@ -81,6 +81,7 @@
 
 #define _attribute_iram_noinit_data_         __attribute__((section(".iram_noinit_data")))
 #define _attribute_iram_bss_                 __attribute__((section(".iram_bss")))
+#define _attribute_iram_rbt_ret_data_        __attribute__((section(".iram_rbt_ret")))  // iram reboot retention data
 
 #if (BLC_PM_DEEP_RETENTION_MODE_EN)
     #define _attribute_data_retention_sec_   __attribute__((section(".retention_data")))
