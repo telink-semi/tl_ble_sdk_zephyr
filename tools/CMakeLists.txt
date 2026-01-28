@@ -98,6 +98,7 @@ file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/flash/*.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/watchdog.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/dma.c
+	${TL_BLE_SRC_DIR}/drivers/${SOC}/lpc.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/lpd.c
 	${TL_BLE_SRC_DIR}/vendor/common/flash_prot.c
 	${TL_BLE_SRC_DIR}/vendor/common/ble_flash.c
@@ -189,6 +190,10 @@ endif()
 if(CONFIG_ADC_TELINK_B9X OR CONFIG_ADC_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/adc.c)
+endif()
+
+if(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_ADC_TELINK_TL323X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/sd_adc.c)
 endif()
 
 if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
