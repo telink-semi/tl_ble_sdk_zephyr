@@ -34,16 +34,11 @@
 
 
 #define USBMOUSE_BUFF_DATA_NUM 8
-
-#if ((MCU_CORE_TYPE != CHIP_TYPE_TL322X) || (USB_MOUSE_REPORT_SMOOTH))
-static unsigned char usbmouse_wptr, usbmouse_rptr;
-#endif
-
-#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
 static mouse_data_t mouse_dat_buff[USBMOUSE_BUFF_DATA_NUM];
+
+static unsigned char usbmouse_wptr, usbmouse_rptr;
 static unsigned int  usbmouse_not_released;
 static unsigned int  usbmouse_data_report_time;
-#endif
 
 void usbmouse_add_frame(rf_packet_mouse_t *packet_mouse)
 {
@@ -146,10 +141,6 @@ int usbmouse_hid_report(unsigned char report_id, unsigned char *data, int cnt)
 
     reg_usb_ep_ctrl(USB_EDP_MOUSE) = FLD_EP_DAT_ACK | (edp_toggle[USB_EDP_MOUSE] ? FLD_USB_EP_DAT1 : FLD_USB_EP_DAT0); // ACK
     edp_toggle[USB_EDP_MOUSE] ^= 1;
-#else
-    (void)report_id;//avoid warning
-    (void)data;//avoid warning
-    (void)cnt;//avoid warning
 #endif
     return 1;
 }

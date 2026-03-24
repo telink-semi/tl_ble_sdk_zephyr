@@ -21,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "stack/pm/pm_sys.h"
 #include "stack/ble/ble.h"
 #include "tl_common.h"
 #include "blt_soft_timer.h"
@@ -31,8 +30,7 @@
 
 
 _attribute_ble_data_retention_ blt_soft_timer_t blt_timer;
-_attribute_ble_data_retention_ u8 blt_timer_process_doing = 0;
-_attribute_ble_data_retention_ u8 blt_timer_cur_task_done  = 0;
+
 /**
  * @brief       This function is used to Sort the timers according
  *              to the time of the timed task, so as to trigger the
@@ -76,28 +74,9 @@ int blt_soft_timer_add(blt_timer_callback_t func, u32 interval_us)
     //int i;
     u32 now = clock_time();
 
-    // Check for valid parameters
-    if (func == NULL || interval_us == 0) {
-        return 0;
-    }
-
-    // Check if timer processing is in progress
-    if(blt_timer_process_doing)
-    {
-        //During the processing, no time tasks can be added.
-        return 0;
-    }
-
-    u32 interval_ticks = interval_us * SYSTEM_TIMER_TICK_1US;
-    // Check if exceeding maximum allowed interval
-    if (interval_ticks > (BIT(30) - SYSTEM_TIMER_TICK_1US)) {
-        return 0;
-    }
-
     if (blt_timer.currentNum >= MAX_TIMER_NUM) { //timer full
         return 0;
-    }
-    else {
+    } else {
         blt_timer.timer[blt_timer.currentNum].cb       = func;
         blt_timer.timer[blt_timer.currentNum].interval = interval_us * SYSTEM_TIMER_TICK_1US;
         blt_timer.timer[blt_timer.currentNum].t        = now + blt_timer.timer[blt_timer.currentNum].interval;
@@ -121,13 +100,6 @@ int blt_soft_timer_add(blt_timer_callback_t func, u32 interval_us)
  */
 int blt_soft_timer_delete_by_index(u8 index)
 {
-    if(blt_timer_process_doing)
-    {
-        //It cannot be deleted directly during operation. It can be deleted after processing.
-        blt_timer_cur_task_done = 1;
-        return 0;
-    }
-
     if (index >= blt_timer.currentNum) {
         return 0;
     }
@@ -150,12 +122,6 @@ int blt_soft_timer_delete_by_index(u8 index)
  */
 int blt_soft_timer_delete(blt_timer_callback_t func)
 {
-    if(blt_timer_process_doing)
-    {
-        //It cannot be deleted directly during operation. It can be deleted after processing.
-        blt_timer_cur_task_done = 1;
-        return 0;
-    }
     for (int i = 0; i < blt_timer.currentNum; i++) {
         if (blt_timer.timer[i].cb == func) {
             blt_soft_timer_delete_by_index(i);
@@ -177,6 +143,22 @@ int blt_soft_timer_delete(blt_timer_callback_t func)
     }
 
     return 0;
+}
+
+/**
+ * @brief       return the frist time tick in the soft timer list
+ * @param[in]   void
+ * @return      0 - no timer
+ *              other - time tick
+ */
+u32   blt_soft_timer_get_first_tick(void)
+{
+    if(!blt_timer.currentNum){
+        return 0;
+    }
+    else {
+        return blt_timer.timer[0].t;
+    }
 }
 
 /**
@@ -206,11 +188,9 @@ void blt_soft_timer_process(int type)
 
             if (blt_timer.timer[i].cb == NULL) {
             } else {
-                blt_timer_cur_task_done = 0;
-                blt_timer_process_doing = 1;
                 result = blt_timer.timer[i].cb();
-                blt_timer_process_doing = 0;
-                if (result < 0 || blt_timer_cur_task_done) {
+
+                if (result < 0) {
                     blt_soft_timer_delete_by_index(i);
                 } else if (result == 0) {
                     change_flg           = 1;

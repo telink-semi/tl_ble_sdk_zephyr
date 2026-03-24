@@ -1532,7 +1532,12 @@ enum
 
 #define reg_rf_hp_demod_cfg1  REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x116)
 #define reg_rf_hp_demod_cfg2  REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x117)
-
+#define reg_rf_hp_demod_cfg5  REG_ADDR8(REG_TL_MODEM_BASE_ADDR + 0x11a)
+enum
+{
+    FLD_RF_HP_PDET_HD_THD      = BIT_RNG(0,5),
+    FLD_RF_HP_LR_SYM_OFFSET    = BIT_RNG(6,7),
+};
 
 #define reg_rf_mode_cfg_rx1_0 REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x20)
 

@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    adc.h
  *
- * @brief   This is the header file for TL322X
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
  * @date    2024
@@ -46,6 +46,7 @@
 
 extern unsigned char g_adc_rx_fifo_index[2];
 
+#define ADC_SAR_CNT  2  //SAR0 and SAR1
 /**
  *  @brief  Define ADC chn
  */
@@ -265,6 +266,7 @@ typedef enum
 } adc_transfer_mode_e;
 
 typedef enum{
+    FLD_CLOCK_RC,
     FLD_CLOCK_XTL,
     FLD_CLOCK_PLL,
 }adc_dig_clk_src_e;
@@ -381,12 +383,13 @@ void adc_oversample_dis(adc_num_e sar_adc_num);
 
 /**
  * @brief This function serves to calculate voltage from adc sample code.
+ * @param[in]   sar_adc_num - SAR0/SAR1.
  * @param[in]   mode - ADC sample mode
  * @param[in]   chn - enum variable of ADC sample channel.
  * @param[in]   adc_code    - the adc sample code.
  * @return      adc_vol_mv  - the average value of adc voltage value.
  */
-short adc_calculate_voltage(adc_mode_e mode,adc_sample_chn_e chn,short adc_code);
+short adc_calculate_voltage(adc_num_e sar_adc_num,adc_mode_e mode,adc_sample_chn_e chn,short adc_code);
 
 /**
  * @brief       This function sets the threshold that triggers the DMA IRQ or SAR ADC RX IRQ.
@@ -555,7 +558,7 @@ void adc_chn_config(adc_num_e sar_adc_num,adc_sample_chn_e chn,adc_chn_cfg_t *ad
  */
 static inline void adc_keyscan_auto_en(adc_num_e sar_adc_num)
 {
-    reg_adc_config2(sar_adc_num) |= FLD_PAD_AUTO_MUX_EN;
+    reg_adc_oversample(sar_adc_num) |= FLD_PAD_AUTO_MUX_EN;
 }
 
 /**
@@ -624,3 +627,27 @@ void adc_trigger_en(adc_num_e sar_adc_num);
  * @note       Manual trigger required
  */
 void adc_trigger_dis(adc_num_e sar_adc_num);
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for SAR0 GPIO.
+ * @param[in] vref - GPIO sampling two-point calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_sar0_gpio_calib_vref(unsigned short vref, signed char offset);
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for SAR0 Vbat.
+ * @param[in] vref - Vbat channel sampling two-point calibration value.
+ * @param[in] offset - Vbat channel sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_sar0_vbat_calib_vref(unsigned short vref, signed char offset);
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for SAR1 GPIO.
+ * @param[in] vref - GPIO sampling two-point calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_sar1_gpio_calib_vref(unsigned short vref, signed char offset);

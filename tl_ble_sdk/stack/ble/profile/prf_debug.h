@@ -142,7 +142,7 @@ extern const unsigned char DBG_PRF_MASK_GATTS_LOG;
 #endif
 
 #ifndef PRF_DBG_STORE_EN
-    #define PRF_DBG_STORE_EN 0
+    #define PRF_DBG_STORE_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_AUD_LOG;
@@ -174,10 +174,6 @@ extern const unsigned char DBG_PRF_MASK_STORE_LOG;
 
 #ifndef PRF_DBG_RAS_DATA_EN
     #define PRF_DBG_RAS_DATA_EN 0
-#endif
-
-#ifndef PRF_DBG_RAS_MEM_EN
-    #define PRF_DBG_RAS_MEM_EN 0
 #endif
 
 extern const unsigned char DBG_PRF_MASK_RAS_LOG;

@@ -38,7 +38,7 @@ enum
     FLD_DMA_CHANINXFR   = BIT(31),
 };
 
-#define reg_dma_pem_task_en REG_ADDR8(0x80100400 + 0x23) // BLE Sniffer SDK use
+#define reg_dma_pem_task_en    REG_ADDR8(0x80100400 + 0x23)
 
 #define reg_dma_err_mask(i) REG_ADDR8(DMA_BASE_ADDR + ((i) >> 3) * 0x1400 + 0x29)
 

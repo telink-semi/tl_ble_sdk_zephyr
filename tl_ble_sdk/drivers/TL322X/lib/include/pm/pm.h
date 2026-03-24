@@ -28,9 +28,8 @@
 #include "gpio.h"
 #include "lib/include/clock.h"
 
-#define PM_FUNCTION_SUPPORT    1
+#define PM_POWER_OPTIMIZATION  1
 
-#if PM_FUNCTION_SUPPORT
 /**
  * @brief these analog register can store data in deep sleep mode or deep sleep with SRAM retention mode.
  *        Reset these analog registers by watchdog, software reboot (sys_reboot()), RESET Pin, power cycle, 32k watchdog, vbus detect.
@@ -120,15 +119,15 @@ typedef enum
     STATUS_CLEAR_FAIL           = BIT(29),
     STATUS_ENTER_SUSPEND        = BIT(30),
 } pm_suspend_wakeup_status_e;
-#endif
 
 /**
  * @brief   mcu status
  */
 typedef enum
 {
-    MCU_POWER_ON                 = BIT(0), /**< power on, vbus detect or reset pin */
-    //BIT(1) RSVD
+    MCU_POWER_ON_ERR             = BIT(0), /**< power on, vbus detect or reset pin,
+                                                It should not occur. If it does occur, it indicates that there has been an error.*/
+    MCU_DEEP_AFTER_POWERON       = BIT(1), /**< power on + deep */
     MCU_SW_REBOOT_BACK           = BIT(2), /**< Clear the watchdog status flag in time, otherwise, the system reboot may be wrongly judged as the watchdog.*/
     MCU_DEEPRET_BACK             = BIT(3),
     MCU_DEEP_BACK                = BIT(4),
@@ -138,7 +137,7 @@ typedef enum
                                               - but software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the status remains;
                                               */
 
-    MCU_STATUS_POWER_ON          = MCU_POWER_ON,
+//    MCU_STATUS_POWER_ON          = MCU_POWER_ON,
     MCU_STATUS_REBOOT_BACK       = MCU_SW_REBOOT_BACK,
     MCU_STATUS_DEEPRET_BACK      = MCU_DEEPRET_BACK,
     MCU_STATUS_DEEP_BACK         = MCU_DEEP_BACK,
@@ -200,7 +199,6 @@ typedef enum
     VDD_ANA      = 0x0a,
 } pm_vol_mux_sel_e;
 
-#if PM_FUNCTION_SUPPORT
 
 /**
  * @brief   early wake up time
@@ -227,7 +225,6 @@ typedef struct
 } pm_r_delay_cycle_s;
 
 extern volatile pm_r_delay_cycle_s g_pm_r_delay_cycle;
-#endif
 
 /**
  * @brief   deep sleep wakeup status
@@ -241,8 +238,15 @@ typedef struct
 } pm_status_info_s;
 
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
-extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
+
 extern unsigned char                                g_areg_aon_7f;
+extern unsigned char                                g_areg_aon_35;
+extern unsigned char                                g_areg_aon_3a;
+extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
+extern _attribute_data_retention_sec_ unsigned char g_areg_aon_0a;
+#if (PM_POWER_OPTIMIZATION)
+extern _attribute_data_retention_sec_ unsigned char g_areg_aon_06;
+#endif
 
 /**
  * @brief       This function serves to get wakeup source.
@@ -256,7 +260,6 @@ static _always_inline pm_wakeup_status_e pm_get_wakeup_src(void)
     return ((pm_wakeup_status_e)analog_read_reg8(areg_aon_0x64));
 }
 
-#if PM_FUNCTION_SUPPORT
 /**
  * @brief       This function serves to clear the wakeup bit.
  * @param[in]   status  - the interrupt status that needs to be cleared.
@@ -297,9 +300,6 @@ static inline void pm_set_usb1_wakeup(void)
     reg_wakeup_en |= FLD_USB1_PWDN_I;
 }
 
-#endif
-
-#if PM_FUNCTION_SUPPORT
 /**
  * @brief       This function configures a GPIO pin as the wakeup pin.
  * @param[in]   pin - the pins can be set to all GPIO except GPIOD and GPIOI groups.
@@ -374,6 +374,9 @@ pm_pd_module_e pm_get_suspend_power_cfg(void);
  * @return      indicate whether the cpu is wake up successful.
  * @attention   Must ensure that all GPIOs cannot be floating status before going to sleep to prevent power leakage.
  */
+#if PM_POWER_OPTIMIZATION
+_attribute_ram_code_sec_optimize_o2_noinline_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick);
+#else
 _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick);
 #endif
 
@@ -439,7 +442,6 @@ _attribute_ram_code_sec_noinline_ drv_api_status_e pm_set_dig_ldo(pm_dig_vol_mod
 /********************************************************************************************************
  *              This is just for internal debug purpose, users are prohibited from calling.
  *******************************************************************************************************/
-
 /**
  * @brief       When an error occurs, such as the crystal does not vibrate properly, the corresponding recording and reset operations are performed.
  * @param[in]   reboot_reason  - The bit to be configured in the power on buffer.

@@ -187,7 +187,7 @@ if(CONFIG_BT OR CONFIG_IEEE802154)
 	endif()
 endif()
 
-if(CONFIG_ADC_TELINK_B9X OR CONFIG_ADC_TELINK_TLX)
+if(CONFIG_ADC_TELINK_B9X OR CONFIG_ADC_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TL321X)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/adc.c)
 endif()

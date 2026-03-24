@@ -227,8 +227,7 @@ void vApplicationMallocFailedHook( void )
 
 #if (OS_SEPARATE_STACK_SPACE) //BLE SDK use
 _attribute_data_retention_sec_ volatile unsigned int  g_plic_switch_sp_flag=0;
-//static
-__attribute__ ((aligned(16))) unsigned long plicISRStack[ configISR_PLIC_STACK_SIZE ] = { 0 };
+ static __attribute__ ((aligned(16))) unsigned long plicISRStack[ configISR_PLIC_STACK_SIZE ] = { 0 };
 _attribute_data_retention_sec_ unsigned long tlk_plicISRStackTop = ( unsigned long ) &( plicISRStack[ configISR_PLIC_STACK_SIZE & ~0x000f ] );
 #endif
 
@@ -368,18 +367,7 @@ void mswi_handler(void)
 {
     A_mswi_cnt++;//Debug use
 
-    /* Flash operation protection check:
-     * - Non-zero = Flash erase/write/read in progress
-     * - Prevents task switching during critical Flash operations
-     *   (Interrupting may corrupt Flash content or cause system crash)
-     */
-    uint32_t flash_operation_in_progress = reg_irq_threshold;
-    if (flash_operation_in_progress != 0) {
-        return;  // Skip task switching during protected Flash operations
-    }
-
-    /* Trigger RTOS task scheduling */
-    vTaskSwitchContext();
+    vTaskSwitchContext();   //RTOS task scheduling
 }
 #endif
 

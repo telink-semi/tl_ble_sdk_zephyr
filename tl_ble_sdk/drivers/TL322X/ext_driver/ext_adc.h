@@ -73,6 +73,10 @@ typedef struct {
     sd_adc_result_type_e     sd_adc_result_type; // SD ADC output result type (e.g., mV, temperature)
 } hal_adc_common_cfg_t;
 
+typedef struct {
+    sd_adc_p_input_pin_def_e input_p;
+    sd_adc_n_input_pin_def_e input_n;
+} sd_adc_gpio_pin_cfg_t;
 
 /**
  * @brief Main configuration struct for ADC HAL layer initialization

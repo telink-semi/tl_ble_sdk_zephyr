@@ -35,6 +35,12 @@
  *  API Reference
  *  ===============
  *  Header File: gpio.h
+ *
+ *  Attention
+ *  ==============
+  -# Peripherals
+      - Multiplexing PD6 and PD7 for PWM functionality affects RF performance, therefore their use as PWM is not recommended.
+      - When PE1~PE5 are used as LSPI, frequencies exceeding 15MHz will affect RF sensitivity. For details, please refer to the HW design guide.
  */
 #ifndef DRIVERS_GPIO_H_
 #define DRIVERS_GPIO_H_
@@ -71,7 +77,9 @@ typedef enum
 
 /**
  *  @brief  Define GPIO types
- *  @note   The GPIOB groups and PA6 of the A2 version chip does not support 10k pull-up wake-up.
+ *  @note  the following two points need to noticed when using GPIOG and GPIOB groups and PA6:
+ *         1.The GPIOB groups and PA6 of the A2 version chip does not support 10k pull-up wake-up
+ *         2.Since these GPIOG groups are used for connecting the flash and have been occupied, they cannot be used as wake-up pins.
  */
 typedef enum
 {
@@ -121,8 +129,10 @@ typedef enum
     GPIO_PD1  = GPIO_GROUPD | BIT(1),
     GPIO_PD2  = GPIO_GROUPD | BIT(2),
     GPIO_PD3  = GPIO_GROUPD | BIT(3),
+#if (SPECIAL_APPLICATION)
     GPIO_PD4  = GPIO_GROUPD | BIT(4),
-    GPIO_PD5  = GPIO_GROUPD | BIT(5),
+#endif
+    GPIO_PD5  = GPIO_GROUPD | BIT(5), //PD5 can only be used for output multiplexing functions. During ADC operation, it must be configured as an output function.
     GPIO_PD6  = GPIO_GROUPD | BIT(6),
     GPIO_PD7  = GPIO_GROUPD | BIT(7),
     GPIOD_ALL = GPIO_GROUPD | 0x00ff,
@@ -193,7 +203,9 @@ typedef enum
     GPIO_FC_PD1 = GPIO_PD1,
     GPIO_FC_PD2 = GPIO_PD2,
     GPIO_FC_PD3 = GPIO_PD3,
+#if (SPECIAL_APPLICATION)
     GPIO_FC_PD4 = GPIO_PD4,
+#endif
     GPIO_FC_PD5 = GPIO_PD5,
     GPIO_FC_PD6 = GPIO_PD6,
     GPIO_FC_PD7 = GPIO_PD7,

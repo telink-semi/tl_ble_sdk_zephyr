@@ -58,17 +58,25 @@
  *  If it is built-in flash, the maximum speed of mspi is 64M,If it is an external flash, the maximum speed
  *  of mspi needs to be based on the board test.)
  * :-------------------------------- Voltage versus frequency(default is 0.8v)  table clock_h_1 --------------------------------------------------------------------------
- * |voltage|  pll  | cclk  | hclk | pclk | mspi | lspi(m/s) | gspi(m/s) | i2s   | alg   |   pm_top  |  rram  |  itag  |  adc  |  i3c | i3c_bus_pp | i3c_bus_od |
+ * |voltage|  pll  | cclk  | hclk | pclk | mspi | lspi(m/s) | gspi(m/s) | i2s   | alg   |   pm_top  |   nvm  |  itag  |  adc  |  i3c | i3c_bus_pp | i3c_bus_od |
  * |  1.1V |  192  |  192  |  96  |  96  |  64  |  48/24    |  48/24    |  13   |  24   |     24    |   48   |   20   |  48   |  48  |     12     |     4      |
  * |  1.0V |  192  |  78   |  39  |  39  |  64  |  48/24    |  48/24    |  13   |  19.5 |     19.5  |   19.5 |   20   |  48   |  24  |     6      |     2      |
+ * 
+ * Note:  -# Default D25F CLOCK supports 96MHz max, if D25F CLOCK > 96MHz is required and these limits are acceptable, please contact Telink FAE for support:
+ *          In order to improve the robustness of the chip during high-speed operation, the low power comparator (LPC) is used to
+ *          protect the flash during power-down of the chip when the D25F CLOCK is running above 96MHz (excluding 96MHz).
+ *          When this feature is enabled, there are the following limitations:
+ *          -# The chip power supply voltage is limited to 2.1V to 4.2V.
+ *          -# One of PB[1:7] must be reserved for this feature.
+ *          -# One of PEM must be reserved for this feature.
+ *          -# One of DMA0-7 must be reserved for this feature.
+ *          -# Before enabling this feature, activate the 32k watchdog or timer watchdog to prevent the LPC from triggering due to power supply voltage fluctuations. 
+ *             This prevents the MCU from stalling and the chip from being unable to reset for an extended period.
  */
 //core 1.1V
-#define PLL_192M_D25F_192M_HCLK_N22_96M_PCLK_96M_MSPI_48M clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 #define PLL_192M_D25F_96M_HCLK_N22_96M_PCLK_96M_MSPI_48M  clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV2, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK, CLK_DIV4)
 #define PLL_192M_D25F_96M_HCLK_N22_48M_PCLK_48M_MSPI_48M  clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 #define PLL_144M_D25F_48M_HCLK_N22_48M_PCLK_48M_MSPI_48M  clock_init(CLK_BASEBAND_PLL_144M, CLK_DIV3, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK, CLK_DIV3)
-#define PLL_180M_D25F_180M_HCLK_N22_90M_PCLK_90M_MSPI_45M clock_init(CLK_BASEBAND_PLL_180M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
-#define PLL_120M_D25F_120M_HCLK_N22_60M_PCLK_60M_MSPI_30M clock_init(CLK_BASEBAND_PLL_120M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 //core 1.0V
 #define PLL_144M_D25F_72M_HCLK_N22_36M_PCLK_36M_MSPI_48M clock_init(CLK_BASEBAND_PLL_144M, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
 #define PLL_192M_D25F_64M_HCLK_N22_32M_PCLK_32M_MSPI_48M clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV3, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
@@ -85,10 +93,9 @@
  *and the high and low temperature long-term stability test speed is no problem.
  */
 //core 1.1V
-#define PLL_192M_D25F_192M_HCLK_N22_96M_PCLK_96M_MSPI_64M clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
 #define PLL_192M_D25F_96M_HCLK_N22_48M_PCLK_48M_MSPI_64M  clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
-#define PLL_120M_D25F_120M_HCLK_N22_60M_PCLK_60M_MSPI_40M clock_init(CLK_BASEBAND_PLL_120M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
-#define PLL_180M_D25F_180M_HCLK_N22_90M_PCLK_90M_MSPI_60M clock_init(CLK_BASEBAND_PLL_180M, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
+//core 1.0V
+#define PLL_192M_D25F_64M_HCLK_N22_32M_PCLK_32M_MSPI_64M clock_init(CLK_BASEBAND_PLL_192M, CLK_DIV3, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/

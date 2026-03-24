@@ -57,13 +57,6 @@
 #include "stack/ble/host/l2cap/l2cap.h"
 #include "stack/ble/host/signaling/signaling.h"
 
-#include "stack/ble/debug/debug.h"
 
-#include "algorithm/algorithm.h"
 
-#ifdef TLK_ONLY_BLE_HOST
-#include "stack/ble/host/hci/hci_simu_ll/hci_simu_ll_api.h"
-#include "stack/ble/host/hci/hci_simu_ll/hci_simu_ll_acl_conn.h"
-#include "stack/ble/host/hci/hci_simu_ll/hci_simu_ll_leg_adv.h"
-#endif
 #endif /* STACK_BLE_HOST_BLE_HOST_H_ */

@@ -21,6 +21,65 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+ /**
+ * @page RF RF Module Configuration Guide
+ * 
+ * @brief This page provides detailed usage notes, power configuration instructions, and key precautions for the RF module.
+ * 
+ * @par Header File
+ *      rf_common.h
+ * 
+ * @section rf_pm_precautions RF and PM Usage Precautions
+ * When using RF and Power Management (PM) functions in combination, note the following requirements for different low-power modes:
+ * 
+ * - <b>Suspend mode</b>:
+ *   RF-related digital registers will be lost. After waking up from suspend mode, re-invoke all RF-related function interfaces to restore functionality.
+ *   <br>
+ *   If you don't want to re-invoke RF-related function interfaces after waking up, you can use the <code>pm_set_suspend_power_cfg</code> function 
+ *   to set <code>PM_POWER_BASEBAND</code> to maintain power during suspend sleep. 
+ *   <b>Note:</b> This will increase power consumption during suspend.
+ * 
+ * - <b>Deep retention mode</b>:
+ *   RF-related digital registers will be lost. After waking up from deep retention mode, re-invoke all RF-related function interfaces to restore functionality.
+ * 
+ * - <b>Deep mode</b>:
+ *   RF-related digital registers will be lost. After waking up from deep mode, re-invoke all RF-related function interfaces to restore functionality.
+ * 
+ * @section rf_power_explanation RF Transmit Power Configuration
+ * 
+ * @subsection rf_power_supply Power Supply Modes of RF PA Module
+ * The RF Power Amplifier (PA) module supports two power supply modes, with key characteristics as follows:
+ * 
+ * | Power Supply Mode | Power Source                          | Output Power Characteristics                                                                 | Advantage                                  |
+ * |-------------------|---------------------------------------|------------------------------------------------------------------------------------------------|-------------------------------------------|
+ * | VBAT mode         | Directly powered by VBAT              | Maximum output power varies with VBAT voltage (higher VBAT → higher available power)          | Simple power path, suitable for high-power scenarios |
+ * | VANT mode         | Powered by embedded DCDC + LDO        | Output power is stable (independent of VBAT voltage)                                          | Lower power consumption at the same transmit power |
+ * 
+ * @subsection rf_power_table TX Power Table (Driver-Provided)
+ * - The default <code>rf_power_level_e</code> enumeration is tested based on the largest package, providing typical reference values for both VBAT and VANT modes.
+ * - Power levels exceeding the maximum VANT power are automatically mapped to VBAT mode (driver handles mode switching internally).
+ * 
+ * @subsection rf_power_adjust Power Level Adjustment Instructions
+ * #### 3.1 Basic Configuration Rules
+ * - Both VBAT and VANT modes support 64 configurable power levels (range: 0 ~ 63).
+ * - The mapping relationship between level numbers and hardware registers is fixed (package-independent); only the actual transmit power differs by package.
+ * 
+ * #### 3.2 Configuration Methods (via <code>rf_set_power_level</code> Interface)
+ * Two configuration approaches are supported:
+ * a) Use predefined values from the <code>rf_power_level_e</code> enumeration (recommended for most scenarios).
+ * b) Write custom level values (for scenario-specific power optimization), following mode-specific formatting rules.
+ * 
+ * #### 3.3 Mode-Specific Level Format
+ * | Mode       | Level Format                          | Valid Range |
+ * |------------|---------------------------------------|-------------|
+ * | VBAT mode  | <code>level = power_level</code>      | 0 ~ 63      |
+ * | VANT mode  | <code>level = BIT(7) \| power_level</code> | 0 ~ 63      |
+ * 
+ * @subsection rf_power_notes Supplementary Notes
+ * 1. For package-specific detailed power data (e.g., actual power values corresponding to each level), refer to the <cite>[Chip Model] RF Test Report</cite>.
+ * 2. Actual transmit power is affected by antenna matching, PCB layout, and hardware design. Mandatory hardware calibration is required for mass production or high-precision applications.
+ */
+
 #ifndef RF_COMMON_H
 #define RF_COMMON_H
 
@@ -294,6 +353,14 @@ typedef enum
     RF_POWER_N25p20dBm = BIT(7) | 1,  /**<  -25.2 dbm */
     RF_POWER_N40p00dBm = BIT(7) | 0,  /**<  -40.0 dbm */
 
+/*
+ * The following power scenarios adopt VANT mode to reduce TX power consumption while sustaining high output power.
+ * When using the following VANT power levels,
+ * call the rf_set_vant_power_trim_level interface to adjust the voltage
+ * both before and after toggling the TX switch.
+ * This configuration calling method can ensure an increase in power while limiting additional power consumption.
+ * For detailed implementation, refer to the invocation example of rf_set_vant1p05_power_trim_vol_up in the RF_Demo project.
+ */
     RF_VANT_POWER_P6p40 = BIT(7)| 63, /**<   6.4 dbm */
     RF_VANT_POWER_P6p00 = BIT(7)| 52, /**<   6.0 dbm */
     RF_VANT_POWER_P5p50 = BIT(7)| 43, /**<   5.5 dbm */
@@ -356,6 +423,14 @@ typedef enum
     RF_POWER_INDEX_N25p20dBm,  /**<  -25.2 dbm */
     RF_POWER_INDEX_N40p00dBm,  /**<  -40.0 dbm */
 
+/*
+ * The following power scenarios adopt VANT mode to reduce TX power consumption while sustaining high output power.
+ * When using the following VANT power levels,
+ * call the rf_set_vant_power_trim_level interface to adjust the voltage
+ * both before and after toggling the TX switch.
+ * This configuration calling method can ensure an increase in power while limiting additional power consumption.
+ * For detailed implementation, refer to the invocation example of rf_set_vant1p05_power_trim_vol_up in the RF_Demo project.
+ */
     RF_VANT_POWER_INDEX_P6p40dBm, /**<  6.4 dbm */
     RF_VANT_POWER_INDEX_P6p00dBm, /**<  6.0 dbm */
     RF_VANT_POWER_INDEX_P5p50dBm, /**<  5.5 dbm */
@@ -453,6 +528,17 @@ typedef enum
     RF_VANT_NORMAL_POWER = 0,
     RF_VANT_HIGH_POWER   = 1,
 }rf_vant_power_trim_e;
+
+/**
+ *  @brief  An enumeration variable used to control the time interval of PA ramp step.
+ */
+ typedef enum
+{
+    RF_PA_RAMP_STEP_P84p0 = 2,
+    RF_PA_RAMP_STEP_P250p0 = 5,
+    RF_PA_RAMP_STEP_P500p0 = 6,
+    RF_PA_RAMP_STEP_P1000p0 = 7,
+}rf_pa_ramp_step_e;
 
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
@@ -568,7 +654,7 @@ static inline void rf_rx_acc_code_pipe_en(rf_channel_e pipe)
  */
 static inline void rf_tx_acc_code_pipe_en(unsigned char pipe)
 {
-    write_reg8(0x170215, ((read_reg8(0x170215) & 0xf8) | pipe) | BIT(4)); //Tx_Channel_man[2:0]
+    write_reg8(0x170215, ((read_reg8(0x170215) & 0xf8) | (pipe&0x07)) | BIT(4)); //Tx_Channel_man[2:0]
 }
 
 /**
@@ -1404,4 +1490,78 @@ void rf_modem_hp_path(unsigned char hp_en);
  *              at the end of the tx to reduce unnecessary power consumption.
  */
 void rf_set_vant_power_trim_level(rf_vant_power_trim_e max_power );
+
+
+/**
+ * @brief      This function serves to optimize RF performance
+ * @param[in]  none
+ * @return     none
+ * @note       1.Call this function after turning on rx 30us, and the calibration value set by the function
+ *                will take effect after calling rf_ldot_ldo_rxtxlf_bypass_en;if automatic calibration is
+ *                required, you can use rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function; how to
+ *                use it can refer to bqb.c file or rf_emi_rx in emi.c
+ *             2. After using rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function and enter tx/rx
+ *                automatic calibration, to use this function again, you need to call the rf_set_rxpara function
+ *                again after entering rx 30us.
+ *
+ */
+void rf_set_rxpara(void);
+
+/**
+ * @brief       This function is used to enable the ldo rxtxlf bypass function, and the calibration value
+ *              written by the software will take effect after enabling.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_en(void);
+
+
+/**
+ * @brief       This function is used to close the ldo rxtxlf bypass function, and the hardware will
+ *              automatically perform the calibration function after closing.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_dis(void);
+
+/**
+ * @brief       This function is used to set the tx trailer length.
+ * @param[in]   bit_len - the tx trailer length, range: 0~7.
+ * @return      none.
+ */
+void rf_set_tx_trailer_len(unsigned char bit_len);
+
+/**
+ * @brief       This function is used to set the rx pdet hard decision length in modem hp mode.
+ * @param[in]   bit_len - the rx pdet hard decision length,range: 0~63.
+ * @return      none.
+ */
+void rf_set_modem_hp_pdet_threshold(unsigned char bit_len);
+
+/**
+  * @brief      This function is mainly used to set the interval time of the PA ramp step.
+  * @param[in]  step_value- Enumeration variables are used to set the interval time for each step – for example, 
+  *             RF_PA_RAMP_STEP_P250p0 represents an interval of 250 ns per step.
+  * @return     none.
+  */
+void rf_set_pa_ramp_step(rf_pa_ramp_step_e step_value);
+
+
+/**
+ * @brief       This function is used to set the tx power down delay.
+ * @param[in]   delay_time - the tx power down delay, range: 0~15 us.
+ * @return      none.
+ */
+void rf_set_tx_power_down_delay(unsigned char delay_time);
+
+/**
+ * @brief       This function is used to shorten the rx timing sequence.
+ * @param[in]   none.
+ * @return      none.
+ * @note        (1)This interface can shorten the 0.5us RX path delay time.
+ *              (2)When the received packet length is greater than the maximum packet length, receive the minimum number of packets.
+ */
+void rf_rx_timing_seq_shorten(void);
+
+
 #endif

@@ -60,11 +60,3 @@
 #elif(CHIP_TYPE == CHIP_TYPE_TL323X)
     #define MCU_CORE_TYPE   MCU_CORE_TL323X
 #endif
-
-#if (MCU_CORE_TYPE == MCU_CORE_TL322X) && defined(TLK_ONLY_BLE_HOST)
-    #define TLK_MESSAGE_D25F    1
-    #define TLK_MESSAGE_N22     0
-#else
-    #define TLK_MESSAGE_D25F    0
-    #define TLK_MESSAGE_N22     0
-#endif

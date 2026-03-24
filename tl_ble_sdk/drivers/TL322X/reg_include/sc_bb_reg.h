@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    sc_bb_reg.h
  *
- * @brief   This is the header file for TL7518
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
  * @date    2023

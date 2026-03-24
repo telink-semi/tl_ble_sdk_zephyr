@@ -54,7 +54,7 @@ _attribute_ram_code_sec_noinline_ void wd_32k_stop(void)
  */
 _attribute_ram_code_sec_noinline_ unsigned char wd_32k_get_status(void)
 {
-    return (analog_read_reg8(0x69) & 0x80);
+    return (analog_read_reg8(areg_aon_0x69) & FLD_32K_WD_OVERFLOW_STATUS);
 }
 
 /**
@@ -64,7 +64,7 @@ _attribute_ram_code_sec_noinline_ unsigned char wd_32k_get_status(void)
  */
 _attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void)
 {
-    analog_write_reg8(0x69, 0x80);
+    analog_write_reg8(areg_aon_0x69, FLD_32K_WD_OVERFLOW_STATUS);
 }
 
 /**
@@ -75,12 +75,8 @@ _attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void)
 _attribute_ram_code_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms)
 {
     unsigned int tmp_period_ms = 0;
-    // The processing of the A0 chip requires a right shift of 4 bits, so the minimum timing error of the 32k watchdog changes from 8ms to 128ms.
-    if (g_chip_version == CHIP_VERSION_A0) {
-        tmp_period_ms = (clock_get_32k_tick() + 32 * period_ms)>> 4;
-    }else{
-        tmp_period_ms = clock_get_32k_tick() + 32 * period_ms;
-    }
+    // The processing of the chip requires a right shift of 4 bits, so the minimum timing error of the 32k watchdog changes from 8ms to 128ms.
+    tmp_period_ms = (clock_get_32k_tick() + 32 * period_ms)>> 4;
 
     analog_write_reg8(0x7c, tmp_period_ms >> 24);
     analog_write_reg8(0x7b, tmp_period_ms >> 16);

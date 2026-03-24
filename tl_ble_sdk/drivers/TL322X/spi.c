@@ -891,6 +891,7 @@ void spi_set_dummy_cnt(spi_sel_e spi_sel, unsigned char dummy_cnt)
 void spi_set_transmode(spi_sel_e spi_sel, spi_tans_mode_e mode)
 {
     reg_spi_ctrl2(spi_sel)          = ((reg_spi_ctrl2(spi_sel) & (~FLD_SPI_TRANSMODE)) | ((mode & 0x0f) << 4));
+    reg_spi_slv_trans_mode(spi_sel) = ((reg_spi_slv_trans_mode(spi_sel) & (~FLD_SPI_SLV_TRANS_MODE)) | (mode & 0x0f));
 }
 
 
@@ -1710,8 +1711,6 @@ void spi_master_write_read_full_duplex(spi_sel_e spi_sel, unsigned char *write_d
         } else {
             spi_read(spi_sel, read_data + i - 1, chunk_size + 1);
         }
-        spi_rx_fifo_clr(spi_sel);
-        spi_tx_fifo_clr(spi_sel);
     }
 }
 
@@ -1915,12 +1914,4 @@ void spi_slave_tx_dma_chain_init(spi_sel_e spi_sel, dma_chn_e chn, unsigned char
     spi_set_slave_tx_dma_chain_llp(spi_sel, chn, dst_addr, data_len, &g_spi_tx_dma_list_cfg);
     spi_tx_dma_add_list_element(spi_sel, chn, &g_spi_tx_dma_list_cfg, &g_spi_tx_dma_list_cfg, (unsigned char *)(dst_addr), data_len);
     dma_chn_en(chn);
-}
-
-drv_api_status_e SPI_Status_Check(spi_sel_e spi_sel)
-{
-    if (SPI_WAIT(spi_txfifo_is_full, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)) {
-        return DRV_API_TIMEOUT;
-    }
-    return DRV_API_SUCCESS;
 }

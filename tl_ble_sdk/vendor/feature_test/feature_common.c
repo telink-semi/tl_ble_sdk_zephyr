@@ -60,11 +60,19 @@ _attribute_ram_code_ void blc_app_system_init(void)
     PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
 #elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
     sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
     wd_32k_stop();
     wd_stop();
     PLL_192M_D25F_48M_HCLK_N22_24M_PCLK_24M_MSPI_48M;
-    sys_n22_init(0x20080000);
+    pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_UP);
     rf_n22_dig_init();
+#elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
+    sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_192M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M;
 #endif
 }

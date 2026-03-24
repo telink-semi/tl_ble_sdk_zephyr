@@ -51,7 +51,7 @@
 #ifdef CFG_SIMU
 #define configMINIMAL_STACK_SIZE                ( 1024 )
 #else
-#define configMINIMAL_STACK_SIZE                ( 512 )
+#define configMINIMAL_STACK_SIZE                ( 256 )
 #endif
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_16_BIT_TICKS                  0
@@ -91,7 +91,7 @@
 #define configUSE_TIMERS                        1
 #define configTIMER_TASK_PRIORITY               ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH                5
-#ifndef configTIMER_TASK_STACK_DEPTH
+#ifndef  configTIMER_TASK_STACK_DEPTH
 #define configTIMER_TASK_STACK_DEPTH            ( configMINIMAL_STACK_SIZE * 2 )
 #endif
 

@@ -164,8 +164,9 @@ void blc_readFlashSize_autoConfigCustomFlashSector(void)
     }
 }
 
-#if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || \
-    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X)|| (MCU_CORE_TYPE == CHIP_TYPE_TL322X))
+#if (MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || \
+    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X)|| (MCU_CORE_TYPE == CHIP_TYPE_TL322X) || \
+    (MCU_CORE_TYPE == CHIP_TYPE_TL323X)
 /**
  * @brief      This function serves to update rf frequency offset.
  * @param[in]  velfrom - the calibration value from flash or otp.
@@ -299,27 +300,30 @@ unsigned char user_calib_adc_vref(user_calib_from_e velfrom, unsigned int addr)
  */
 void blc_app_loadCustomizedParameters_normal(void)
 {
-// Check if flash sector for calibration is valid
+    // Check if flash sector for calibration is valid
 #if  (MCU_CORE_TYPE == MCU_CORE_TL721X)
-   otp_calib_adc_vref();
+       otp_calib_adc_vref();
 #endif
 
 #if  (MCU_CORE_TYPE == MCU_CORE_TL321X)
-    efuse_calib_adc_vref();
+        efuse_calib_adc_vref();
 #endif
+
 #if (MCU_CORE_TYPE == MCU_CORE_TL322X)
     /******get sar adc calibration value from EFUSE********/
-    extern drv_api_status_e efuse_calib_sar_adc_vref(void);
     efuse_calib_sar_adc_vref();
+#endif
+
+#if (MCU_CORE_TYPE == MCU_CORE_TL322X || MCU_CORE_TYPE == MCU_CORE_TL323X)
     /******get sd_adc calibration value from EFUSE********/
     extern drv_api_status_e efuse_calib_sd_adc_vref(void);
     efuse_calib_sd_adc_vref();
 #endif
 
-    // Check if flash sector for calibration is valid
     if (flash_sector_calibration) {
 #if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || \
-    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X) || MCU_CORE_TYPE == MCU_CORE_TL322X)
+    (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL321X) || MCU_CORE_TYPE == MCU_CORE_TL322X) || \
+    (MCU_CORE_TYPE == MCU_CORE_TL323X)
         // Load RF frequency offset calibration
         user_calib_freq_offset(USER_CALIB_FROM_FLASH, (flash_sector_calibration + CALIB_OFFSET_CAP_INFO));
 #endif
@@ -331,6 +335,9 @@ void blc_app_loadCustomizedParameters_normal(void)
 #elif (MCU_CORE_TYPE == MCU_CORE_B92)
         // Load RF RX DCOC calibration
         user_calib_rf_rx_dcoc(USER_CALIB_FROM_FLASH, (flash_sector_calibration + CALIB_OFFSET_RF_RX_DCOC_CALI_VALUE));
+#endif
+#if (MCU_CORE_TYPE == MCU_CORE_TL323X)
+        pm_efuse_calib_vdd1v8_voltage();
 #endif
     }
 }
@@ -410,15 +417,7 @@ _attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8
             mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
             mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
 
-            if(flash_prot_op_cb){
-                flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_BEGIN, flash_addr, flash_addr + 6);
-            }
-
             flash_write_page(flash_addr, 6, mac_public); //store public address on flash for future use
-
-            if(flash_prot_op_cb){
-                flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_END, flash_addr, flash_addr + 6);
-            }
         }
     }
 
@@ -432,14 +431,6 @@ _attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8
         mac_random_static[3] = value_rand[3];
         mac_random_static[4] = value_rand[4];
 
-        if(flash_prot_op_cb){
-            flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_BEGIN, flash_addr + 6, flash_addr + 8);
-        }
-
         flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3)); //store random address on flash for future use
-
-        if(flash_prot_op_cb){
-            flash_prot_op_cb(FLASH_OP_EVT_APP_WRITE_MAC_ADDR_END, flash_addr + 6, flash_addr + 8);
-        }
     }
 }

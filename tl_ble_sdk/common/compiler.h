@@ -76,12 +76,12 @@
 #define _attribute_session_(s)               __attribute__((section(s)))
 
 #define _attribute_no_inline_                __attribute__((noinline))
+#define _attribute_noinline_                 __attribute__((noinline))        //
 #define _attribute_data_dlm_                 _attribute_session_(".dlm_data")   // dlm:Data Local Memory
 #define _attribute_data_sec_                 __attribute__((section(".data")))  // Force only read data to be stored in data segments to avoid compiler optimization
 
 #define _attribute_iram_noinit_data_         __attribute__((section(".iram_noinit_data")))
 #define _attribute_iram_bss_                 __attribute__((section(".iram_bss")))
-#define _attribute_iram_rbt_ret_data_        __attribute__((section(".iram_rbt_ret")))  // iram reboot retention data
 
 #if (BLC_PM_DEEP_RETENTION_MODE_EN)
     #define _attribute_data_retention_sec_   __attribute__((section(".retention_data")))

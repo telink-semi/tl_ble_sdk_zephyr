@@ -85,7 +85,6 @@ static inline unsigned char mailbox_get_irq_status_n22(void)
  */
 static inline void mailbox_clr_irq_status_d25f(void)
 {
-
     reg_mailbox_irq_status0 = BIT(0);
 }
 

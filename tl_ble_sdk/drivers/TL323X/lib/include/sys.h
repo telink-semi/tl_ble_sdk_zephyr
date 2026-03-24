@@ -197,10 +197,6 @@ typedef enum
 
 extern unsigned int g_chip_version;
 
-#ifdef BLC_ZEPHYR_BLE_INTEGRATION
-extern unsigned int g_chip_protection_code;
-#endif /* BLC_ZEPHYR_BLE_INTEGRATION, MATTER USED */
-
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/

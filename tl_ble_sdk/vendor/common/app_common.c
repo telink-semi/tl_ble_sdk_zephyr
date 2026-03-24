@@ -25,10 +25,6 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
-#if defined(TLK_ONLY_BLE_HOST)
-#include "stack/pm/pm_sys.h"
-#endif
-
 #if PM_DEEPSLEEP_RETENTION_ENABLE
 /**
  * @brief       this function is used to set deepsleep retention SRAM size for all application project.
@@ -56,15 +52,6 @@ void blc_app_setDeepsleepRetentionSramSize(void)
         ".option pop\n"
     );
     #endif
-    #if (MCU_CORE_TYPE == MCU_CORE_TL322X)      //todo-jk: deepRet size for Condor in not set automatically yet, because D25F should konw N22 usage.
-        #if defined(TLK_ONLY_BLE_HOST)          //todo-jk: design dual-core/single-core unified code.
-    if (1) {
-        blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW384K);
-        tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 348K\r\n");
-        return;
-    }
-        #endif
-    #endif //#if (MCU_CORE_TYPE == MCU_CORE_TL322X)
     if (deepret_size <= 0x8000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW32K);
         tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 32K\r\n");
@@ -92,7 +79,7 @@ void blc_app_setDeepsleepRetentionSramSize(void)
     #if (MCU_CORE_TYPE == MCU_CORE_TL323X)
     else if (deepret_size <= 0x28000) {
         blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW160K);
-        tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 128K\r\n");
+        tlkapi_printf(APP_LOG_COMMON_EN, "[APP][COMMON] deep retention size 160K\r\n");
     }
     #endif
 

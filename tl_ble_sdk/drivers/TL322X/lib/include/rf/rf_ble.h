@@ -156,5 +156,11 @@ _attribute_ram_code_sec_noinline_ void rf_start_brx(void *addr, unsigned int tic
  */
 _attribute_ram_code_sec_noinline_ void rf_start_btx(void *addr, unsigned int tick);
 
-
+/**
+ *@brief      This function is primarily used to set the threshold value for modem sync in BLE HP mode.
+ *@param[in]  byte_len   - Specify the synchronization word length to be set for the modem, measured in bytes.
+ *@return     none.
+ *@note       byte_len:range 0~6.
+ */
+void rf_ble_hp_set_modem_sync_byte_len(unsigned char byte_len);
 #endif

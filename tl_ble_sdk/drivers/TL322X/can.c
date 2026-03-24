@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    can.c
  *
- * @brief   This is the source file for TL322X
+ * @brief   This is the source file for tl322x
  *
  * @author  Driver Group
  * @date    2025

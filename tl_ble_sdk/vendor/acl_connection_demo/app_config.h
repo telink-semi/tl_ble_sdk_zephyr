@@ -33,10 +33,10 @@
 #define ACL_PERIPHR_SMP_ENABLE        1 //1 for smp,  0 no security
 #define ACL_CENTRAL_SMP_ENABLE        1 //1 for smp,  0 no security
 #define ACL_CENTRAL_SIMPLE_SDP_ENABLE 1 //simple service discovery for ACL central
-
 #define BLE_OTA_SERVER_ENABLE         1
 
 #define BLE_APP_PM_ENABLE             1
+
 #define BATT_CHECK_ENABLE             0
 
 

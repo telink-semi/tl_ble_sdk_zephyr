@@ -328,8 +328,6 @@
 ./tl_ble_sdk/drivers/TL321X/error_handler/error_handler.c			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL321X/error_handler/error_handler.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL321X/ext_driver/driver_ext.h			TELINK_APACHE 
-./tl_ble_sdk/drivers/TL321X/ext_driver/ext_adc.c			TELINK_APACHE 
-./tl_ble_sdk/drivers/TL321X/ext_driver/ext_adc.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL321X/ext_driver/ext_flash.c			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL321X/ext_driver/ext_flash.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL321X/ext_driver/ext_hci_uart.c			TELINK_APACHE 
@@ -513,7 +511,6 @@
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_flash.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_hci_uart.c			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_hci_uart.h			TELINK_APACHE 
-./tl_ble_sdk/drivers/TL322X/ext_driver/ext_mailbox.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_misc.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_pm.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/ext_driver/ext_uart.c			TELINK_APACHE 
@@ -670,6 +667,7 @@
 ./tl_ble_sdk/drivers/TL322X/reg_include/register.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/rf_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/rram_reg.h			TELINK_APACHE 
+./tl_ble_sdk/drivers/TL322X/reg_include/rz_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/sar_adc_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/sc_bb_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/sd_adc_reg.h			TELINK_APACHE 
@@ -683,6 +681,8 @@
 ./tl_ble_sdk/drivers/TL322X/reg_include/uart_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/usb0_reg.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/reg_include/usb1_reg.h			TELINK_APACHE 
+./tl_ble_sdk/drivers/TL322X/rz.c			TELINK_APACHE 
+./tl_ble_sdk/drivers/TL322X/rz.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/sd_adc.c			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/sd_adc.h			TELINK_APACHE 
 ./tl_ble_sdk/drivers/TL322X/spi.c			TELINK_APACHE 
@@ -1030,6 +1030,7 @@
 ./tl_ble_sdk/stack/2p4g/tpll/tpll.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/2p4g/version_detection/version_detection.h			TELINK_PROP 
 ./tl_ble_sdk/stack/ble/ble.h			TELINK_APACHE 
+./tl_ble_sdk/stack/ble/ble_ad_type.h			TELINK_PROP 
 ./tl_ble_sdk/stack/ble/ble_common.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/ble_format.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/controller/ble_controller.h			TELINK_APACHE 
@@ -1080,10 +1081,6 @@
 ./tl_ble_sdk/stack/ble/host/gatt/gatt.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/host/gatt/gattc.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/host/gatt/gatts.h			TELINK_APACHE 
-./tl_ble_sdk/stack/ble/host/hci/hci_simu_ll/hci_simu_ll_acl_conn.h			TELINK_PROP 
-./tl_ble_sdk/stack/ble/host/hci/hci_simu_ll/hci_simu_ll_api.h			TELINK_PROP 
-./tl_ble_sdk/stack/ble/host/hci/hci_simu_ll/hci_simu_ll_internal.h			TELINK_PROP 
-./tl_ble_sdk/stack/ble/host/hci/hci_simu_ll/hci_simu_ll_leg_adv.h			TELINK_PROP 
 ./tl_ble_sdk/stack/ble/host/host_comp.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/host/l2cap/l2cap.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/host/signaling/signaling.h			TELINK_APACHE 
@@ -1155,12 +1152,6 @@
 ./tl_ble_sdk/stack/ble/service/ota/ota.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/service/ota/ota_server.h			TELINK_APACHE 
 ./tl_ble_sdk/stack/ble/service/uuid.h			TELINK_APACHE 
-./tl_ble_sdk/stack/multicore_comm/port/mailbox.h			TELINK_APACHE 
-./tl_ble_sdk/stack/multicore_comm/port/sharememory.h			TELINK_APACHE 
-./tl_ble_sdk/stack/multicore_comm/service/mcc.h			TELINK_APACHE 
-./tl_ble_sdk/stack/multicore_comm/service/service_d25f.h			TELINK_APACHE 
-./tl_ble_sdk/stack/multicore_comm/service/service_n22.h			TELINK_APACHE 
-./tl_ble_sdk/stack/pm/pm_sys.h			TELINK_PROP 
 ./tl_ble_sdk/tl_common.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/2p4g_feature_test/2p4g_ota/app.c			TELINK_APACHE 
 ./tl_ble_sdk/vendor/2p4g_feature_test/2p4g_ota/app.h			TELINK_APACHE 
@@ -1246,6 +1237,7 @@
 ./tl_ble_sdk/vendor/common/boards/TL322X_C1T371A20.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/common/boards/TL322X_C1T382A20.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/common/boards/TL323X_C1T388A20.h			TELINK_APACHE 
+./tl_ble_sdk/vendor/common/boards/TL323X_C1T401A20.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/common/boards/TL721X_C1T315A20.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/common/boards/TL721X_ML7218A.h			TELINK_APACHE 
 ./tl_ble_sdk/vendor/common/boards/TL721X_ML7218D1.h			TELINK_APACHE 

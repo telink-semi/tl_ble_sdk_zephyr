@@ -31,19 +31,14 @@ typedef enum
 {
     STK_LOG_NONE = 0,
 
-    STK_LOG_LL_CMD       = BIT(1),
-    STK_LOG_ACL_DATA     = BIT(2),
-    STK_LOG_HCI          = BIT(3),
-    STK_LOG_BSTNOOP      = BIT(4),
+    STK_LOG_LL_CMD  = BIT(0),
+    STK_LOG_HCI_CMD = BIT(1),
+    STK_LOG_HCI_EVT = BIT(2),
 
-    STK_LOG_SMP          = BIT(5),
-    STK_LOG_ATT          = BIT(6),
-    STK_LOG_MAILBOX      = BIT(7),
-    STK_LOG_SHAREMEM     = BIT(8),
-    STK_LOG_HOST_COMMON  = BIT(9),
+    STK_LOG_ATT_RX = BIT(5),
+    STK_LOG_ATT_TX = BIT(6),
 
-    STK_LOG_SMP_LTK      = BIT(10),
-    STK_LOG_PM           = BIT(11),
+    STK_LOG_SMP_LTK = BIT(10),
 
     STK_LOG_OTA_FLOW = BIT(15),
     STK_LOG_OTA_DATA = BIT(16),

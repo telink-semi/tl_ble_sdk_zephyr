@@ -180,7 +180,6 @@ typedef enum
 
 } ble_sts_t;
 
-
 /**
  *  @brief  Definition for Error Response of ATTRIBUTE PROTOCOL PDUS
  *  See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
@@ -217,7 +216,6 @@ typedef enum
     ATT_ERR_OUT_OF_RANGE,                         //!< Out of Range
 
 } att_err_t;
-
 
 /**
  *  @brief  error code for user initialization error
@@ -377,13 +375,10 @@ typedef enum
 } att_pdu_type;
 
 /**
- * @brief   In Spec and HCI final pkt, HCI ACL DATA buffer length = LE_ACL_Data_Packet_Length + 4.
- *          pkt_len is integer multiple of 4, so result is 4 Byte align.
- *          See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
- *          However when dealing with RxFifo to HCI, Telink use a byte to PBFlag.
- *          So Telink Controller used 5 = 2(connHandle) + 1(PBFlag) + 2(length)
+ * @brief   HCI ACL DATA buffer length = LE_ACL_Data_Packet_Length + 4, pkt_len is integer multiple of 4, so result is 4 Byte align
+ *          4 = 2(connHandle) + 1(PBFlag) + 1(length)
  */
-#define CALCULATE_HCI_ACL_DATA_FIFO_SIZE(pkt_len) ((pkt_len + 5 + 3) / 4 * 4)
+#define CALCULATE_HCI_ACL_DATA_FIFO_SIZE(pkt_len) ((pkt_len + 4 + 3) / 4 * 4)
 
 
 /**
