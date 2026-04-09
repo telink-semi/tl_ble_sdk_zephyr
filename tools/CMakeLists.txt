@@ -218,3 +218,7 @@ if(CONFIG_BT_B9X OR CONFIG_BT_TLX)
 		${TL_BLE_SRC_DIR}/common/utility.c
 	)
 endif()
+
+if(CONFIG_SOC_RISCV_TELINK_TL322X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/keyscan.c)
+endif()
