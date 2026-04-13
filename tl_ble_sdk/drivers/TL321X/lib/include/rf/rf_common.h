@@ -101,7 +101,7 @@
  *              when this function turn on the time of rx_dly will shorten 6.3us,
  */
 #define RF_RX_SHORT_MODE_EN         1 //In order to debug whether the problem is caused by rx_dly.
-#ifndef RF_RX_DCOC_SOFTWARE_CAL_EN	//Zephyr use
+#ifndef RF_RX_DCOC_SOFTWARE_CAL_EN    //Zephyr use
     #define RF_RX_DCOC_SOFTWARE_CAL_EN  1 //BLE move the macro here.
 #endif
 
