@@ -191,6 +191,7 @@ void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
  * @param[in]   divider - selected scaling coefficient.(%25,%50,%75,%100)
  * @return      none.
  */
+
 void lpc_gpio_vol_detect_init(lpc_mode_e mode, lpc_input_channel_e pin, lpc_reference_e ref,lpc_scaling_e divider);
 /**
  * @brief       This function is used to initialize vbat low power detection.
@@ -199,3 +200,11 @@ void lpc_gpio_vol_detect_init(lpc_mode_e mode, lpc_input_channel_e pin, lpc_refe
  * @note        -# When using the bat low power detection feature, the reference voltage can ONLY be set to BG, and this feature CANNOT be used in sleep mode.
  */
 void lpc_vbat_vol_detect_init(lpc_vbat_threshold_vol_e thres_vol);
+
+/**
+ * @brief       This function is used to disable vbat low power detection.
+ * @param[in]   none.
+ * @return      none.
+ * @note        -# disable the vbat low power detection feature.
+ */
+void lpc_vbat_vol_detect_deinit(void);
