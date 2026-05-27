@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    efuse.h
  *
- * @brief   This is the header file for TL323X
+ * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
  * @date    2025
@@ -25,6 +25,7 @@
 #define EFUSE_H_
 
 #include "error_handler/error_handler.h"
+
 /**
 * @brief      This function servers to get chip id from EFUSE.
 * @param[in]  chip_id_buff - store chip id. Chip ID is 16 bytes.
@@ -33,6 +34,11 @@
 */
 drv_api_status_e efuse_get_chip_id(unsigned char *chip_id_buff);
 
+/**
+ * @brief      This function serves to read IEEE address from EFUSE.
+ * @param[out] buf  - Pointer to IEEE address buffer(IEEE address is 8bytes)
+ * @return     DRV_API_SUCCESS: operation successful.
+ *             DRV_API_TIMEOUT: operation timeout.
+ */
 drv_api_status_e efuse_get_ieee_addr(unsigned char *buf);
-
 #endif

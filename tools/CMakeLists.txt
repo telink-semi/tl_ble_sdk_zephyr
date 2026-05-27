@@ -16,13 +16,9 @@ zephyr_compile_definitions(
 	-DLL_FEATURE_SUPPORT_LE_DATA_LENGTH_EXTENSION=1
 	-DBLUETOOTH_VER=BLUETOOTH_VER_5_0
 	-DLL_FEATURE_SUPPORT_PRIVACY=1
-	-DCONTROLLER_GEN_P256KEY_ENABLE=1
-	-DCONN_MAX_NUM_CONFIG=CONN_MAX_NUM_C0_P1
 	-DOPTIMIZE_RAM_FOR_MATTER=1
 	-DLL_FEATURE_SUPPORT_LOCAL_RPA=0
 	-DLL_FEATURE_SUPPORT_PHY_TEST_MODE=0
-	-DLL_FEATURE_SUPPORT_LE_ENCRYPTION=1
-	-DLL_FEATURE_SUPPORT_LE_LEGACY_SCANNING=0
 	-DLL_FEATURE_SUPPORT_EXTENDED_SCANNER_FILTER_POLICIES=0
 	-DLL_FEATURE_SUPPORT_LE_2M_PHY=1
 	-DLL_FEATURE_SUPPORT_LE_CODED_PHY=0
@@ -31,7 +27,6 @@ zephyr_compile_definitions(
 	-DLL_FEATURE_SUPPORT_CHANNEL_SELECTION_ALGORITHM2=1
 	-DLL_FEATURE_SUPPORT_MIN_USED_OF_USED_CHANNELS=0
 	-DLL_FEATURE_SUPPORT_LE_EXTENDED_SCANNING=0
-	-DLL_FEATURE_SUPPORT_LE_EXTENDED_INITIATE=0
 	-DLL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING_SYNC=0
 	-DLL_FEATURE_SUPPORT_SYNCHRONIZED_RECEIVER=0
 	-DTIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM=0
@@ -49,6 +44,24 @@ zephyr_compile_definitions(
 	#used for short connection application, for example, 7.5ms keyboard/mouse
 	-DBLC_ZEPHYR_BLE_INTEGRATION_SHORT_CONNECTION_APPLICATION=0
 )
+
+if(CONFIG_BT_CENTRAL)
+	zephyr_compile_definitions(
+		-DCONTROLLER_GEN_P256KEY_ENABLE=1
+		-DCONN_MAX_NUM_CONFIG=CONN_MAX_NUM_C1_P1
+		-DLL_FEATURE_SUPPORT_LE_ENCRYPTION=1
+		-DLL_FEATURE_SUPPORT_LE_LEGACY_SCANNING=1
+		-DLL_FEATURE_SUPPORT_LE_EXTENDED_INITIATE=1
+	)
+else()
+	zephyr_compile_definitions(
+		-DCONTROLLER_GEN_P256KEY_ENABLE=0
+		-DCONN_MAX_NUM_CONFIG=CONN_MAX_NUM_C0_P1
+		-DLL_FEATURE_SUPPORT_LE_ENCRYPTION=0
+		-DLL_FEATURE_SUPPORT_LE_LEGACY_SCANNING=0
+		-DLL_FEATURE_SUPPORT_LE_EXTENDED_INITIATE=0
+	)
+endif()
 
 if(CONFIG_PM)
 	if(CONFIG_SOC_RISCV_TELINK_TLX_RETENTION)
@@ -112,6 +125,7 @@ zephyr_include_directories(
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/reg_include
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver
 	${TL_BLE_SRC_DIR}/stack/ble/hal/hal_${SOC}
+	${TL_BLE_SRC_DIR}/stack/system
 	${TL_BLE_SRC_DIR}/common
 	${TL_BLE_SRC_DIR}/vendor/common
 )
@@ -142,83 +156,13 @@ if(NOT CONFIG_SOC_RISCV_TELINK_B91)
 	endif()
 endif()
 
-if(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX))
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/clock.c)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/analog.c)
-endif()
-
-if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B9X)
-	zephyr_sources(
-		${TL_BLE_SRC_DIR}/drivers/${SOC}/flash.c
-		${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c
-	)
-endif()
-
-# if(CONFIG_SOC_FLASH_TELINK_TLX OR CONFIG_USB_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/flash.c)
-# endif()
-
-if(CONFIG_GPIO_TELINK_B9X OR CONFIG_GPIO_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-endif()
-
-if(CONFIG_UART_TELINK_B9X OR CONFIG_UART_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/uart.c)
-endif()
-
-if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/pwm.c)
-endif()
-
-if(CONFIG_SPI_TELINK_B9X OR CONFIG_SPI_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-endif()
-
-if(CONFIG_I2C_TELINK_B9X OR CONFIG_I2C_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/i2c.c)
-endif()
-
-if(CONFIG_BT OR CONFIG_IEEE802154)
-	if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
-	endif()
-	if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
-	endif()
-endif()
-
-if(CONFIG_ADC_TELINK_B9X OR CONFIG_ADC_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TL321X)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/adc.c)
-endif()
-
-if(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_ADC_TELINK_TL323X)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/sd_adc.c)
-endif()
-
-if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-	if(CONFIG_SOC_RISCV_TELINK_TL322X)
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb0hw.c)
-	elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
-		message(STATUS "no usbhw module for TELINK_TL323X")
-	else()
-		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
-	endif()
-endif()
-
-if(CONFIG_PM)
-	zephyr_sources_ifdef(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
-		${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c
-	)
-endif()
+file(GLOB DRIVER_SOURCES
+	${TL_BLE_SRC_DIR}/drivers/${SOC}/*.c
+)
+zephyr_sources(${DRIVER_SOURCES})
 
 if(CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	zephyr_sources(
 		${TL_BLE_SRC_DIR}/common/utility.c
 	)
-endif()
-
-if(CONFIG_SOC_RISCV_TELINK_TL322X)
-	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/keyscan.c)
 endif()
