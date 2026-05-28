@@ -156,13 +156,83 @@ if(NOT CONFIG_SOC_RISCV_TELINK_B91)
 	endif()
 endif()
 
-file(GLOB DRIVER_SOURCES
-	${TL_BLE_SRC_DIR}/drivers/${SOC}/*.c
-)
-zephyr_sources(${DRIVER_SOURCES})
+if(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX))
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/clock.c)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/analog.c)
+endif()
+
+if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B9X)
+	zephyr_sources(
+		${TL_BLE_SRC_DIR}/drivers/${SOC}/flash.c
+		${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c
+	)
+endif()
+
+# if(CONFIG_SOC_FLASH_TELINK_TLX OR CONFIG_USB_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/flash.c)
+# endif()
+
+if(CONFIG_GPIO_TELINK_B9X OR CONFIG_GPIO_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
+endif()
+
+if(CONFIG_UART_TELINK_B9X OR CONFIG_UART_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/uart.c)
+endif()
+
+if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/pwm.c)
+endif()
+
+if(CONFIG_SPI_TELINK_B9X OR CONFIG_SPI_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
+endif()
+
+if(CONFIG_I2C_TELINK_B9X OR CONFIG_I2C_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/i2c.c)
+endif()
+
+if(CONFIG_BT OR CONFIG_IEEE802154)
+	if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
+	endif()
+	if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c)
+	endif()
+endif()
+
+if(CONFIG_ADC_TELINK_B9X OR CONFIG_ADC_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TL321X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/adc.c)
+endif()
+
+if(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_ADC_TELINK_TL323X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/sd_adc.c)
+endif()
+
+if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
+	if(CONFIG_SOC_RISCV_TELINK_TL322X)
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb0hw.c)
+	elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
+		message(STATUS "no usbhw module for TELINK_TL323X")
+	else()
+		zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+	endif()
+endif()
+
+if(CONFIG_PM)
+	zephyr_sources_ifdef(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+		${TL_BLE_SRC_DIR}/drivers/${SOC}/stimer.c
+	)
+endif()
 
 if(CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	zephyr_sources(
 		${TL_BLE_SRC_DIR}/common/utility.c
 	)
+endif()
+
+if(CONFIG_SOC_RISCV_TELINK_TL322X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/keyscan.c)
 endif()
