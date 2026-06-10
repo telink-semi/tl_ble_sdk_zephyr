@@ -166,6 +166,9 @@ void gpio_ds_dis(gpio_pin_e pin)
  * @param[in]  pin  - select the specified GPIO.
  * @return     none.
  */
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+    _attribute_ram_code_sec_noinline_ /* ble used */
+#endif
 void gpio_shutdown(gpio_pin_e pin)
 {
     unsigned short group = pin & 0xf00;
