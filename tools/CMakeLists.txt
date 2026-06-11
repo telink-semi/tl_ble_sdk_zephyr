@@ -196,6 +196,10 @@ if(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_ADC_TELINK_TL323X)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/sd_adc.c)
 endif()
 
+if(CONFIG_SOC_RISCV_TELINK_TL721X)
+	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/adc.c)
+endif()
+
 if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
 	zephyr_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
 	if(CONFIG_SOC_RISCV_TELINK_TL322X)
