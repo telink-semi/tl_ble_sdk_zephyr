@@ -72,7 +72,6 @@
  * @param[out] buf  - Pointer to IEEE address buffer(IEEE address is 8bytes)
  * @return     none
  */
-extern void otp_get_ieee_addr(unsigned char *buf);
 
  static inline bool get_device_mac_address(u8* mac_read, int length)
  {

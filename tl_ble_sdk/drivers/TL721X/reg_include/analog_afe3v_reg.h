@@ -63,8 +63,7 @@ enum
 
 enum
 {
-    FLD_PD_BBPLL_LDO = BIT(0),      //power down bbpll LDO
-                                    //LDO:260uA, DCDC:100uA
+    FLD_PD_BBPLL_LDO      = BIT(0), //power down bbpll LDO  LDO:260uA, DCDC:100uA
     FLD_PD_LC_COMP_3V     = BIT(1), //power down of low current comparator
     FLD_PD_TEMP_SENSOR_3V = BIT(2), //power down of temp sensor
     FLD_PD_VBAT_SW        = BIT(3), //power down of bypass switch(VBAT LDO)
@@ -136,6 +135,7 @@ typedef enum
     XTAL_UNSTABLE            = 0x01,
     PM_CLR_PLIC_REQUEST_FAIL = 0x02,
     WAIT_TIMEOUT             = 0x03,
+    PLL_DONE                 = 0x04,
 } pm_sw_reboot_reason_e;
 
 #define areg_aon_0x3d 0x3d

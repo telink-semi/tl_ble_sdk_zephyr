@@ -44,7 +44,10 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-/**
+
+#define SPECIAL_APPLICATION 0
+
+ /**
  * @brief instruction delay
  */
 
@@ -123,7 +126,6 @@
     CLOCK_DLY_10_CYC;    \
     CLOCK_DLY_4_CYC
 
-#define ADC_ANTI_AGING_MODE                1
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/
@@ -205,7 +207,11 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+_attribute_text_sec_ void protected_sys_reboot(void);
+#else
 _attribute_text_sec_ void sys_reboot(void);
+#endif
 
 /**
  * @brief      This function reboot mcu.
