@@ -467,3 +467,55 @@ _attribute_ram_code_sec_noinline_ void pm_set_vdd0p94(pm_cal_0p94v_e value);
  * @return      none.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en);
+
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+/**
+ * @brief trim dig ldo
+ * 
+ */
+typedef enum
+{
+    DIG_LDO_TRIM_0P550V = 0,
+    DIG_LDO_TRIM_0P575V,
+    DIG_LDO_TRIM_0P600V,
+    DIG_LDO_TRIM_0P625V,
+    DIG_LDO_TRIM_0P650V,
+    DIG_LDO_TRIM_0P675V,
+    DIG_LDO_TRIM_0P700V,
+    DIG_LDO_TRIM_0P725V,
+    DIG_LDO_TRIM_0P750V,
+    DIG_LDO_TRIM_0P775V,
+    DIG_LDO_TRIM_0P800V,
+    DIG_LDO_TRIM_0P825V,
+    DIG_LDO_TRIM_0P850V,
+    DIG_LDO_TRIM_0P875V,
+    DIG_LDO_TRIM_0P900V,
+    DIG_LDO_TRIM_0P925V,
+} pm_dig_ldo_trim_e;
+static _always_inline void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim)
+{
+    analog_write_reg8(areg_aon_0x0f, (analog_read_reg8(areg_aon_0x0f) & 0x0f) | (dig_ldo_trim << 4));
+}
+
+/**
+ * @brief trim deep retention LDO
+ *
+ */
+typedef enum
+{
+    RET_LDO_TRIM_0P55V = 0,
+    RET_LDO_TRIM_0P60V, //0.589V
+    RET_LDO_TRIM_0P65V,
+    RET_LDO_TRIM_0P70V,
+    RET_LDO_TRIM_0P75V,
+    RET_LDO_TRIM_0P80V,
+    RET_LDO_TRIM_0P85V,
+    RET_LDO_TRIM_0P90V,
+} pm_ret_ldo_trim_e;
+
+static _always_inline void pm_set_ret_ldo_voltage(pm_ret_ldo_trim_e ret_ldo_trim)
+{
+    analog_write_reg8(areg_aon_0x0f, (analog_read_reg8(areg_aon_0x0f) & 0xf8) | ret_ldo_trim);
+}
+
+#endif /* BLC_ZEPHYR_BLE_INTEGRATION */
