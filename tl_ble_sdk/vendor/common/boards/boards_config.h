@@ -71,3 +71,9 @@
 #ifndef BOARD_323X_EVK_C1T401A20
     #define BOARD_323X_EVK_C1T401A20   0x401A20
 #endif
+
+#ifndef BOARD_521X_EVK_C1T416A20
+    #define BOARD_521X_EVK_C1T416A20   0x416A20
+#endif
+
+//Remove when file merge to SDK //

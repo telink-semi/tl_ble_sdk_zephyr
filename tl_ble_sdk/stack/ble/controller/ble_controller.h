@@ -35,7 +35,11 @@
 #include "stack/ble/hci/hci_event.h"
 
 #include "stack/ble/controller/ll/ll.h"
+
+#if !defined(TLK_ONLY_BLE_HOST)
 #include "stack/ble/controller/ll/ll_pm.h"
+#endif
+
 
 #include "stack/ble/controller/ll/fsu/ll_fsu.h"
 #include "stack/ble/controller/ll/acl_conn/acl_conn.h"

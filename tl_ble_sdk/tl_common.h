@@ -41,7 +41,6 @@
 #include "vendor/common/user_config.h"
 #include "vendor/common/app_common.h"
 #include "vendor/common/ble_flash.h"
-#include "vendor/common/blt_fw_sign.h"
 #include "vendor/common/blt_led.h"
 #include "vendor/common/blt_soft_timer.h"
 #include "vendor/common/device_manage.h"
@@ -52,7 +51,11 @@
 #include "vendor/common/battery_check.h"
 #include "gpio_default.h"
 
-#include "application/keyboard/keyboard.h"
+#if MCU_CORE_TYPE != MCU_CORE_TL323X
+#include "application/app/usbkb.h"
+#include "application/app/usbmouse.h"
+#endif
 #include "application/usbstd/usbkeycode.h"
+#include "application/keyboard/keyboard.h"
 
 #endif /* TL_COMMON_H_ */

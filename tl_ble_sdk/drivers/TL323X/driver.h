@@ -53,6 +53,7 @@
 #include "lib/include/mspi.h"
 #include "plic_sw.h"
 #include "plmt.h"
+#include "pem.h"
 #include "flash/flash_type.h"
 #include "flash/flash_common.h"
 #include "sd_adc.h"

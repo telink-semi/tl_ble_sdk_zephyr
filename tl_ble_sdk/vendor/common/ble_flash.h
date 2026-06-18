@@ -96,11 +96,6 @@
     #define FLASH_ADR_SMP_PAIRING_2M_FLASH 0x1EC000 //1EC000 & 1ED000 & 1EE000 & 1EF000
 #endif
 
-/* SMP pairing and key information area */
-#ifndef FLASH_ADR_SMP_PAIRING_2M_FLASH
-    #define FLASH_ADR_SMP_PAIRING_2M_FLASH 0x1EC000 //1EC000 & 1ED000 & 1EE000 & 1EF000
-#endif
-
 /* for ACL Central simple SDP: bonding ACL Peripheral GATT service critical information area */
 #ifndef FLASH_SDP_ATT_ADDRESS_2M_FLASH
     #define FLASH_SDP_ATT_ADDRESS_2M_FLASH 0x1EA000 //1EA000 & 1EB000
@@ -166,6 +161,18 @@
 #define CALIB_OFFSET_CALI_TABLE_PACKET_1M_INFO 0x3a2
 
 #define CALIB_OFFSET_CALI_TABLE_PACKET_2M_INFO 0x3f1
+
+#ifdef MCU_STARTUP_FLASH
+    #define MCU_RUN_IN_FLASH          1
+#else
+    #define MCU_RUN_IN_FLASH          0
+#endif
+
+#ifdef MCU_STARTUP_NVM
+    #define MCU_RUN_IN_NVM            1
+#else
+    #define MCU_RUN_IN_NVM            0
+#endif
 
 /**
  * @brief       This function can automatically recognize the flash size,

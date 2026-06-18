@@ -326,6 +326,8 @@
        #define BOARD_SELECT BOARD_322X_EVK_C1T371A20
     #elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
         #define BOARD_SELECT BOARD_323X_EVK_C1T388A20
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
+        #define BOARD_SELECT BOARD_521X_EVK_C1T416A20
     #else
         #error "SDK do not support this MCU!"
     #endif
@@ -365,6 +367,8 @@
     #include "boards/TL321X_C1T335A78.h"
 #elif (BOARD_SELECT == BOARD_322X_EVK_C1T382A20)
     #include "boards/TL322X_C1T382A20.h"
+#elif (BOARD_SELECT == BOARD_521X_EVK_C1T416A20)
+    #include "boards/TL521X_C1T416A20.h"
 #elif (BOARD_SELECT == BOARD_721X_EVK_C1T315A20)
     #include "boards/TL721X_C1T315A20.h"
 #elif (BOARD_SELECT == BOARD_721X_AIOT_DK1_ML7218D1)
