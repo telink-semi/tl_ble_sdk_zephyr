@@ -1,6 +1,7 @@
 stages:
   - checktab
   - scc
+  - cmake_builds
   - checkLicense
   - build_TelinkIoTStudio
   - build_Andes
@@ -68,6 +69,29 @@ checkLicense:
     - "unknow_type_file.txt"
   when: always
 
+cmake_builds:
+  stage: cmake_builds
+  tags:
+    - TELINKIDE_LINUX
+  before_script:
+  script:
+    - cmake --version
+    - echo ${TL32_ELF_MCULIB_V5F_GCC12_2}
+    - echo ${TL32_ELF_MCULIB_V5_GCC12_2}
+    - echo ${TL32_ELF_MCULIB_V5F_GCC10_3}
+    - echo ${TL32_ELF_MCULIB_V5F_GCC7_4}
+    - echo ${TC32_GCC_Toolchain}
+
+    - run_cmake.sh TL_BLE_SDK_B91 all
+    - run_cmake.sh TL_BLE_SDK_B92 all
+    - run_cmake.sh TL_BLE_SDK_321X all
+    - run_cmake.sh TL_BLE_SDK_322X all
+    - run_cmake.sh TL_BLE_SDK_721X all
+  artifacts:
+    paths:
+    - "**/cmake_builds/**/*.bin"
+    - "**/cmake_builds/**/*.elf"
+
 
 build_TelinkIoTStudio:
   variables:
@@ -95,7 +119,7 @@ build_TelinkIoTStudio:
     paths:
     - "tl_ble_sdk/build/TL721X/**/*.lst"
     - "tl_ble_sdk/build/TL721X/**/*.bin"
-  when: always
+  when: manual
   
   variables:
     ECLIPSE_PROJECT_PATH: './tl_ble_sdk/build/TL321X'
@@ -122,7 +146,7 @@ build_TelinkIoTStudio:
     paths:
     - "tl_ble_sdk/build/TL321X/**/*.lst"
     - "tl_ble_sdk/build/TL321X/**/*.bin"
-  when: always
+  when: manual
  
 
 build_Andes:

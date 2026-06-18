@@ -361,6 +361,8 @@
     #include "boards/TL321X_C1T331A20.h"
 #elif (BOARD_SELECT == BOARD_321X_EVK_C1T335A20)
     #include "boards/TL321X_C1T335A20.h"
+#elif (BOARD_SELECT == BOARD_321X_EVK_C1T335A78)
+    #include "boards/TL321X_C1T335A78.h"
 #elif (BOARD_SELECT == BOARD_322X_EVK_C1T382A20)
     #include "boards/TL322X_C1T382A20.h"
 #elif (BOARD_SELECT == BOARD_721X_EVK_C1T315A20)
@@ -374,6 +376,8 @@
     #include "boards/TL322X_C1T371A20.h"
 #elif (BOARD_SELECT == BOARD_323X_EVK_C1T388A20)
      #include "boards/TL323X_C1T388A20.h"
+#elif (BOARD_SELECT == BOARD_323X_EVK_C1T401A20)
+     #include "boards/TL323X_C1T401A20.h"
 #endif
 
 

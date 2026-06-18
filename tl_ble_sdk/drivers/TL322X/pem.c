@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    pem.c
  *
- * @brief   This is the source file for TL721X
+ * @brief   This is the source file for tl322x
  *
  * @author  Driver Group
  * @date    2024
@@ -43,7 +43,7 @@ void pem_init(void)
  */
 void pem_event_config(pem_chn_e chn, pem_event_config_t pem_event_config)
 {
-    reg_pem_ctr(chn) = (reg_pem_ctr(chn) & (~(FLD_PEM_EVENT_MODULE_SEL | FLD_PEM_EVENT_SIG_SEL | FLD_PEM_EVENT_CLK_SEL | FLD_PEM_EVENT_CHANGE_LVL_TO_EDGE_SEL | FLD_PEM_EVENT_LVL))) | (*(unsigned int *)&pem_event_config);
+    reg_pem_ctr(chn) = (reg_pem_ctr(chn) & (~(FLD_PEM_EVENT_MODULE_SEL | FLD_PEM_EVENT_SIG_SEL | FLD_PEM_EVENT_CLK_SEL | FLD_PEM_BOTH_EDGE_DETECT | FLD_PEM_INV | FLD_PEM_EVENT_LVL))) | (*(unsigned int *)&pem_event_config);
 }
 
 /**

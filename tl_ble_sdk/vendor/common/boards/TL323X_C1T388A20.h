@@ -21,8 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_
-#define VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_
+#ifndef VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_
+#define VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_
 
 /**
  *  @brief  Antenna Switch Configuration
@@ -203,4 +203,4 @@
 
 #define TLKAPI_DEBUG_GPIO_PIN GPIO_PA0
 
-#endif /* VENDOR_COMMON_BOARDS_TL323X_C1T88A20_H_ */
+#endif /* VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_ */

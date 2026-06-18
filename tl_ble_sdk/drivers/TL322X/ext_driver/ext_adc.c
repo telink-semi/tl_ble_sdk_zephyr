@@ -40,7 +40,9 @@ sd_adc_gpio_cfg_t sd_adc_gpio_cfg =
     .chn                = SD_ADC_DC0,
     .clk_freq           = SD_ADC_SAPMPLE_CLK_2M,  // Note: "SAPMPLE" may be a typo for "SAMPLE"
     .downsample_rate    = SD_ADC_DOWNSAMPLE_RATE_128,
-    .gpio_div           = SD_ADC_GPIO_CHN_DIV_1F4
+    .gpio_div           = SD_ADC_GPIO_CHN_DIV_1F4,
+    .input_p            = SD_ADC_GPIO_PC0P,
+    .input_n            = SD_ADC_GNDN
 };
 
 /**
@@ -107,7 +109,7 @@ hal_adc_status_e ext_adc_init(const hal_adc_cfg_t *adc_cfg) {
     switch (adc_cfg->adc_mode) {
         case HAL_ADC_MODE_GPIO: {
             // GPIO mode: Reuse legacy GPIO config (replaceable with s_adc_common_cfg for consistency)
-            sd_adc_gpio_sample_init( &sd_adc_gpio_cfg,&sd_adc_dc0_pin_cfg, NULL);
+            sd_adc_gpio_sample_init( &sd_adc_gpio_cfg);
             break;
         }
         case HAL_ADC_MODE_VBAT: {
@@ -191,7 +193,8 @@ signed int ext_adc_read_data(void) {
     signed int code_average = 0;  // Average of sorted sampling codes (eliminates outliers)
     signed int sd_adc_result = 0; // Final processed result
 
-#if (SAMPLE_MODE == EXT_NDMA_POLLING_MODE)
+//#if (SAMPLE_MODE == EXT_NDMA_POLLING_MODE)
+#if 1
     // Polling mode: Read data from ADC FIFO until buffer is full
     int cnt = 0;
     while (cnt < SD_ADC_SAMPLE_CNT) {

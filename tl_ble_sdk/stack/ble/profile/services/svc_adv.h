@@ -47,3 +47,4 @@ bool blc_adv_getCsipRSI(u8 *advData, u16 len, u8 rsi[6]);
 u8 *blc_adv_getManufacturerDataInformationByCompanyId(u8 *advData, u16 len, u16 companyId, u8 *outLen);
 
 bool blc_adv_get16BitServiceUuid(u8 *advData, u16 len, u16 uuid);
+

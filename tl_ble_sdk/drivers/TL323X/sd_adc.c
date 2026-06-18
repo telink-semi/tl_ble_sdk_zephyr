@@ -173,7 +173,6 @@ void sd_adc_set_vbat_2v2_calib_vref(signed int gain_a, signed int gain_b, signed
     vbat_gain_b = (double)gain_b/10000;
     vbat_offset_c = (double)offset_c/10000;
 }
-
 /**
  * @brief This function is used to store the voltage values of four voltage points recorded by ATE, without undergoing calibration and calculation.
  * @param[in] vol2v2 - the voltage value of 2.200V.
@@ -193,7 +192,6 @@ void sd_adc_set_vbat_4p_calib_vref(signed short vol2v2, signed short vol2v225, s
     g_sd_adc_4p_gain.vbat_2v225_to_2v25_gain = (double)SD_ADC_VBAT_4P_250MV_INTERVAL / (g_sd_adc_4p_voltage.vbat_2v25_vol_10000x - g_sd_adc_4p_voltage.vbat_2v225_vol_10000x);
     g_sd_adc_4p_gain.vbat_2v25_to_2v275_gain = (double)SD_ADC_VBAT_4P_250MV_INTERVAL / (g_sd_adc_4p_voltage.vbat_2v275_vol_10000x - g_sd_adc_4p_voltage.vbat_2v25_vol_10000x);
 }
-
 /**
  * @brief     This function servers to set the sample mode.
  * @param[in] mode -sd_adc_mux_mode_e
@@ -552,7 +550,6 @@ void sd_adc_temp_init(unsigned char clk_freq, sd_adc_downsample_rate_e downsampl
     sd_adc_set_downsample_rate(downsample_rate);
     sd_adc_temp_sensor_power_on();
 }
-
 /**
  * @brief       This function performs linear calibration for SD_ADC voltage conversion.
  * @param[in]   adc_vol    - Raw ADC voltage value (in 10x mV units internally).
@@ -598,7 +595,6 @@ static signed int sd_adc_vbat_4p_calib(signed int adc_vol, sd_adc_result_type_e 
         return 0;
     }
 }
-
 /**
  * @brief       This function performs second-order curve calibration for low-voltage SD_ADC conversion (typically 2.0V ~ 2.2V).
  * @param[in]   adc_vol    - Raw ADC voltage value (in 10x mV units).
@@ -619,7 +615,6 @@ static signed int sd_adc_vbat_curve_calib(signed int adc_vol,sd_adc_result_type_
     }
     return vol_result;
 }
-
 /**
  * @brief       This function converts the raw SD_ADC sample code to a calibrated voltage value,
  *              selecting the appropriate calibration method based on chip version, mode, and calibration flags.
@@ -670,7 +665,6 @@ signed int sd_adc_calculate_voltage(signed int sd_adc_code,sd_adc_result_type_e 
         }
     }
 }
-
 /**
  * @brief       This function is used to convert SD_ADC sample code to celsius value.
  * @param[in]   sd_adc_code    - the adc sample code.

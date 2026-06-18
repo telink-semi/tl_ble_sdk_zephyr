@@ -423,11 +423,16 @@ void gpio_shutdown(gpio_pin_e pin)
 void gpio_set_irq(gpio_irq_num_e irq, gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 {
     /*
-        When selecting pull-up resistance and rising edge to trigger gpio interrupt, gpio_irq_en should be placed before setting gpio_set_irq,
-        otherwise an interrupt will be triggered by mistake.
+     * Incorrect sequence during GPIO interrupt configuration often leads to spurious interrupts. 
+     * The configuration must strictly follow the following sequence (jira DRIV-4162):
+     * Enable irq first (before setting Polarity)  
+     * Set irq config
+     * Finally, clear the interrupt status flag 
      */
     gpio_irq_en(pin, irq);
-    gpio_clr_irq_status((gpio_irq_e)BIT(irq)); //must clear cause to unexpected interrupt.
+    if (irq == GPIO_IRQ0) {
+        reg_gpio_irq_ctrl |= FLD_GPIO_CORE_INTERRUPT_EN; //Only GPIO_IRQ0 needs to enable FLD_GPIO_CORE_INTERRUPT_EN.
+    }
     switch (trigger_type) {
     case INTR_RISING_EDGE:
         BM_CLR(reg_gpio_pol(pin), pin & 0xff);
@@ -446,9 +451,8 @@ void gpio_set_irq(gpio_irq_num_e irq, gpio_pin_e pin, gpio_irq_trigger_type_e tr
         BM_SET(reg_gpio_irq_level, BIT(irq));
         break;
     }
-    if (irq == GPIO_IRQ0) {
-        reg_gpio_irq_ctrl |= FLD_GPIO_CORE_INTERRUPT_EN; //Only GPIO_IRQ0 needs to enable FLD_GPIO_CORE_INTERRUPT_EN.
-    }
+    gpio_clr_irq_status((gpio_irq_e)BIT(irq));
+
 }
 
 /**
@@ -540,7 +544,6 @@ void gpio_set_pem_event(pem_chn_e chn, gpio_pin_e pin)
     gpio_pem_event_config.sig_sel = GPIO_BIT_POSITION(bit);
     pem_event_config(chn, gpio_pem_event_config);
 }
-
 /**
  * @brief     This function set jtag or sdp function.
  * @param[in] pin
@@ -549,7 +552,7 @@ void gpio_set_pem_event(pem_chn_e chn, gpio_pin_e pin)
 void jtag_sdp_set_pin(gpio_pin_e pin)
 {
     gpio_input_en(pin);
-    reg_gpio_func_mux(pin) = 0;
+    gpio_set_mux_function((gpio_func_pin_e)pin, 41);
     gpio_function_dis(pin);
 }
 
@@ -563,6 +566,21 @@ void jtag_set_pin_en(void)
     jtag_sdp_set_pin(GPIO_PD4); //TDI
     gpio_set_up_down_res(GPIO_PD4, GPIO_PIN_PULLDOWN_100K);
     jtag_sdp_set_pin(GPIO_PD5); //TDO
+    jtag_sdp_set_pin(GPIO_PD6); //TMS
+    gpio_set_up_down_res(GPIO_PD6, GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PD7); //TCK
+    gpio_set_up_down_res(GPIO_PD7, GPIO_PIN_PULLUP_10K);
+}
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin . where, PD[6]; PD[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag,
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void sdp_set_pin_en(void)
+{
     jtag_sdp_set_pin(GPIO_PD6); //TMS
     gpio_set_up_down_res(GPIO_PD6, GPIO_PIN_PULLUP_10K);
     jtag_sdp_set_pin(GPIO_PD7); //TCK

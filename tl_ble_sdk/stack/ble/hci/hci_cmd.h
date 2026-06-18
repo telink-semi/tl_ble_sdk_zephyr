@@ -762,12 +762,6 @@ typedef enum
 
 typedef enum
 {
-    LE_PHY_CODING_SEL_S8 = 0x03,
-    LE_PHY_CODING_SEL_S2 = 0x04,
-} le_phy_coding_selection_type_t;
-
-typedef enum
-{
     HOST_NO_PREFER_REQUIRE_CODED_PHY,
     HOST_PREFER_S2_CODED_PHY,  //prefer
     HOST_PREFER_S8_CODED_PHY,
@@ -849,7 +843,7 @@ typedef enum
 } le_phy_option_prefer_t;
 
 /**
- *  @brief  Command Parameters for "7.8.53 LE Set Extended Advertising Parameters command" [v1]
+ *  @brief  Command Parameters for "7.8.53 LE Set Extended Advertising Parameters command"
  */
 typedef struct __attribute__((packed))
 {
@@ -869,30 +863,6 @@ typedef struct __attribute__((packed))
     u8  adv_sid;
     u8  scan_req_notify_en;
 } hci_le_setExtAdvParam_cmdParam_t;
-
-/**
- *  @brief  Command Parameters for "7.8.53 LE Set Extended Advertising Parameters command" [v2]
- */
-typedef struct __attribute__((packed))
-{
-    u8  adv_handle;
-    u16 advEvt_props;
-    u8  pri_advIntMin[3];
-    u8  pri_advIntMax[3];
-    u8  pri_advChnMap;
-    u8  ownAddrType;
-    u8  peerAddrType;
-    u8  peerAddr[6];
-    u8  advFilterPolicy;
-    u8  adv_tx_pow;
-    u8  pri_adv_phy;
-    u8  sec_adv_max_skip;
-    u8  sec_adv_phy;
-    u8  adv_sid;
-    u8  scan_req_notify_en;
-    u8  prim_adv_phy_options;
-    u8  secd_adv_phy_options;
-} hci_le_setExtAdvParamV2_cmdParam_t;
 
 /* Advertising_Handle */
 typedef enum
@@ -2354,28 +2324,6 @@ ble_sts_t blc_hci_le_createBigParamsTest(hci_le_createBigParamsTest_t *pCmdParam
  *                     other: failed
  */
 ble_sts_t blc_hci_le_terminateBig(hci_le_terminateBigParams_t *pCmdParam);
-
-
-/**
- *  @brief   for "7.8.128 LE Read All Local Supported Features command"
- */
-typedef struct __attribute__((packed))
-{
-    u8 status;
-    u8 max_page;
-    u8 le_features[248];
-} hci_le_readAllLocalSupportedFeatures_retParam_t;
-
-
-/**
- *  @brief   for "7.8.129 LE Read All Remote Features command"
- */
-typedef struct __attribute__((packed))
-{
-    u16 conn_handle;
-    u8 pages_requested;
-} hci_le_readAllRemoteFeatures_cmdParam_t;
-
 
 typedef struct __attribute__((packed))
 {

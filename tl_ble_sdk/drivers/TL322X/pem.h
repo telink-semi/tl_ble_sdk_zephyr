@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    pem.h
  *
- * @brief   This is the header file for TL721X
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
  * @date    2024
@@ -53,7 +53,7 @@
  */
 typedef enum
 {
-    PEM0 = 0, // BLE Sniffer SDK use
+    PEM0 = 0,
     PEM1,
     PEM2,
     PEM3,
@@ -90,7 +90,7 @@ typedef enum
     PEM_EVENT_SECURITY_IP,
     PEM_EVENT_GPIO,
     PEM_EVENT_DMA,
-    PEM_EVENT_QDEC,
+    PEM_EVENT_MISC,
     PEM_EVENT_CPU,
     PEM_EVENT_TIMER,
     PEM_EVENT_STIMER,

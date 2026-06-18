@@ -165,7 +165,7 @@ void blc_svc_calculateDatabaseHash(void)
  */
 void blc_svc_setDeviceName(const char *name)
 {
-    strncpy((char*)defaultDevName, name, sizeof(defaultDevName));
+    strncpy(defaultDevName, name, sizeof(defaultDevName));
     defaultDevNameLen = strlen(name);
 }
 

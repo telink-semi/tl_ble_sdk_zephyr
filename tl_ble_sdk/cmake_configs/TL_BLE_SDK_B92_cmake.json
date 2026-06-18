@@ -1,0 +1,890 @@
+{
+  "name": "TL_BLE_SDK_B92",
+  "language": "c",
+  "toolchain_path": "",
+  "targets": [
+    {
+      "name": "acl_central_demo",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "algorithm",
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/acl_central_demo",
+        "vendor/common"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_ACL_CEN_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_ACL_CEN_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   acl_central_demo"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": []
+    },
+    {
+      "name": "acl_connection_demo",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "algorithm",
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/acl_connection_demo",
+        "vendor/common"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_ACL_CONN_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_ACL_CONN_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   acl_connection_demo"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": []
+    },
+    {
+      "name": "acl_peripheral_demo",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "algorithm",
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/acl_peripheral_demo",
+        "vendor/common"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_ACL_PER_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_ACL_PER_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   acl_peripheral_demo"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": []
+    },
+    {
+      "name": "ble_controller",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "algorithm",
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/ble_controller",
+        "vendor/common"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_BLE_CONTROLLER__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_BLE_CONTROLLER__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   ble_controller"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": []
+    },
+    {
+      "name": "eslp_ap_demo",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "3rd-party",
+        "algorithm",
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/common",
+        "vendor/eslp_ap_demo"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_ESLP_AP_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_ESLP_AP_DEMO__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92_AP",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   eslp_ap_demo"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": []
+    },
+    {
+      "name": "feature_test",
+      "path": "./",
+      "toolchain": "RISC-V Cross GCC",
+      "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2",
+      "directories": [
+        "application",
+        "boot/B92",
+        "common",
+        "config.h",
+        "drivers.h",
+        "drivers/B92",
+        "proj_lib",
+        "stack",
+        "tl_common.h",
+        "vendor/common",
+        "vendor/feature_test",
+        "algorithm/crypto"
+      ],
+      "global_options": [
+        "-O2",
+        "-fmessage-length=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-flto",
+        "-g3"
+      ],
+      "asm_compile_options": [
+        "-x assembler-with-cpp",
+        "-D__PROJECT_FEATURE_TEST__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "cpp_compile_options": [],
+      "c_compile_options": [
+        "-D__PROJECT_FEATURE_TEST__=1",
+        "-DCHIP_TYPE=CHIP_TYPE_B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/drivers/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/build/B92",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/include",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/freertos-V5/portable/GCC/RISC-V",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/common",
+        "-I${CMAKE_CURRENT_SOURCE_DIR}/vendor/common",
+        "-c",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables",
+        "-fno-fat-lto-objects"
+      ],
+      "linker_script": "",
+      "linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-mcmodel=medium",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct",
+        "-fno-jump-tables"
+      ],
+      "linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/proj_lib"
+      ],
+      "linker_libraries": [
+        "m",
+        "lt_B92",
+        "dsp"
+      ],
+      "cpp_linker_script": "",
+      "cpp_linker_options": [
+        "-Xlinker --gc-sections",
+        "-T${CMAKE_CURRENT_SOURCE_DIR}/boot/B92/boot_general.link",
+        "-nostartfiles",
+        "-O2",
+        "-mcmodel=medium",
+        "-g3",
+        "-mcpu=d25f",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-mext-dsp",
+        "-fmessage-length=0",
+        "-fno-builtin",
+        "-fomit-frame-pointer",
+        "-fno-strict-aliasing",
+        "-fshort-wchar",
+        "-fuse-ld=bfd",
+        "-fpack-struct"
+      ],
+      "cpp_linker_directories": [
+        "${CMAKE_CURRENT_SOURCE_DIR}/algorithm/audio_alg/lc3/gcc10"
+      ],
+      "cpp_linker_libraries": [
+        "m",
+        "LC3",
+        "dsp"
+      ],
+      "pre_build": [],
+      "post_build": [
+        "chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh",
+        " ${CMAKE_CURRENT_SOURCE_DIR}/build/B92/../../tl_check_fw.sh   feature_test"
+      ],
+      "print_size": [
+        "-t"
+      ],
+      "obj_copy": [
+        "-O binary"
+      ],
+      "obj_dump": [
+        "--source",
+        "--all-headers",
+        "--demangle",
+        "--line-numbers",
+        "--wide"
+      ],
+      "sub_directories": [
+        {
+          "name": "algorithm_audio_alg_lc3_gcc7",
+          "path": "algorithm/audio_alg/lc3/gcc7",
+          "toolchain": "RISC-V Cross GCC",
+          "toolchainVersionName": "",
+          "directories": [
+            "./"
+          ],
+          "asm_compile_options": [],
+          "c_compile_options": [],
+          "cpp_compile_options": []
+        }
+      ]
+    }
+  ],
+  "toolchainName": "RISC-V Cross GCC",
+  "toolchainVersionName": "TL32 ELF MCULIB V5F GCC12.2"
+}

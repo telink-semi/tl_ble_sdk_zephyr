@@ -180,15 +180,12 @@ typedef struct {
     sd_adc_sample_clk_freq_e clk_freq;
     sd_adc_downsample_rate_e downsample_rate;
     sd_adc_gpio_chn_div_e gpio_div;
-} sd_adc_gpio_cfg_t;
 
-/**
- * @brief sd_adc gpio sample pin configuration.
- */
-typedef struct {
     sd_adc_p_input_pin_def_e input_p;
     sd_adc_n_input_pin_def_e input_n;
-} sd_adc_gpio_pin_cfg_t;
+
+} sd_adc_gpio_cfg_t;
+
 
 /**
  * @brief sd_adc sample result type.
@@ -212,6 +209,21 @@ typedef enum{
  *                                                  SD_ADC only interface                                                 *
  **********************************************************************************************************************/
 /**
+ * @brief This function is used to calibrate sd adc sample voltage for single GPIO.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void sd_adc_set_single_gpio_calib_vref(unsigned short vref, signed short offset);
+
+/**
+ * @brief This function is used to calibrate sd adc sample voltage for VABT.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void sd_adc_set_vbat_calib_vref(unsigned short vref, signed short offset);
+/**
  * @brief      This function servers to clear the rx fifo.
  * @param[in]  none
  * @return     none
@@ -228,15 +240,9 @@ static inline void sd_adc_clr_fifo_wptr(void)
  * @param[in]  n_ain - sd_adc_n_input_pin_def_e
  * @return none
  */
-static inline void sd_adc_set_diff_input(sd_adc_dc_chn_e  chn, sd_adc_p_input_pin_def_e p_ain, sd_adc_n_input_pin_def_e n_ain)
+static inline void sd_adc_set_diff_input(sd_adc_p_input_pin_def_e p_ain, sd_adc_n_input_pin_def_e n_ain)
 {
-    if(chn == SD_ADC_DC1)
-    {
-        analog_write_reg8(areg_dc1_sel_ana_input, (n_ain>>12) | (p_ain>>12)<<4);
-    }else
-    {
-        analog_write_reg8(areg_sel_ana_input, (n_ain>>12) | (p_ain>>12)<<4);
-    }
+      analog_write_reg8(areg_sel_ana_input, (n_ain>>12) | (p_ain>>12)<<4);
 }
 
 /**
@@ -413,12 +419,11 @@ static inline unsigned char sd_adc_get_rxfifo_cnt(void)
 
 /**
  * @brief      This function is used to initialize the positive and negative channels for gpio and temp sensor sampling.
- * @param[in]  chn   - sd_adc_dc_chn_e
  * @param[in]  p_pin - sd_adc_p_input_pin_def_e
  * @param[in]  n_pin - sd_adc_n_input_pin_def_e
  * @return     none
  */
-void sd_adc_gpio_pin_init(sd_adc_dc_chn_e  chn, sd_adc_p_input_pin_def_e p_pin,sd_adc_n_input_pin_def_e n_pin);
+void sd_adc_gpio_pin_init(sd_adc_p_input_pin_def_e p_pin,sd_adc_n_input_pin_def_e n_pin);
 
 /**
  * @brief      This function serves to select Vbat voltage division.
@@ -445,13 +450,11 @@ void sd_adc_init(sd_dc_op_mode_e mode);
 /**
  * @brief      This function is used to initialize the SD_ADC for gpio sampling.
  * @param[in]  cfg -Pointer to configure the GPIO channel structure.
- * @param[in]  dc0_pin_cfg -Pointer to configure the DC0 GPIO pin structure.
- * @param[in]  dc0_pin_cfg -Pointer to configure the DC1 GPIO pin structure.
  * @return     none
  * @note       If you switch to gpio mode from other modes, the first 4 codes of the sample are abnormal
  *             due to the internal filter reset, so you need to discard the first 4 codes.
  */
-void sd_adc_gpio_sample_init(sd_adc_gpio_cfg_t *cfg,sd_adc_gpio_pin_cfg_t *dc0_pin_cfg, sd_adc_gpio_pin_cfg_t *dc1_pin_cfg);
+void sd_adc_gpio_sample_init(sd_adc_gpio_cfg_t *cfg);
 
 #if SD_ADC_INTERNAL_TEST_FUNC_EN
 /**

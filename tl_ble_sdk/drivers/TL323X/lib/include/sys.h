@@ -188,7 +188,6 @@ typedef enum
 {
     CHIP_VERSION_A0 = 0x00,
     CHIP_VERSION_A1 = 0x01, /*20260325 add*/
-    CHIP_VERSION_A2 = 0xc0, 
 } sys_chip_version_e;
 
 /**********************************************************************************************************************
@@ -196,10 +195,6 @@ typedef enum
  *********************************************************************************************************************/
 
 extern unsigned int g_chip_version;
-
-#ifdef BLC_ZEPHYR_BLE_INTEGRATION
-extern unsigned int g_chip_protection_code;
-#endif /* BLC_ZEPHYR_BLE_INTEGRATION, MATTER USED */
 
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *

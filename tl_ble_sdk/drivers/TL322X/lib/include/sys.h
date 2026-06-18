@@ -191,6 +191,7 @@ typedef struct tbl_cmd_set_t
 typedef enum
 {
     CHIP_VERSION_A0 = 0x00,
+    CHIP_VERSION_A1 = 0x01,
 } sys_chip_version_e;
 
 extern unsigned int g_chip_version;
@@ -251,5 +252,11 @@ void sys_n22_init(unsigned int addr);
  * @return      none
  */
 void sys_n22_start(void);
+
+/**
+ * @brief       This function serves to stop n22 core system.
+ * @return      none
+ */
+void sys_n22_stop(void);
 
 #endif

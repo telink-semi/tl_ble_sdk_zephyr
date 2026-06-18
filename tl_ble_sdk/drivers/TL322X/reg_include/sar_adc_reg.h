@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    sar_adc_reg.h
  *
- * @brief   This is the header file for TL322X
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
  * @date    2024

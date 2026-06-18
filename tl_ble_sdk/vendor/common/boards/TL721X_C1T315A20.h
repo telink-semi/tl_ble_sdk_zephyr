@@ -154,8 +154,7 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN_P ADC_GPIO_PB0
-        #define ADC_INPUT_PIN_CHN_N 0
+        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
     #endif
 #endif
 
@@ -202,47 +201,6 @@
     #define PF1_OUTPUT_ENABLE 1
 
 #endif //end of DEBUG_GPIO_ENABLE
-
-#if (DEBUG_CS_GPIO_ENABLE || DEBUG_HDT_GPIO_ENABLE)
-    #define GPIO_CHN0         GPIO_PE0
-    #define GPIO_CHN1         GPIO_PF1
-    #define GPIO_CHN2         GPIO_PE1
-    #define GPIO_CHN3         GPIO_PF2
-    #define GPIO_CHN4         GPIO_PE2
-    #define GPIO_CHN5         GPIO_PF3
-    #define GPIO_CHN6         GPIO_PF0
-    #define GPIO_CHN7         GPIO_PF4
-
-    #define GPIO_CHN8         GPIO_PF5
-    #define GPIO_CHN9         GPIO_PE3
-    #define GPIO_CHN10        GPIO_PF6
-    #define GPIO_CHN11        GPIO_PE4
-    #define GPIO_CHN12        GPIO_PF7
-    #define GPIO_CHN13        GPIO_PE5
-    #define GPIO_CHN14        GPIO_PA0
-    #define GPIO_CHN15        GPIO_PE6
-
-
-    #define PE0_OUTPUT_ENABLE 1
-    #define PE1_OUTPUT_ENABLE 1
-    #define PE2_OUTPUT_ENABLE 1
-    #define PE3_OUTPUT_ENABLE 1
-    #define PE4_OUTPUT_ENABLE 1
-    #define PE5_OUTPUT_ENABLE 1
-    #define PE6_OUTPUT_ENABLE 1
-    #define PF0_OUTPUT_ENABLE 1
-
-    #define PF1_OUTPUT_ENABLE 1
-    #define PF2_OUTPUT_ENABLE 1
-    #define PF3_OUTPUT_ENABLE 1
-    #define PF4_OUTPUT_ENABLE 1
-    #define PF5_OUTPUT_ENABLE 1
-    #define PF6_OUTPUT_ENABLE 1
-    #define PF7_OUTPUT_ENABLE 1
-    #define PA0_OUTPUT_ENABLE 1
-
-#endif
-
 
 #define TLKAPI_DEBUG_GPIO_PIN GPIO_PB6
 

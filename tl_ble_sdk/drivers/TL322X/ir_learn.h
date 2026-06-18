@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    ir_learn.h
  *
- * @brief   This is the source file for TL322X
+ * @brief   This is the header file for tl322x
  *
  * @author  Driver Group
  * @date    2025

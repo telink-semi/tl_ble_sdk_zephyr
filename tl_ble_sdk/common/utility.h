@@ -27,7 +27,6 @@
 #ifndef abs
     #define abs(a) (((a) > 0) ? ((a)) : (-(a)))
 #endif
-
 /*set parameter unused, remove warning*/
 #define TL_UNUSED(x) (void)sizeof(x)
 
@@ -103,11 +102,6 @@
 #define IS_POWER_OF_2(x)  (!(x & (x - 1)))
 #define IS_LITTLE_ENDIAN  (*(unsigned short *)"\0\xff" > 0x100)
 #define IS_4BYTE_ALIGN(x) (!(x & 3))
-
-#define Z_IS_ENABLED3(ignore_this, val, ...) val
-#define Z_IS_ENABLED2(one_or_two_args)       Z_IS_ENABLED3(one_or_two_args 1, 0)
-#define Z_IS_ENABLED1(config_macro)          Z_IS_ENABLED2(_XXXX##config_macro)
-#define IS_ENABLED(config_macro)             Z_IS_ENABLED1(config_macro)
 
 #define IMPLIES(x, y)     (!(x) || (y))
 

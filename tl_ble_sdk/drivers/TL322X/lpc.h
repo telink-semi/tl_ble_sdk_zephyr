@@ -24,6 +24,8 @@
 #pragma once
 
 #include "lib/include/analog.h"
+#include "pem.h"
+#include "lib/include/pm/pm.h"
 
 /**
  * define input IO.
@@ -33,7 +35,7 @@ typedef enum
     LPC_INPUT_PB1 = 1,
     LPC_INPUT_PB2 = 2,
     LPC_INPUT_PB3 = 3,
-    LPC_INPUT_PB4 = 4, // BLE Sniffer SDK use
+    LPC_INPUT_PB4 = 4,
     LPC_INPUT_PB5 = 5,
     LPC_INPUT_PB6 = 6,
     LPC_INPUT_PB7 = 7,
@@ -81,7 +83,12 @@ typedef enum
  */
 static inline void lpc_power_down(void)
 {
-    analog_write_reg8(0x06, (analog_read_reg8(0x06)) | 0x02);
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 |= FLD_PD_LC_COMP_3V;
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
+    analog_write_reg8(0x06, (analog_read_reg8(0x06)) | FLD_PD_LC_COMP_3V);
+#endif
 }
 
 /**
@@ -90,7 +97,12 @@ static inline void lpc_power_down(void)
  */
 static inline void lpc_power_on(void)
 {
-    analog_write_reg8(0x06, analog_read_reg8(0x06) & 0xfd);
+#if (PM_POWER_OPTIMIZATION)
+    g_areg_aon_06 &= ~FLD_PD_LC_COMP_3V;
+    analog_write_reg8(areg_aon_0x06, g_areg_aon_06);
+#else
+    analog_write_reg8(0x06, analog_read_reg8(0x06) & ~(FLD_PD_LC_COMP_3V));
+#endif
 }
 
 /**
@@ -147,3 +159,32 @@ static inline void lpc_set_single_mode(void)
  * @return      none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
+
+/**
+ * @brief       This function serves to use LPC to trigger DMA via PEM to write the value to reg_rst to hold all reset signals, thereby protecting the flash during the chip power-down process.
+ * @param[in]   lpc_chn - selected input channel.Input derived from external PortB(PB<1>~PB<7>).
+ * @param[in]   pem_chn - to select the PEM channel.
+ * @param[in]   dma_chn - to select the DMA channel.
+ * @return      none.
+ * @note       -# In order to improve the robustness of the chip during high-speed operation, the low power comparator (LPC) is used to
+ *              protect the flash during power-down of the chip.
+ *              When this feature is enabled, there are the following limitations:
+ *               -# The chip power supply voltage is limited to 2.1V to 4.2V.
+ *               -# One of PB[1:7] must be reserved for this feature.
+ *               -# One of PEM must be reserved for this feature.
+ *               -# One of DMA0-7 must be reserved for this feature.
+ *               -# Before enabling this feature, activate the 32k watchdog or timer watchdog to prevent the LPC from triggering due to power supply voltage fluctuations. 
+ *                  This prevents the MCU from stalling and the chip from being unable to reset for an extended period.
+ */
+void lpc_pem_flash_prot_config(lpc_input_channel_e lpc_chn, pem_chn_e pem_chn, dma_chn_e dma_chn);
+
+/**
+ * @brief       This function is used to initialize GPIO voltage detection.
+ * @param[in]   mode    - lower power comparator working mode includes normal mode and low power mode.
+ * @param[in]   pin     - selected input channel.Input derived from external PortB(PB<1>~PB<7>).
+ * @param[in]   ref     - selected input reference voltage.
+ * @param[in]   divider - selected scaling coefficient.(%25,%50,%75,%100)
+ * @return      none.
+ */
+void lpc_gpio_vol_detect_init(lpc_mode_e mode, lpc_input_channel_e pin, lpc_reference_e ref,lpc_scaling_e divider);
+

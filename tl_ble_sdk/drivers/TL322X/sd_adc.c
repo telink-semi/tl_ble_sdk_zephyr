@@ -25,8 +25,20 @@
 #include "compiler.h"
 #include <stdio.h>
 
-volatile unsigned char g_sd_adc_divider;
-volatile unsigned short g_sd_adc_downsample_rate;
+volatile unsigned char g_sd_adc_divider=1;
+volatile unsigned short g_sd_adc_downsample_rate=128;
+
+#define UNCALIBRATED_VALUE 0xFFFF
+
+/*The following calibration defaults are provided by ATE, and both gpio and vbat sampling are calibrated to within 50mv of errors. */
+_attribute_data_retention_sec_ volatile unsigned short g_sd_adc_vref = UNCALIBRATED_VALUE;
+_attribute_data_retention_sec_ volatile signed short g_sd_adc_vref_offset = 0;
+
+_attribute_data_retention_sec_ volatile unsigned short g_single_sd_adc_vref = UNCALIBRATED_VALUE;
+_attribute_data_retention_sec_ volatile signed short g_single_sd_adc_vref_offset = 0;
+
+_attribute_data_retention_sec_ volatile unsigned short g_sd_adc_vbat_calib_vref = UNCALIBRATED_VALUE;
+_attribute_data_retention_sec_ volatile signed short g_sd_adc_vbat_calib_vref_offset = 0;
 
 dma_chn_e sd_adc_dma_chn;
 dma_config_t sd_adc_rx_dma_config=
@@ -45,6 +57,30 @@ dma_config_t sd_adc_rx_dma_config=
     .write_num_en=0,
     .auto_en=0,//must 0
 };
+
+/**
+ * @brief This function is used to calibrate sd adc sample voltage for single GPIO.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void sd_adc_set_single_gpio_calib_vref(unsigned short vref, signed short offset)
+{
+    g_single_sd_adc_vref = vref;
+    g_single_sd_adc_vref_offset = offset;
+}
+
+/**
+ * @brief This function is used to calibrate sd adc sample voltage for VABT.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void sd_adc_set_vbat_calib_vref(unsigned short vref, signed short offset)
+{
+    g_sd_adc_vbat_calib_vref        = vref;
+    g_sd_adc_vbat_calib_vref_offset = offset;
+}
 
 /**
  * @brief     This function servers to set the sample mode.
@@ -145,12 +181,11 @@ void sd_adc_power_off(sd_adc_mode_e mode)
 
 /**
  * @brief      This function is used to initialize the positive and negative channels for gpio and temp sensor sampling.
- * @param[in]  chn   - sd_adc_dc_chn_e
  * @param[in]  p_pin - sd_adc_p_input_pin_def_e
  * @param[in]  n_pin - sd_adc_n_input_pin_def_e
  * @return     none
  */
-void sd_adc_gpio_pin_init(sd_adc_dc_chn_e  chn, sd_adc_p_input_pin_def_e p_pin,sd_adc_n_input_pin_def_e n_pin)
+void sd_adc_gpio_pin_init(sd_adc_p_input_pin_def_e p_pin,sd_adc_n_input_pin_def_e n_pin)
 {
     //SD_ADC GPIO Init
     gpio_input_dis(p_pin&0xfff);
@@ -160,8 +195,18 @@ void sd_adc_gpio_pin_init(sd_adc_dc_chn_e  chn, sd_adc_p_input_pin_def_e p_pin,s
     {
         gpio_input_dis(n_pin&0xfff);
         gpio_output_dis(n_pin&0xfff);
+        g_sd_adc_vref = 9435;
+        g_sd_adc_vref_offset = 72;
+    }else{
+        if (g_single_sd_adc_vref == UNCALIBRATED_VALUE)
+        {
+            g_single_sd_adc_vref = 9435;
+            g_single_sd_adc_vref_offset = 72;
+        }
+        g_sd_adc_vref = g_single_sd_adc_vref;
+        g_sd_adc_vref_offset = g_single_sd_adc_vref_offset;
     }
-    sd_adc_set_diff_input(chn, p_pin, n_pin);
+    sd_adc_set_diff_input(p_pin, n_pin);
 
 }
 
@@ -203,15 +248,13 @@ void sd_adc_init(sd_dc_op_mode_e mode)
 /**
  * @brief      This function is used to initialize the SD_ADC for gpio sampling.
  * @param[in]  cfg -Pointer to configure the GPIO channel structure.
- * @param[in]  dc0_pin_cfg -Pointer to configure the DC0 GPIO pin structure.
- * @param[in]  dc0_pin_cfg -Pointer to configure the DC1 GPIO pin structure.
  * @return     none
  * @note       If you switch to gpio mode from other modes, the first 4 codes of the sample are abnormal
  *             due to the internal filter reset, so you need to discard the first 4 codes.
  */
-void sd_adc_gpio_sample_init(sd_adc_gpio_cfg_t *cfg,sd_adc_gpio_pin_cfg_t *dc0_pin_cfg, sd_adc_gpio_pin_cfg_t *dc1_pin_cfg)
+void sd_adc_gpio_sample_init(sd_adc_gpio_cfg_t *cfg)
 {
-    if (cfg == NULL || dc0_pin_cfg == NULL){
+    if (cfg == NULL){
         return;
     }
     sd_adc_temp_sensor_power_off();//Turn off to reduce power
@@ -219,11 +262,7 @@ void sd_adc_gpio_sample_init(sd_adc_gpio_cfg_t *cfg,sd_adc_gpio_pin_cfg_t *dc0_p
     sd_adc_set_clk_freq(cfg->clk_freq);
     sd_adc_set_gpio_divider(cfg->gpio_div);
     sd_adc_set_downsample_rate(cfg->downsample_rate);
-    sd_adc_gpio_pin_init(SD_ADC_DC0,dc0_pin_cfg->input_p,dc0_pin_cfg->input_n);
-    if(dc1_pin_cfg != NULL)
-    {
-         sd_adc_gpio_pin_init(SD_ADC_DC1,dc1_pin_cfg->input_p,dc1_pin_cfg->input_n);
-    }
+    sd_adc_gpio_pin_init(cfg->input_p,cfg->input_n);
 }
 
 #if SD_ADC_INTERNAL_TEST_FUNC_EN
@@ -279,6 +318,13 @@ void sd_adc_vbat_sample_init(unsigned char clk_freq, sd_adc_vbat_div_e div, sd_a
     sd_adc_set_clk_freq(clk_freq);
     sd_adc_set_vbat_divider(div);
     sd_adc_set_downsample_rate(downsample_rate);
+    if (g_sd_adc_vbat_calib_vref == UNCALIBRATED_VALUE)
+    {
+        g_sd_adc_vbat_calib_vref = 9349;
+        g_sd_adc_vbat_calib_vref_offset = 5;
+    }
+    g_sd_adc_vref = g_sd_adc_vbat_calib_vref;
+    g_sd_adc_vref_offset = g_sd_adc_vbat_calib_vref_offset;
 }
 
 /**
@@ -293,7 +339,7 @@ void sd_adc_temp_init(unsigned char clk_freq, sd_adc_downsample_rate_e downsampl
 {
     sd_adc_set_mux_control(SD_ADC_TEMP_MODE);
     sd_adc_set_clk_freq(clk_freq);
-    sd_adc_set_diff_input(SD_ADC_DC0,SD_ADC_TEMP_SENSOR_P, SD_ADC_GNDN);
+    sd_adc_set_diff_input(SD_ADC_TEMP_SENSOR_P, SD_ADC_GNDN);
     sd_adc_set_downsample_rate(downsample_rate);
     sd_adc_temp_sensor_power_on();
 }
@@ -313,13 +359,13 @@ signed int sd_adc_calculate_voltage(signed int sd_adc_code,sd_adc_result_type_e 
     }
     else
     {
-        //code to vol: vol = (code*1000/(OSR^3)/2)*diviver (unit:mv)
+        //code to vol: vol = (code*1000/(OSR^3)/2)*diviver*vref/10000 + offset (unit:mv)
         if(type == SD_ADC_VOLTAGE_10X_MV)
         {
-            return  ((signed long long)((float)sd_adc_code*(float)10/(float)g_sd_adc_downsample_rate*(float)100/(float)g_sd_adc_downsample_rate*(float)10/(float)g_sd_adc_downsample_rate/(float)2*(float)g_sd_adc_divider));
+            return (signed long long)((float)sd_adc_code/g_sd_adc_downsample_rate/g_sd_adc_downsample_rate/g_sd_adc_downsample_rate/2*g_sd_adc_divider*g_sd_adc_vref)+g_sd_adc_vref_offset;
         }else if(type == SD_ADC_VOLTAGE_MV)
         {
-            return  ((signed long long)((float)sd_adc_code*(float)10/(float)g_sd_adc_downsample_rate*(float)100/(float)g_sd_adc_downsample_rate/(float)g_sd_adc_downsample_rate/(float)2*(float)g_sd_adc_divider));
+            return (signed long long)((float)sd_adc_code/g_sd_adc_downsample_rate/g_sd_adc_downsample_rate/g_sd_adc_downsample_rate/2*g_sd_adc_divider*g_sd_adc_vref/10) + (g_sd_adc_vref_offset/10);
         }else
         {
             return 0;

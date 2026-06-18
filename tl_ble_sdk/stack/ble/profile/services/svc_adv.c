@@ -23,10 +23,8 @@
  *******************************************************************************************************/
 #include "common/utility.h"
 
-
 #include "svc_adv.h"
 #include <string.h>
-
 #include "stack/ble/ble_format.h"
 
 #include "stack/ble/service/uuid.h"
@@ -117,6 +115,7 @@ u8 *blc_adv_get16BitServiceDataInformation(u8 *advData, u16 len, u16 serviceUuid
     return blc_adv_getAdvTypeInformationWithCmpValue(advData, len, DT_SERVICE_DATA_16BIT_UUID, (u8 *) &serviceUuid, 2, outLen);
 }
 
+
 bool blc_advGetBroadcastID(u8 *advData, u16 len, u8 broadcastID[3])
 {
     u8 broadcastIdLen = 0;
@@ -162,4 +161,3 @@ bool blc_adv_get16BitServiceUuid(u8 *advData, u16 len, u16 uuid)
     }
     return false;
 }
-

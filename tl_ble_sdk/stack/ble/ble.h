@@ -28,12 +28,7 @@
 #include "ble_common.h"
 #include "ble_format.h"
 
-#ifndef TLK_ONLY_BLE_HOST
-#include "stack/ble/controller/ble_controller.h"
-#else
-#include "stack/pm/pm_sys.h"
-#endif
-
+#include "controller/ble_controller.h"
 #include "host/ble_host.h"
 #include "profile/ble_profile.h"
 
@@ -47,7 +42,6 @@
 #include "service/device_information.h"
 #include "service/hids.h"
 #include "service/uuid.h"
-
 #include "stack/ble/debug/debug.h"
 
 

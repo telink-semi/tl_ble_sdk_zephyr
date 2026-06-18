@@ -171,7 +171,7 @@ _RESET_ENTRY:
     .org 0x20
     .word ('T'<<24 | 'L'<<16 | 'N'<<8 | 'K')
 
-        .org 0x24
+    .org 0x24
     .word (0x3B0097A9)             //DREAD:   cmd:1x, addr:1x, data:2x, dummy:8
     //.word (0xBB0093B9)             //X2READ:  cmd:1x, addr:2x, data:2x, dummy:4
     //.word (0x6B0097AA)             //QREAD:   cmd:1x, addr:1x, data:4x, dummy:8
