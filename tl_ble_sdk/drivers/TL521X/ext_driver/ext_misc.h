@@ -255,7 +255,75 @@ void generateRandomNum(int len, unsigned char *data);
 //12 = 4(struct bis_rx_pdu_tag  *next) + 4(u32 payloadNum) + 4(u32 idealPldAnchorTick) in bis_rx_pdu_t
 #define     BIS_LL_RX_PDU_FIFO_SIZE(n)              (CAL_LL_ISO_RX_FIFO_SIZE(n) + 12)
 
+
+/*
+*  DMA_len(4us)
+*
+*  ExtraInfo(sizeof(cs_rx_para_t) = 62us)
+*
+*  Mode2_len: rx_early_us(5us) + (T_PM + T_SW)*(AntPath +1) - T_SW
+*  Mode1_len: rx_early_us(5us) + AA_Only(44us) + Sequence(maximum 128us) + extend (15us) = 192us
+*  Mode0_len: T_FM(80us)
+*
+*  Max_mode_len = max3(Mode2_len,Mode1_len,Mode0_len)
+*
+*  IQ sample_1us :  4[sample rate is 4Mhz] * 5[IQ_20_BIT] = 20 bytes
+*
+*  buffer_len = DMA_len(bytes) + Max_mode_len * IQ sample_1us + ExtraInfo(sizeof(cs_rx_para_t) 80bytes already contains redundancy) 
+*
+*  RX buffer size must be be 16*n, due to MCU design
+*
+*  RX buffer size : ((buffer_len + 15)/16) *16
+*
+*/
+#define     CS_EXTRAINFO_LEN                                                 80
+#define     CS_ALIGN_16(len)                                                 (((len + 15)>>4) <<4)
+#define     CS_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(80*20 + CS_EXTRAINFO_LEN + 4)
+#define     CS_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + CS_EXTRAINFO_LEN + 4)
+#define     CS_RX_MODE2_FIFO_SIZE_MAX(AP,PM, SW)                             CS_ALIGN_16((5 + (AP+1)*(PM+SW) - SW)*20 + CS_EXTRAINFO_LEN + 4)
+#define     CHANNEL_SOUNDING_RX_FIFO_SIZE_ALIGN16(N_AP, T_PM_US, T_SW_US)    max3(CS_RX_MODE0_FIFO_SIZE_MAX,CS_RX_MODE1_FIFO_SIZE_MAX, CS_RX_MODE2_FIFO_SIZE_MAX(N_AP, T_PM_US, T_SW_US))
+
+/*
+*  transport_len(4 bytes)
+*
+*  Mode0_len: (10us) * 20 bytes(IQ sample_1us = 20 bytes) + 4 bytes(transport_len) + extend
+*  Mode1_len: rx_early_us(5us) + AA_Only(44us) + Sequence(maximum 128us) + extend
+*  Mode2_len: 4 bytes(transport_len) + ExtraInfo(sizeof(cs_rx_para_t) 80bytes already contains redundancy) + (T_PM(8us valid))*(AntPath +1) * 20 bytes(IQ sample_1us = 20 bytes)
+*
+*  Max_mode_len = max3(Mode2_len,Mode1_len,Mode0_len)
+*
+*  RX buffer size must be be 16*n, due to MCU design
+*
+*  RX buffer size : ((buffer_len + 15)/16) *16
+*
+*/
+#define CS_TRANSPORT_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(10*20 + CS_EXTRAINFO_LEN + 4)
+#define CS_TRANSPORT_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + CS_EXTRAINFO_LEN + 4)
+#define CS_TRANSPORT_RX_MODE2_FIFO_SIZE_MAX(AP,PM, SW)                             CS_ALIGN_16(((AP+1)*(8))*20 + CS_EXTRAINFO_LEN + 4)
+#define CHANNEL_SOUNDING_TRANSPORT_RX_FIFO_SIZE_WITHOUT_MODE1_ALIGN16(N_AP, T_PM_US, T_SW_US)    max2(CS_TRANSPORT_RX_MODE0_FIFO_SIZE_MAX, CS_TRANSPORT_RX_MODE2_FIFO_SIZE_MAX(N_AP, T_PM_US, T_SW_US))
+#define CHANNEL_SOUNDING_TRANSPORT_RX_FIFO_SIZE_ALIGN16(N_AP, T_PM_US, T_SW_US)                  max3(CS_TRANSPORT_RX_MODE0_FIFO_SIZE_MAX, CS_TRANSPORT_RX_MODE1_FIFO_SIZE_MAX, CS_TRANSPORT_RX_MODE2_FIFO_SIZE_MAX(N_AP, T_PM_US, T_SW_US))
+
 /******************************* dma_end ********************************************************************/
+
+
+/******************************* cs_ant_switch_start *********************************************************/
+typedef struct{
+    gpio_pin_e  pin;
+    gpio_func_e  pin_fun;
+}rf_cs_ant_switch_ctrl;
+
+/**
+ * @brief        * This function initializes the GPIO pins used for antenna switching according to the specified configuration.
+ *                 It disables the input and output functions of the GPIO pins, sets the pull-down resistance, and configures
+ *                 the multiplexing function of the pins.
+ *
+ * @param[in]   switch_ctrl    - Pointer to the antenna switch control structure array.
+ * @param[in]   num            - Number of antenna switch pins
+ * @return      none.
+ */
+void rf_cs_ant_switch_pin_init(rf_cs_ant_switch_ctrl *switch_ctrl, u8 num);
+
+/******************************* cs_ant_switch_end **********************************************************/
 
 
 

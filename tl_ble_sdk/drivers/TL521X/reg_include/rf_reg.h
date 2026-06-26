@@ -547,6 +547,8 @@ enum
     FLD_RF_PKT_DEC_ERR = BIT_RNG(4, 7),
 };
 
+#define    reg_rf_tx_frac_time_pose_time    REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x48)
+
 #define reg_rf_timestamp REG_ADDR32(REG_BASEBAND_BASE_ADDR + 0x50)
 #define reg_rf_tstamp0   REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x50)
 
