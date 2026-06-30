@@ -73,6 +73,12 @@ typedef struct
     u8  rsvd[14]; //14  peer_csrk info address if needed(delete this note at last, customers can not see it)
 } smp_param_save_t;
 
+
+typedef u32 (*smp_info_custom_save_callback_t)(u16 connHandle, u32 current_addr, smp_param_save_t *smp_param);
+typedef void (*smp_info_custom_load_callback_t)(u16 connHandle);
+extern smp_info_custom_save_callback_t smp_info_custom_save_cb;
+extern smp_info_custom_load_callback_t smp_info_custom_load_cb;
+
 /**
  * @brief      This function is used to configure the bonding storage address and size.
  * @param[in]  address - SMP bonding storage start address.

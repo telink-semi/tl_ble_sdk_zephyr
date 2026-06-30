@@ -566,7 +566,7 @@ typedef enum
     PROBE_CCLK       = 4,
     PROBE_HCLK       = 5,
     PROBE_PCLK       = 6,
-    PROBE_NVM        = 7,
+    PROBE_RRAM       = 7,
     PROBE_CLK_MSPI   = 8,
     PROBE_CLK_LSPI   = 9,
     PROBE_CLK_GSPI   = 0x0a,

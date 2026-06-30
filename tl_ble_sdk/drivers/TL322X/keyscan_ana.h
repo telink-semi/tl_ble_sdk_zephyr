@@ -28,80 +28,157 @@
 #include "dma.h"
 #include "gpio.h"
 
-#define KS_EVK_KEYBOARD             0 //2*16
-#define KS_FULL_KEYBOARD            1 //8*16
+#define KS_FIXED_COLS               8
+#define KS_FIXED_ROWS               16
 
-//2.4g used
-#define KS_BOARD_TYPE               KS_FULL_KEYBOARD
+// #if (KEYSCAN_MODE == KEYSCAN_PWM_IO)
+#define ANA_SWITCH_CHANNEL_NUMBER   0 //for analog switch 16 mux 1
+
+// #elif (KEYSCAN_MODE == KEYSCAN_SWITCH_CHANNEL_IO)
+// #define ANA_SWITCH_CHANNEL_NUMBER   4 //for analog switch 16 mux 1
+
+// #endif
+#define HALL_ROWS_POWER_NUMBER      0 //for keyboard rows power
+
+#define KS_FIXED_SCAN_TOTAL_KEYS    (KS_FIXED_COLS * KS_FIXED_ROWS)
 
 /**
- * @brief keyscan mode
- * 
+ * @brief analog keyscan key-value map
  */
-typedef enum {
-    KEYSCAN_1XADC_MODE               = 0,
-    KEYSCAN_2XADC_MODE               = 1,
-    KEYSCAN_1XADC_8K_ONCE_MODE       = 2,
-    KEYSCAN_2XADC_8K_ONCE_MODE       = 3,
-    KEYSCAN_2XADC_8K_TWICE_M1_MODE   = 4,
-    KEYSCAN_2XADC_8K_TWICE_M2_MODE   = 5,//note, this mode will trigger twice interrupt
-    KEYSCAN_MODE_MAX,
-}ks_mode_e;
-
 typedef struct
 {
-    unsigned char adc_simple;
-    unsigned char setl_time;
-    unsigned char setl_capture;
-    unsigned char setl_capture1;
-    unsigned char setl_time_pwr;
-    unsigned char setl_time_scan;
-    unsigned char setl_time_scan2;
-
-    unsigned char pwr_on0;
-    unsigned char pwr_on1;
-    unsigned char pwr_on2;
-    unsigned char pwr_on3;
-    unsigned char pwr_on4;
-    unsigned char pwr_on5;
-    unsigned char pwr_on6;
-    unsigned char pwr_on7;
-
-    unsigned char pwr_dn0;
-    unsigned char pwr_dn1;
-    unsigned char pwr_dn2;
-    unsigned char pwr_dn3;
-    unsigned char pwr_dn4;
-    unsigned char pwr_dn5;
-    unsigned char pwr_dn6;
-    unsigned char pwr_dn7;
-} ks_config_t;
+    unsigned char key;
+    unsigned char value[10];
+} ks_ana_data_t;
 
 /**
- * @brief keyscan clock mode source 
+ * @brief analog keyscan hall threshold
+ */
+typedef struct
+{
+    int release_threshold;
+    int press_threshold;
+} ks_ana_threshold_t;
+
+/**
+ * @brief analog keyscan key status
+ */
+typedef struct
+{
+    unsigned int last_key_bits[KS_FIXED_ROWS];
+    unsigned int now_key_bits[KS_FIXED_ROWS];
+} ks_ana_value_t;
+
+/**
+ * @brief analog keyscan gpio
+ * @note  please refer to the gpio_lookuptable, the channel pin and the power pin must in the same group
+ */
+typedef struct
+{
+    /* the pin group id */
+    unsigned char pin_group_id;
+
+    /* the enable pin for all the analog switches*/
+    gpio_pin_e    ana_switch_enable_pin;
+
+    /* the channel pin for the analog switch*/
+    gpio_pin_e    ana_switch_channel_pin[ANA_SWITCH_CHANNEL_NUMBER];
+
+    /* the power pin the halls*/
+    gpio_pin_e    hall_rows_power_pin[HALL_ROWS_POWER_NUMBER];
+} ks_ana_gpio_pin_t;
+
+/**
+ * @brief analog keyscan mode
+ */
+typedef enum {
+    KEYSCAN_1XADC_8K_ONCE_MODE = 0,//For internal testing only. Not available.
+    KEYSCAN_2XADC_8K_ONCE_MODE,
+    KEYSCAN_2XADC_8K_TWICE_M1_MODE,//For internal testing only. Not available.
+    KEYSCAN_2XADC_8K_TWICE_M2_MODE,//For internal testing only. Not available. (note: this mode will trigger twice interrupt)
+    KEYSCAN_MODE_MAX,
+} ks_ana_mode_e;
+
+/**
+ * @brief analog keyscan clock
+ */
+typedef enum {
+    KEYSCAN_PWM_CLOCK_32M = 0,
+    KEYSCAN_PWM_CLOCK_64M,
+    KEYSCAN_PWM_CLOCK_96M,
+} ks_ana_clock_e;
+
+/**
+ * @brief analog keyscan configuration
+ */
+typedef struct
+{
+    /* 
+     * set adc simple rate
+     * simple rate = (adc_simple_rate + 1) * (1 / clk) 
+     */
+    unsigned char adc_sample_rate;
+
+    /* 
+     * ks_a_setl0: set one analog switch channel scan during time
+     * time = (one_channel_scan_time + 1) * (1 / clk)
+     */
+    unsigned char one_channel_scan_time;
+
+    /* 
+     * ks_a_setl1-2: set time from start channel switch to start adc simple (adc0-adc1)
+     * time = ((2 * channel_switch_to_adc_simple_time) + 1) * (1 / clk)
+     */
+    unsigned char channel_switch_to_adc_sample_time[2];
+
+    /* 
+     * ks_a_setl3: set time from keyscan enable to finish once scan
+     * time = (16 * ks_en_to_scan_once_time) * (1 / clk)
+     */
+    unsigned char ks_en_to_scan_once_time;
+
+    /*
+    * ks_a_setl5: set time from keyscan enable to start second scan
+    * time = (16 * ks_en_to_second_scan_time) * (1 / clk)
+    */
+    unsigned char ks_en_to_second_scan_time;
+
+    /*
+    * set time from keyscan enable to power on rows (row0-row7)
+    * time = (16 * ks_en_to_row_power_on_time) * (1 / clk)
+    */
+    unsigned char ks_en_to_row_power_on_time[8];
+
+    /*
+    * set time from keyscan enable to power down rows (row0-row7)
+    * time = (16 * ks_en_to_row_power_dn_time) * (1 / clk)
+    */
+    unsigned char ks_en_to_row_power_dn_time[8];
+
+    unsigned char ks_en_to_start_scan_time;
+} ks_ana_config_t;
+
+/**
+ * @brief analog keyscan clock source 
  */
 typedef enum
 {
     KS_SRC_32K       = 0x01,
     KS_8K_SRC_RC24M  = 0x23,
+    KS_4K_SRC_XTL24M = 0x46,
+    KS_6K_SRC_XTL24M = 0x44,
     KS_8K_SRC_XTL24M = 0x43,
+    KS_12K_SRC_XTL24M = 0x42,
 } ks_clock_mode_e;
 
 /**
  * @brief the data length of a key with sar_adc selection
- * @note  this enumeration is for debugging EVK boards (2*16), for full keyboard set to 1
  */
 typedef enum
 {
-#if (KS_BOARD_TYPE == KS_EVK_KEYBOARD)
-    KS_ADC0_SCAN_ONCE_DATA_LEN    = 8,
-    KS_ADC0_1_SCAN_ONCE_DATA_LEN  = 4,
-    KS_ADC0_1_SCAN_TWICE_DATA_LEN = 8,
-#elif (KS_BOARD_TYPE == KS_FULL_KEYBOARD)
     KS_ADC0_SCAN_ONCE_DATA_LEN    = 1,
     KS_ADC0_1_SCAN_ONCE_DATA_LEN  = 1,
     KS_ADC0_1_SCAN_TWICE_DATA_LEN = 1,
-#endif
 } ks_saradc_data_len_e;
 
 /**
@@ -110,8 +187,8 @@ typedef enum
 typedef enum
 {
     KS_ADC0_SCAN_ONCE_DATA_SIZE    = 128,
-    KS_ADC0_1_SCAN_ONCE_DATA_SIZE  = 64,
-    KS_ADC0_1_SCAN_TWICE_DATA_SIZE = 128,
+    KS_ADC0_1_SCAN_ONCE_DATA_SIZE  = 128,
+    KS_ADC0_1_SCAN_TWICE_DATA_SIZE = 256,
 } ks_saradc_data_size_e;
 
 /**
@@ -120,18 +197,18 @@ typedef enum
  */
 typedef enum
 {
-    KS_CHANNEL_POWER_PIN_0 = 0,
-    KS_CHANNEL_POWER_PIN_1,
-    KS_CHANNEL_POWER_PIN_2,
-    KS_CHANNEL_POWER_PIN_3,
-    KS_CHANNEL_POWER_PIN_TOTAL,
-}ks_channel_power_pin_group_e;
+    KS_PIN_GROUP_ID_0 = 0,
+    KS_PIN_GROUP_ID_1,
+    KS_PIN_GROUP_ID_2,
+    KS_PIN_GROUP_ID_3,
+    KS_PIN_GROUP_ID_TOTAL,
+}ks_pin_group_e;
 
 /**
  * @brief    This function servers to clear the keyscan irq status.
  * @return   none.
  */
-static inline void keyscan_ana_clr_irq_status(unsigned char irq)
+static inline void ks_ana_clr_irq_status(unsigned char irq)
 {
     reg_ks_a_status |= irq;
 }
@@ -140,68 +217,56 @@ static inline void keyscan_ana_clr_irq_status(unsigned char irq)
  * @brief    This function servers to get the keyscan irq status.
  * @return   the keyscan irq status.
  */
-static inline unsigned char keyscan_ana_get_irq_status(void)
+static inline unsigned char ks_ana_get_irq_status(void)
 {
     return reg_ks_a_status & 0x03;
 }
 
 /**
+ * @brief      This function serves to set keyscan hall threshold.
+ * @param[in]  ks_ana_threshold          - the analog keyscan hall threshold
+*/
+void ks_ana_set_hall_threshold(ks_ana_threshold_t ks_ana_threshold);
+
+/**
  * @brief      This function serves to init keyscan analog module.
- * @param[in]  ks_mode          - the keyscan mode
- * @param[in]  ks_clock_mode    - the keyscan clock mode
- * @param[in]  ks_pin_group     - the keyscan pin group
+ * @param[in]  ks_ana_gpio_pin          - the analog keyscan gpio pins 
+ * @param[in]  ks_ana_mode              - the analog keyscan mode
+ * @param[in]  hall_init_time    -set time from keyscan enable to start first scan, time = (16 * hall_init_time) * (1 / clk)
+ * @param[in]  ks_ana_threshold         - the analog keyscan hall threshold
  * @return     none
  */
-void keyscan_ana_init(ks_mode_e ks_mode, ks_clock_mode_e ks_clock_mode, ks_channel_power_pin_group_e ks_pin_group);
+void ks_ana_init(ks_ana_gpio_pin_t ks_ana_gpio_pin, ks_ana_mode_e ks_ana_mode, ks_ana_clock_e ks_ana_clock, ks_ana_threshold_t ks_ana_threshold);
+
+void ks_ana_sar_adc_set_dma_chain_llp(adc_num_e adc_chn, dma_chn_e dma_chn, unsigned short *dst_addr, unsigned int size_byte, dma_chain_config_t *head_of_list);
+
+void ks_ana_rx_dma_add_list_element(adc_num_e adc_chn, dma_chn_e chn,  dma_chain_config_t *node, dma_chain_config_t *llpointer, unsigned short *dst_addr, unsigned int size_byte);
 
 /**
- * @brief      This function serves to get sar adc data with DMA.
- * @param[in]  chn              - the DMA channel
- * @param[in]  buffer_addr      - the DMA data_buffer address
- * @param[in]  size_byte        - the DMA buffer size 
+ * @brief     This function serves to configure adc_dma_chn channel.
+ * @param[in] adc_chn          - the ADC channel
+ * @param[in] dma_chn          - the DMA channel
+ * @param[in] data_buffer  - the DMA data_buffer address
+ * @param[in] size_byte    - the DMA buffer size
+ * @return    none
+ */
+void ks_ana_receive_dma(adc_num_e adc_chn, dma_chn_e dma_chn, unsigned short *data_buffer, unsigned int size_byte);
+
+void ks_ana_set_rx_dma_config(adc_num_e adc_chn, dma_chn_e dma_chn);
+
+void ks_ana_rx_dma_chain_init(adc_num_e adc_chn, dma_chn_e adc0_dma_chn, unsigned short *dst_addr, unsigned int size_byte);
+
+/**
+ * @brief      This function serves to disable keyscan analog module.
  * @return     none
+ * @note       the disable order: ks_ana_disable-> dma_chn_dis
  */
-void keyscan_get_sar_adc_data_dma(dma_chn_e chn, unsigned short* buffer_addr, unsigned int size_byte);
+void ks_ana_disable(void);
 
 /**
- * @brief      This function serves to get sar adc data with DMA LLP.
- * @param[in]  chn              - the DMA channel
- * @param[in]  buffer_addr      - the DMA data_buffer address
- * @param[in]  size_byte        - the DMA buffer size 
+ * @brief      This function serves to enable keyscan analog module.
  * @return     none
+ * @note       the enable order: ks_ana_enable-> ks_ana_rx_dma_chain_init
  */
-void keyscan_get_sar_adc_data_dma_llp(dma_chn_e chn, unsigned short* buffer_addr, unsigned int size_byte);
-
-/**
- * @brief      This function serves to get sar adc0 adc1 data with DMA.
- * @param[in]  ks_mode          - the Keyscan mode
- * @param[in]  chn0             - the DMA channel
- * @param[in]  chn1             - the DMA channel
- * @param[in]  data_buffer0     - the DMA data_buffer0 address
- * @param[in]  data_buffer1     - the DMA data_buffer1 address
- * @param[in]  size_byte        - the DMA buffer size 
- * @return     none
- */
-void keyscan_get_sar_adc0_adc1_data_dma(ks_mode_e ks_mode, dma_chn_e chn0, dma_chn_e chn1, unsigned short *data_buffer0, unsigned short *data_buffer1, unsigned int size_byte);
-
-/**
- * @brief      This function serves to get sar adc0 adc1 data with DMA LLP.
- * @param[in]  ks_mode          - the Keyscan mode
- * @param[in]  chn0             - the DMA channel
- * @param[in]  chn1             - the DMA channel
- * @param[in]  data_buffer0     - the DMA data_buffer0 address
- * @param[in]  data_buffer1     - the DMA data_buffer1 address
- * @param[in]  size_byte        - the DMA buffer size 
- * @return     none
- */
-void keyscan_get_sar_adc0_adc1_data_dma_llp(ks_mode_e ks_mode, dma_chn_e chn0, dma_chn_e chn1, unsigned short *data_buffer0, unsigned short *data_buffer1, unsigned int size_byte);
-
-/**
- * @brief      This function serves to get the keynumber from meta data.
- * @param[in]  ks_mode          - the keyscan mode
- * @param[in]  data             - the meta data
- * @param[in]  index            - the meta data index
- * @return     the keynumber
- */
-int keyscan_get_keynumber_from_meta_data(ks_mode_e ks_mode, short *data, unsigned char index);
+void ks_ana_enable(void);
 #endif

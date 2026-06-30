@@ -23,7 +23,10 @@
  *******************************************************************************************************/
 #pragma once
 
+
 #define SERVICE_GATT_START_HANDLE          0x0001
+
+#define SERVICE_HID_START_HDL              0x00C0
 
 #define SERVICE_LE_AUDIO_START_HDL         0x0200
 
@@ -31,14 +34,16 @@
 
 #define SERVICE_ELECTRONIC_SHELF_LABEL_HDL 0x0820
 
-#define SERVICE_HID_START_HDL              0x0880
 
 //Telink private Service all 128 uuid
 #define SERVICE_TELINK_PRIVATE_START_HDL 0x8000
 
 
 #include "svc_gatt/svc_gatt.h"
+#include "svc_cs/svc_cs.h"
 #include "svc_telink/svc_telink.h"
+#include "svc_hid/svc_hid.h"
 #include "svc_esl/svc_esl.h"
 
 #include "svc_uuid.h"
+

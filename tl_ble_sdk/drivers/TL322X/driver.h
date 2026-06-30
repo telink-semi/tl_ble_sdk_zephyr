@@ -25,8 +25,10 @@
 
 
 #include "lib/include/plic.h"
+#include "lib/include/pm/pm_internal.h"
 #include "lib/include/pm/pm.h"
 #include "lib/include/rf/rf_common.h"
+#include "lib/include/swire.h"
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
@@ -36,6 +38,12 @@
 #if defined(MCU_CORE_TL322X_N22)
     #include "lib/include/clic.h"
 #endif
+#if defined(__CHANNEL_SOUNDING_EN__) || (__PROJECT_SNIF_SUB_NODE__) || \
+    (__PROJECT_SNIF_FOB_NODE__) || (__PROJECT_SNIF_MAIN_NODE__) ||  \
+    (__PROJECT_CS_INITIATOR_DEMO__) || (__PROJECT_CS_REFLECTOR_DEMO__) || \
+    (__PROJECT_D25F_RAS_CLIENT__) || (__PROJECT_D25F_RAS_SERVER__)
+    #include "lib/include/clock_internal.h"
+#endif /* remove in sdk */
 
 #include "audio.h"
 #include "lib/include/analog.h"
@@ -49,6 +57,7 @@
 #include "usb0hw.h"
 #include "usb1hw.h"
 #include "watchdog.h"
+#include "s7816.h"
 #include "lib/include/core.h"
 
 #include "uart.h"
@@ -68,11 +77,14 @@
 #include "mailbox.h"
 #include "timer_bb.h"
 #include "keyscan_ana.h"
-#include "lib/include/nvm.h"
+#include "lib/include/rram.h"
 #include "lin.h"
 #include "pem.h"
 #include "sd_adc.h"
 #include "can.h"
 #include "gpio_default.h"
+
+#include "lib/include/rf/rf_cs.h" //BLE SDK ADD
 #include "ir_learn.h"
+#include "i3c.h"
 #include "rz.h"

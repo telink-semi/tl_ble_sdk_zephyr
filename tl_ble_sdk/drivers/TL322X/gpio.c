@@ -540,6 +540,7 @@ void gpio_set_pem_event(pem_chn_e chn, gpio_pin_e pin)
     gpio_pem_event_config.sig_sel = GPIO_BIT_POSITION(bit);
     pem_event_config(chn, gpio_pem_event_config);
 }
+
 /**
  * @brief     This function set jtag or sdp function.
  * @param[in] pin
@@ -548,7 +549,7 @@ void gpio_set_pem_event(pem_chn_e chn, gpio_pin_e pin)
 void jtag_sdp_set_pin(gpio_pin_e pin)
 {
     gpio_input_en(pin);
-    gpio_set_mux_function((gpio_func_pin_e)pin, 41);
+    gpio_set_mux_function((gpio_func_pin_e)pin, TDI_I);
     gpio_function_dis(pin);
 }
 

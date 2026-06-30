@@ -97,7 +97,20 @@
  */
 #define gpio_set_input_en(pin, value) gpio_set_input(pin, value)
 
+typedef enum {
+    PM_PIN_UP_DOWN_FLOAT    = 0,
+    PM_PIN_PULLUP_1M        = 1,
+    PM_PIN_PULLDOWN_100K    = 2,
+    PM_PIN_PULLUP_10K       = 3,
+}gpio_pull_type;
 
+/**
+ * @brief     This function set a pin's pull-up/down resistor.
+ * @param[in] pin - the pin needs to set its pull-up/down resistor.
+ * @param[in] up_down_res - the type of the pull-up/down resistor.
+ * @return    none.
+ */
+#define gpio_setup_up_down_resistor(gpio, up_down)  gpio_set_up_down_res(gpio, up_down)
 /**********************************************************************************************************************
  *                                     stimer  compatibility                                                          *
  *********************************************************************************************************************/

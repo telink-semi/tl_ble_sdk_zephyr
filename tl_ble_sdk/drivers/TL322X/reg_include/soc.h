@@ -348,11 +348,11 @@ enum
     FLD_S7816_CLK_EN = BIT(7),
 };
 
-#define reg_nvm_div REG_ADDR8(SC_BASE_ADDR + 0x31)
+#define reg_rram_div REG_ADDR8(SC_BASE_ADDR + 0x31)
 
 enum
 {
-    FLD_NVM_DIV = BIT_RNG(0, 3),
+    FLD_RRAM_DIV = BIT_RNG(0, 3),
 };
 
 #define reg_ram_crc REG_ADDR8(SC_BASE_ADDR + 0x32)
@@ -374,11 +374,14 @@ enum
 
 #define reg_dmic_mod   REG_ADDR16(SC_BASE_ADDR + 0x36)
 
+#define reg_rram_ctrl0 REG_ADDR8(SC_BASE_ADDR + 0x38)
+
 #define reg_nvm_ctrl0 REG_ADDR8(SC_BASE_ADDR + 0x38)
+
 
 enum
 {
-    FLD_REG_EN_IO_NVM = BIT(0),
+    FLD_REG_EN_IO_RRAM = BIT(0),
 };
 
 #define reg_usb_div REG_ADDR8(SC_BASE_ADDR + 0x3b)
@@ -425,7 +428,7 @@ enum
     FLD_RST6_GSPI4 = BIT(4),
     FLD_RST6_LIN0  = BIT(5),
     FLD_RST6_LIN1  = BIT(6),
-    FLD_RST6_NVM   = BIT(7),
+    FLD_RST6_RRAM  = BIT(7),
 };
 
 #define reg_rst7 REG_ADDR8(SC_BASE_ADDR + 0x43)
@@ -479,7 +482,7 @@ enum
     FLD_CLK6_GSPI4_EN = BIT(4),
     FLD_CLK6_LIN0_EN  = BIT(5),
     FLD_CLK6_LIN1_EN  = BIT(6),
-    FLD_CLK6_NVM_EN   = BIT(7),
+    FLD_CLK6_RRAM_EN  = BIT(7),
 
 };
 
