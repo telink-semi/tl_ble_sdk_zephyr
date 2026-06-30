@@ -32,9 +32,6 @@
 #include "mcu_boot.h"
 #include "ext_hci_uart.h"
 #include "ext_flash.h"
-#include "ext_mailbox.h"
 #include "ext_adc.h"
-#include "ext_fast_settle.h"
-#include "ext_lib.h"
 
 #endif /* DRIVERS_TL721X_EXT_DRIVER_DRIVER_EXT_H_ */

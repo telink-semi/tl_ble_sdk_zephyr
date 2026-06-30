@@ -311,6 +311,7 @@ void blc_app_loadCustomizedParameters_normal(void)
 
 #if (MCU_CORE_TYPE == MCU_CORE_TL322X)
     /******get sar adc calibration value from EFUSE********/
+    extern drv_api_status_e efuse_calib_sar_adc_vref(void);
     efuse_calib_sar_adc_vref();
 #endif
 

@@ -40,17 +40,17 @@ typedef int (*ll_task_callback_0_t)(void);
 extern ll_task_callback_0_t ll_cs_rawData_process_cb;
 extern ll_task_callback_0_t ll_cs_hci_subevent_report_cb;
 
-typedef enum
-{
-    BLT_EV_FLAG_RX_DATA_ABANDON,
-    BLT_EV_FLAG_GPIO_EARLY_WAKEUP,
-    BLT_EV_FLAG_SLEEP_ENTER,
-    BLT_EV_FLAG_SUSPEND_EXIT,
-    BLT_EV_FLAG_KEY_MISSING,
-    BLT_EV_FLAG_WFI_ENTER,
-    BLT_EV_FLAG_WFI_EXIT,
-    BLT_EV_MAX_NUM,
-} blt_ev_flag_t;
+// typedef enum
+// {
+//     BLT_EV_FLAG_RX_DATA_ABANDON,
+//     BLT_EV_FLAG_GPIO_EARLY_WAKEUP,
+//     BLT_EV_FLAG_SLEEP_ENTER,
+//     BLT_EV_FLAG_SUSPEND_EXIT,
+//     BLT_EV_FLAG_KEY_MISSING,
+//     BLT_EV_FLAG_WFI_ENTER,
+//     BLT_EV_FLAG_WFI_EXIT,
+//     BLT_EV_MAX_NUM,
+// } blt_ev_flag_t;
 
 typedef enum
 {

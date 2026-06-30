@@ -25,10 +25,8 @@
 
 
 #include "lib/include/plic.h"
-#include "lib/include/pm/pm_internal.h"
 #include "lib/include/pm/pm.h"
 #include "lib/include/rf/rf_common.h"
-#include "lib/include/swire.h"
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
@@ -57,7 +55,6 @@
 #include "usb0hw.h"
 #include "usb1hw.h"
 #include "watchdog.h"
-#include "s7816.h"
 #include "lib/include/core.h"
 
 #include "uart.h"
@@ -77,14 +74,11 @@
 #include "mailbox.h"
 #include "timer_bb.h"
 #include "keyscan_ana.h"
-#include "lib/include/rram.h"
 #include "lin.h"
 #include "pem.h"
 #include "sd_adc.h"
 #include "can.h"
 #include "gpio_default.h"
 
-#include "lib/include/rf/rf_cs.h" //BLE SDK ADD
 #include "ir_learn.h"
-#include "i3c.h"
 #include "rz.h"
