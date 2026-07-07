@@ -42,7 +42,7 @@
 #include "plmt_reg.h"
 #include "uart_reg.h"
 #include "stimer_reg.h"
-#include "adc_reg.h"
+#include "sd_adc_reg.h"
 #include "pem_reg.h"
 #include "analog_afe3v_reg.h"
 #include "analog_afe1v_reg.h"

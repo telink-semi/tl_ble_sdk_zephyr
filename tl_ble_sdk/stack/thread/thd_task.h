@@ -82,6 +82,15 @@ void tlksdk_thd_initInsertTask1_module(void);
  */
 void tlksdk_thd_enableInsertTask1(thd_task_en_e enable);
 
+
+extern void (*thd_insertTsk_switch_to_802154_cb)(void);
+extern void (*thd_insertTsk_switch_to_ble_cb)(void);
+extern void (*tlksdk_switch_to_802154_rf_cb)(void);
+extern void (*tlksdk_switch_to_ble_rf_cb)(void);
+
+void tlksdk_thd_registerModeChangeCb(void (*to_802154_cb)(void), void (*to_ble_cb)(void));
+void tlksdk_thd_registerSwitchTo802154RfCb(void (*switch_to_802154_rf_cb)(void), void (*switch_to_ble_rf_cb)(void));
+
 #endif
 
 

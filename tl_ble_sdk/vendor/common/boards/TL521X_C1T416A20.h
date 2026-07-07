@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    TL323X_C1T315115.h
+ * @file    TL521X_C1T416A20.h
  *
  * @brief   This is the header file for BLE SDK
  *
@@ -39,6 +39,10 @@
     #define MAX_ANT_PATHS_SUPPORT 0X02
 #endif
 
+#ifndef BLE_AUDIO_ENABLE
+    #define BLE_AUDIO_ENABLE        0
+#endif
+
 /**
  *  @brief  Keyboard Configuration
  */
@@ -48,19 +52,35 @@
 
     #define KB_LINE_HIGH_VALID 0 //drive pin output 0 when scan key, scan pin read 0 is valid
 
-    #define BTN_PAIR           0x01
-    #define BTN_UNPAIR         0x02
+    #if (BLE_AUDIO_ENABLE)
+        #define VOICE              0xc0
+        #define BTN_UNPAIR         0x02
 
-    #define CR_VOL_UP          0xf0 ////
-    #define CR_VOL_DN          0xf1
+        #define CR_VOL_UP          0xf0 ////
+        #define CR_VOL_DN          0xf1
 
-    /**
-     *  @brief  Normal keyboard map
-     */
-    #define KB_MAP_NORMAL {     \
-        {BTN_UNPAIR, BTN_PAIR }, \
-        {CR_VOL_UP,  CR_VOL_DN}, \
-}
+        /**
+         *  @brief  Normal keyboard map
+         */
+        #define KB_MAP_NORMAL {     \
+            {BTN_UNPAIR, VOICE }, \
+            {CR_VOL_UP,  CR_VOL_DN}, \
+        } 
+    #else
+        #define BTN_PAIR           0x01
+        #define BTN_UNPAIR         0x02
+
+        #define CR_VOL_UP          0xf0 ////
+        #define CR_VOL_DN          0xf1
+
+        /**
+         *  @brief  Normal keyboard map
+         */
+        #define KB_MAP_NORMAL {     \
+            {BTN_UNPAIR, BTN_PAIR }, \
+            {CR_VOL_UP,  CR_VOL_DN}, \
+        }
+    #endif
 
     //////////////////// KEY CONFIG (EVK board) ///////////////////////////
     #define KB_DRIVE_PINS {GPIO_PC2, GPIO_PC3}
@@ -199,5 +219,22 @@
 #endif //end of DEBUG_GPIO_ENABLE
 
 #define TLKAPI_DEBUG_GPIO_PIN GPIO_PC7
+
+/**
+ *  @brief  AUDIO Configuration
+ */
+#if (BLE_AUDIO_ENABLE)
+    #define GPIO_DMIC_DI                    GPIO_PD3
+    #define GPIO_DMIC_CK                    GPIO_PD1
+    #define GPIO_DMIC_CK2                   GPIO_PD2
+
+    #define GPIO_AMIC_BIAS                  GPIO_PB1
+    #define GPIO_AMIC_SP                    GPIO_PC0
+    #define GPIO_AMIC_SN                    GPIO_PC1
+
+    #define PB1_FUNC                        AS_GPIO
+    #define PC0_FUNC                        AS_GPIO
+    #define PC1_FUNC                        AS_GPIO
+#endif
 
 #endif /* VENDOR_COMMON_BOARDS_TL323X_C1T315115_H_ */

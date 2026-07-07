@@ -135,6 +135,14 @@
 /// define the force inlining attribute for this compiler
 #define __INLINE static __attribute__((__always_inline__)) inline
 
+#ifdef BLC_ZIGBEE_INTEGRATION
+    #undef _attribute_data_retention_sec_
+    #define _attribute_data_retention_sec_
 
+    #undef  _attribute_data_retention_
+    #define _attribute_data_retention_
+    #undef  _attribute_ble_data_retention_
+    #define _attribute_ble_data_retention_
+#endif /* BLC_ZIGBEE_INTEGRATION */
 
 #endif

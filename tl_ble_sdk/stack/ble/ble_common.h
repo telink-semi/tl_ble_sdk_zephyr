@@ -210,6 +210,10 @@ typedef enum
     ATT_ERR_DATABASE_OUT_OF_SYNC   = 0x12, //!< The server requests the client to rediscover the database
     ATT_ERR_VALUE_NOT_ALLOWED      = 0x13, //!< The attribute parameter value was not allowed
 
+#ifdef BLC_ZIGBEE_INTEGRATION
+    ATT_ERR_ZIGBEE_DIRECT_APP_ERROR = 0x80,//!<The attribute PDU was invalid for zigbee direct
+#endif /* BLC_ZIGBEE_INTEGRATION */
+
     /* List of Common Profile and Service Error Codes */
     ATT_ERR_WRITE_REQUEST_REJECT = 0xFC,          //!< Write Request Rejected
     ATT_ERR_CCC_DESCRIPTOR_IMPROPERLY_CONFIGURED, //!< Client Characteristic Configuration Descriptor Improperly Configured

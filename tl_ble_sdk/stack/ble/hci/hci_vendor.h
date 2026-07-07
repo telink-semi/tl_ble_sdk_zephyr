@@ -120,6 +120,24 @@ typedef enum
 //#define HCI_OCF_VS_END_DFU                                0x01
 //#define HCI_OCF_VS_FW_DATA                                0x02
 
+
+
+typedef unsigned char hci_vendor_CmdParams_t;
+
+typedef unsigned char hci_vendor_EndStatusParam_t;
+
+typedef unsigned char (*blt_vendor_FuCallback_t)(u8 pCmdparaLen, u8 opCode_ocf, hci_vendor_CmdParams_t *pCmd, hci_vendor_EndStatusParam_t *pRetParam);
+
+/**
+ * @brief      This function sets the eventcode returned to the host
+ * @param[in]  result: HCI_EVT_CMD_COMPLETE | HCI_EVT_CMD_STATUS .Others not supported
+ * @return     NONE
+ */
+void blt_hci_vendor_setEventCode(u8 result);
+
+ble_sts_t blt_hci_vendor_setFuVendorCallback(blt_vendor_FuCallback_t handler);
+
+
 /**
  * @brief Processes a vendor-specific Host Controller Interface (HCI) command.
  *

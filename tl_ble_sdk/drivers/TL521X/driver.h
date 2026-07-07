@@ -54,7 +54,7 @@
 
 #include "lib/include/clock.h"
 #include "lib/include/mspi.h"
-#include "adc.h"
+#include "sd_adc.h"
 
 #include "pem.h"
 #include "flash/flash_type.h"

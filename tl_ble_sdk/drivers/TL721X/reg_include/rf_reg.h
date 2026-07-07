@@ -2205,14 +2205,6 @@ enum
 
 #define reg_rf_locd_cfg_0 REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x104)
 
-#define reg_rf_fcal_rdbk REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x11e)
-
-enum
-{
-    FLD_RF_FCAL_DCAP_COARSE = BIT_RNG(0, 5),
-    FLD_RF_FCAL_DCAP_FINE   = BIT_RNG(6, 7),
-};
-
 #define reg_rf_bypass_clk_gating    REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x138)
 
 enum
@@ -2403,6 +2395,14 @@ enum
 {
     FLD_RF_TX_PA_PUP = BIT(0),
     FLD_RF_TX_PA_PWR = BIT_RNG(1, 6),
+};
+
+#define reg_rf_fcal_rdbk REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x11e)
+
+enum
+{
+    FLD_RF_FCAL_DCAP_COARSE = BIT_RNG(0, 5),
+    FLD_RF_FCAL_DCAP_FINE   = BIT_RNG(6, 7),
 };
 
 #define reg_rf_cbpf_adc_ow_ctrl REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x180)

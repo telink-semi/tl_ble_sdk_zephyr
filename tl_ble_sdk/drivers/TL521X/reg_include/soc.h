@@ -328,12 +328,12 @@ enum
 
 #define reg_clkzb_set REG_ADDR8(SC_BASE_ADDR + 0x56)
 
-#define reg_i2s0_step REG_ADDR16(SC_BASE_ADDR + 0x06)
+#define reg_sdm_step        REG_ADDR16(SC_BASE_ADDR + 0x06)
 
 enum
 {
-    FLD_I2S0_STEP     = BIT_RNG(0, 14),
-    FLD_I2S0_CLK_EN_0 = BIT(15),
+    FLD_SDM_STEP            = BIT_RNG(0, 14),
+    FLD_SDM_CLK_EN_0        = BIT(15),
 };
 
 #define reg_i2s1_step REG_ADDR16(SC_BASE_ADDR + 0x1c)
@@ -344,30 +344,31 @@ enum
     FLD_I2S1_CLK_EN_0 = BIT(15),
 };
 
-#define reg_i2s2_step REG_ADDR16(SC_BASE_ADDR + 0x08)
-
-enum
-{
-    FLD_I2S2_STEP     = BIT_RNG(0, 14),
-    FLD_I2S2_CLK_EN_0 = BIT(15),
-};
-
-#define reg_i2s0_mod  REG_ADDR16(SC_BASE_ADDR + 0x2a)
-
 #define reg_i2s1_mod  REG_ADDR16(SC_BASE_ADDR + 0x1e)
 
-#define reg_i2s2_mod  REG_ADDR16(SC_BASE_ADDR + 0x0a)
 
-#define reg_dmic_mod  REG_ADDR16(SC_BASE_ADDR + 0x36)
 
-#define reg_dmic_step REG_ADDR16(SC_BASE_ADDR + 0x2c)
+#define reg_sdm_mod         REG_ADDR16(SC_BASE_ADDR + 0x2a)
+
+#define reg_i2s2_step       REG_ADDR16(SC_BASE_ADDR + 0x08)
 
 enum
 {
-    FLD_DMIC_STEP = BIT_RNG(0, 14),
-    FLD_DMIC_SEL  = BIT(15),
+    FLD_I2S2_STEP           = BIT_RNG(0, 14),
+    FLD_I2S2_EN             = BIT(15),
 };
 
+#define reg_i2s2_mod        REG_ADDR16(SC_BASE_ADDR + 0x0a)
+
+#define reg_dmic_step       REG_ADDR16(SC_BASE_ADDR + 0x6c)
+
+#define reg_dmic_mod        REG_ADDR16(SC_BASE_ADDR + 0x6e)
+
+enum
+{
+    FLD_DMIC_STEP           = BIT_RNG(0, 14),
+    FLD_DMIC_SEL            = BIT(15),
+};
 #define AUDIO_SRAM_EMA_ADDR     (SC_BASE_ADDR + 0x68)
 #define AUDIO_SRAM_EMA_DATA_LEN 2
 #define reg_audio_reg_cfg0      REG_ADDR8(SC_BASE_ADDR + 0x68)

@@ -126,18 +126,14 @@
 typedef enum
 {
     /**
-     * @brief Reduce 74us of RX settle time
+     * @brief Reduce 77.5us of RX settle time
      *
      * Receive for a period of time and then do a normal calibration.
      *
      * @note
-     * 1. Related to frequency points. When enabling fast settle on both TX and RX ends,
-     *    if 15us option is selected, both TX and RX ends must use the 15us option simultaneously.
-     * 2. Refer to the table below to determine the range of frequency points used.
+     *    Related to frequency points,Refer to the table below to determine the range of frequency points used.
      *    In addition to configuring the calibration values for the used frequency points,
      *    corresponding channel values in the respective intervals need to be configured.
-     *    For example, if using the 2426 frequency point, channel should be configured as 26 and 24.
-     *
      * @table
      * | Frequency (MHz) | 2400-2410 | 2410-2420 | 2420-2430 | 2430-2440 | 2440-2450 | 2450-2460 | 2460-2470 | 2470-2480 |
      * |-----------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -180,11 +176,8 @@ typedef enum
      * After frequency hopping, a normal calibration must be done.
      *
      * @note
-     * 1. Related to frequency points. When enabling fast settle on both TX and RX ends,
-     *    if the 15us option is selected, both TX and RX ends must use the 15us option simultaneously.
-     * 2. Refer to the following table to determine the range of frequency points used.
+     *    Related to frequency points,Refer to the following table to determine the range of frequency points used.
      *    Corresponding channel values in the respective intervals need to be configured.
-     *    For example, if using the 2426 frequency point, the channel should be configured as 24.
      *
      * @table
      * | Frequency (MHz) | 2400-2410 | 2410-2420 | 2420-2430 | 2430-2440 | 2440-2450 | 2450-2460 | 2460-2470 | 2470-2480 |
@@ -240,9 +233,7 @@ typedef struct
  */
 typedef struct
 {
-    unsigned char RCCAL_CODE;
-    unsigned char CBPF_CCODE_L;
-    unsigned char CBPF_CCODE_H;
+    unsigned char CBPF_CCODE_RCCAL;
 } rf_rccal_cal_t;
 
 typedef struct
@@ -251,6 +242,8 @@ typedef struct
     rf_ldo_trim_t  ldo_trim;
     rf_dcoc_cal_t  dcoc_cal;
     rf_rccal_cal_t rccal_cal;
+    unsigned char  tx_fcal[81];
+    unsigned char  rx_fcal[81];
 } rf_fast_settle_t;
 
 /**
@@ -292,58 +285,52 @@ typedef enum
 typedef enum
 {
     /*VBAT*/
-    RF_POWER_P10p73dBm = 22, /**<  10.7 dbm */
-    RF_POWER_P10p51dBm = 21, /**<  10.5 dbm */
-    RF_POWER_P10p04dBm = 20, /**<  10.0 dbm */
-    RF_POWER_P9p54dBm  = 19, /**<  9.5 dbm */
-    RF_POWER_P8p99dBm  = 18, /**<  9.0 dbm */
-    RF_POWER_P8p52dBm  = 17, /**<  8.5 dbm */
-    RF_POWER_P8p03dBm  = 16, /**<  8.0 dbm */
-    RF_POWER_P7p49dBm  = 15, /**<  7.5 dbm */
-    RF_POWER_P7p31dBm  = 14, /**<  7.3 dbm */
-    RF_POWER_P7p11dBm  = 13, /**<  7.1 dbm */
-    RF_POWER_P6p91dBm  = 12, /**<  6.9 dbm */
-    RF_POWER_P6p70dBm  = 11, /**<  6.7 dbm */
-    RF_POWER_P6p49dBm  = 10, /**<  6.5 dbm */
-    RF_POWER_P6p03dBm  = 9, /**<  6.0 dbm */
-    RF_POWER_P5p54dBm  = 8, /**<  5.5 dbm */
-    RF_POWER_P5p02dBm  = 7, /**<  5.0 dbm */
-    RF_POWER_P4p47dBm  = 6, /**<  4.5 dbm */
-    RF_POWER_P3p86dBm  = 5, /**<  3.8 dbm */
-    RF_POWER_P3p21dBm  = 4, /**<  3.2 dbm */
-    RF_POWER_P2p85dBm  = 3, /**<  2.9 dbm */
-    RF_POWER_P2p47dBm  = 2, /**<  2.5 dbm */
+    RF_POWER_P10p00dBm = 22, /**<  10.0 dbm */
+    RF_POWER_P9p69dBm  = 20, /**<   9.7 dbm */
+    RF_POWER_P9p43dBm  = 19, /**<   9.4 dbm */
+    RF_POWER_P9p12dBm  = 18, /**<   9.1 dbm */
+    RF_POWER_P8p79dBm  = 17, /**<   8.8 dbm */
+    RF_POWER_P8p40dBm  = 16, /**<   8.4 dbm */
+    RF_POWER_P7p91dBm  = 15, /**<   7.9 dbm */
+    RF_POWER_P7p42dBm  = 14, /**<   7.4 dbm */
+    RF_POWER_P6p88dBm  = 13, /**<   6.9 dbm */
+    RF_POWER_P6p26dBm  = 12, /**<   6.3 dbm */
+    RF_POWER_P5p59dBm  = 11, /**<   5.6 dbm */
+    RF_POWER_P4p83dBm  = 10, /**<   4.8 dbm */
 
     /*VANT*/
-    RF_POWER_P1p90dBm  = BIT(7) | 63, /**<   1.9 dbm */
-    RF_POWER_P1p47dBm  = BIT(7) | 59, /**<   1.5 dbm */
-    RF_POWER_P1p00dBm  = BIT(7) | 55, /**<   1.0 dbm */
-    RF_POWER_P0p74dBm  = BIT(7) | 53, /**<   0.7 dbm */
-    RF_POWER_P0p47dBm  = BIT(7) | 51, /**<   0.4 dbm */
-    RF_POWER_P0p19dBm  = BIT(7) | 49, /**<   0.2 dbm */
-    RF_POWER_P0p03dBm  = BIT(7) | 48, /**<   0.0 dbm */
-    RF_POWER_N0p13dBm  = BIT(7) | 47, /**<  -0.2 dbm */
-    RF_POWER_N0p30dBm  = BIT(7) | 46, /**<  -0.3 dbm */
-    RF_POWER_N0p44dBm  = BIT(7) | 45, /**<  -0.7 dbm */
-    RF_POWER_N0p96dBm  = BIT(7) | 42, /**<  -1.0 dbm */
-    RF_POWER_N1p50dBm  = BIT(7) | 39, /**<  -1.5 dbm */
-    RF_POWER_N2p12dBm  = BIT(7) | 36, /**<  -2.1 dbm */
-    RF_POWER_N2p55dBm  = BIT(7) | 34, /**<  -2.6 dbm */
-    RF_POWER_N3p02dBm  = BIT(7) | 32, /**<  -3.0 dbm */
-    RF_POWER_N3p52dBm  = BIT(7) | 30, /**<  -3.5 dbm */
-    RF_POWER_N4p06dBm  = BIT(7) | 28, /**<  -4.0 dbm */
-    RF_POWER_N4p64dBm  = BIT(7) | 26, /**<  -4.6 dbm */
-    RF_POWER_N5p59dBm  = BIT(7) | 23, /**<  -5.6 dbm */
-    RF_POWER_N6p72dBm  = BIT(7) | 20, /**<  -6.7 dbm */
-    RF_POWER_N7p57dBm  = BIT(7) | 18, /**<  -7.6 dbm */
-    RF_POWER_N8p52dBm  = BIT(7) | 16, /**<  -8.5 dbm */
-    RF_POWER_N10p28dBm = BIT(7) | 13, /**<  -10.3 dbm */
-    RF_POWER_N11p67dBm = BIT(7) | 11, /**<  -11.7 dbm */
-    RF_POWER_N14p37dBm = BIT(7) | 8,  /**<  -14.4 dbm */
-    RF_POWER_N16p82dBm = BIT(7) | 6,  /**<  -16.8 bm */
-    RF_POWER_N20p25dBm = BIT(7) | 4,  /**<  -20.3 dbm */
-    RF_POWER_N26p20dBm = BIT(7) | 2,  /**<  -26.2 dbm */
-    RF_POWER_N31p73dBm = BIT(7) | 1,  /**<  -31.7 dbm */
+    RF_POWER_P4p50dBm  = BIT(7) | 56,  /**<    4.5 dbm */
+    RF_POWER_P4p00dBm  = BIT(7) | 49,  /**<    4.0 dbm */
+    RF_POWER_P3p50dBm  = BIT(7) | 43,  /**<    3.5 dbm */
+    RF_POWER_P3p00dBm  = BIT(7) | 39,  /**<    3.0 dbm */
+    RF_POWER_P2p50dBm  = BIT(7) | 35,  /**<    2.5 dbm */
+    RF_POWER_P2p00dBm  = BIT(7) | 32,  /**<    2.0 dbm */
+    RF_POWER_P1p50dBm  = BIT(7) | 30,  /**<    1.5 dbm */
+    RF_POWER_P1p00dBm  = BIT(7) | 28,  /**<    1.0 dbm */
+    RF_POWER_P0p50dBm  = BIT(7) | 26,  /**<    0.5 dbm */
+    RF_POWER_P0p00dBm  = BIT(7) | 24,  /**<    0.0 dbm */
+    RF_POWER_N0p50dBm  = BIT(7) | 22,  /**<   -0.5 dbm */
+    RF_POWER_N1p00dBm  = BIT(7) | 20,  /**<  -1.00 dbm */
+    RF_POWER_N1p50dBm  = BIT(7) | 19,  /**<  -1.50 dbm */
+    RF_POWER_N2p00dBm  = BIT(7) | 18,  /**<  -2.00 dbm */
+    RF_POWER_N2p50dBm  = BIT(7) | 17,  /**<  -2.50 dbm */
+    RF_POWER_N3p00dBm  = BIT(7) | 16,  /**<  -3.00 dbm */
+    RF_POWER_N3p50dBm  = BIT(7) | 15,  /**<  -3.50 dbm */
+    RF_POWER_N4p00dBm  = BIT(7) | 14,  /**<  -4.00 dbm */
+    RF_POWER_N4p50dBm  = BIT(7) | 13,  /**<  -4.50 dbm */
+    RF_POWER_N5p00dBm  = BIT(7) | 12,  /**<  -5.00 dbm */
+    RF_POWER_N5p50dBm  = BIT(7) | 11,  /**<  -5.50 dbm */
+    RF_POWER_N6p50dBm  = BIT(7) | 10,  /**<  -6.50 dbm */
+    RF_POWER_N7p50dBm  = BIT(7) | 9,   /**<  -7.50 dbm */
+    RF_POWER_N8p50dBm  = BIT(7) | 8,   /**<  -8.50 dbm */
+    RF_POWER_N9p50dBm  = BIT(7) | 7,   /**<  -9.50 dbm */
+    RF_POWER_N10p90dBm = BIT(7) | 6,  /**<  -10.90 dbm */
+    RF_POWER_N12p30dBm = BIT(7) | 5,  /**<  -12.30 dbm */
+    RF_POWER_N14p20dBm = BIT(7) | 4,  /**<  -14.20 dbm */
+    RF_POWER_N16p50dBm = BIT(7) | 3,  /**<  -16.50 dbm */
+    RF_POWER_N20p00dBm = BIT(7) | 2,  /**<  -20.00 dbm */
+    RF_POWER_N25p30dBm = BIT(7) | 1,  /**<  -25.30 dbm */
+
 } rf_power_level_e;
 
 /**
@@ -355,58 +342,52 @@ typedef enum
 typedef enum
 {
     /*VBAT*/
-    RF_POWER_INDEX_P10p73dBm , /**<  10.7 dbm */
-    RF_POWER_INDEX_P10p51dBm , /**<  10.5 dbm */
-    RF_POWER_INDEX_P10p04dBm , /**<  10.0 dbm */
-    RF_POWER_INDEX_P9p54dBm  , /**<  9.5 dbm */
-    RF_POWER_INDEX_P8p99dBm  , /**<  9.0 dbm */
-    RF_POWER_INDEX_P8p52dBm  , /**<  8.5 dbm */
-    RF_POWER_INDEX_P8p03dBm  , /**<  8.0 dbm */
-    RF_POWER_INDEX_P7p49dBm  , /**<  7.5 dbm */
-    RF_POWER_INDEX_P7p31dBm  , /**<  7.3 dbm */
-    RF_POWER_INDEX_P7p11dBm  , /**<  7.1 dbm */
-    RF_POWER_INDEX_P6p91dBm  , /**<  6.9 dbm */
-    RF_POWER_INDEX_P6p70dBm  , /**<  6.7 dbm */
-    RF_POWER_INDEX_P6p49dBm  , /**<  6.5 dbm */
-    RF_POWER_INDEX_P6p03dBm  , /**<  6.0 dbm */
-    RF_POWER_INDEX_P5p54dBm  , /**<  5.5 dbm */
-    RF_POWER_INDEX_P5p02dBm  , /**<  5.0 dbm */
-    RF_POWER_INDEX_P4p47dBm  , /**<  4.5 dbm */
-    RF_POWER_INDEX_P3p86dBm  , /**<  3.8 dbm */
-    RF_POWER_INDEX_P3p21dBm  , /**<  3.2 dbm */
-    RF_POWER_INDEX_P2p85dBm  , /**<  2.9 dbm */
-    RF_POWER_INDEX_P2p47dBm  , /**<  2.5 dbm */
+    RF_POWER_INDEX_P10p00dBm, /**<  10.0 dbm */
+    RF_POWER_INDEX_P9p69dBm,  /**<   9.7 dbm */
+    RF_POWER_INDEX_P9p43dBm,  /**<   9.4 dbm */
+    RF_POWER_INDEX_P9p12dBm,  /**<   9.1 dbm */
+    RF_POWER_INDEX_P8p79dBm,  /**<   8.8 dbm */
+    RF_POWER_INDEX_P8p40dBm,  /**<   8.4 dbm */
+    RF_POWER_INDEX_P7p91dBm,  /**<   7.9 dbm */
+    RF_POWER_INDEX_P7p42dBm,  /**<   7.4 dbm */
+    RF_POWER_INDEX_P6p88dBm,  /**<   6.9 dbm */
+    RF_POWER_INDEX_P6p26dBm,  /**<   6.3 dbm */
+    RF_POWER_INDEX_P5p59dBm,  /**<   5.6 dbm */
+    RF_POWER_INDEX_P4p83dBm,  /**<   4.8 dbm */
 
     /*VANT*/
-    RF_POWER_INDEX_P1p90dBm  , /**<   1.9 dbm */
-    RF_POWER_INDEX_P1p47dBm  , /**<   1.5 dbm */
-    RF_POWER_INDEX_P1p00dBm  , /**<   1.0 dbm */
-    RF_POWER_INDEX_P0p74dBm  , /**<   0.7 dbm */
-    RF_POWER_INDEX_P0p47dBm  , /**<   0.4 dbm */
-    RF_POWER_INDEX_P0p19dBm  , /**<   0.2 dbm */
-    RF_POWER_INDEX_P0p03dBm  , /**<   0.0 dbm */
-    RF_POWER_INDEX_N0p13dBm  , /**<  -0.2 dbm */
-    RF_POWER_INDEX_N0p30dBm  , /**<  -0.3 dbm */
-    RF_POWER_INDEX_N0p44dBm  , /**<  -0.7 dbm */
-    RF_POWER_INDEX_N0p96dBm  , /**<  -1.0 dbm */
-    RF_POWER_INDEX_N1p50dBm  , /**<  -1.5 dbm */
-    RF_POWER_INDEX_N2p12dBm  , /**<  -2.1 dbm */
-    RF_POWER_INDEX_N2p55dBm  , /**<  -2.6 dbm */
-    RF_POWER_INDEX_N3p02dBm  , /**<  -3.0 dbm */
-    RF_POWER_INDEX_N3p52dBm  , /**<  -3.5 dbm */
-    RF_POWER_INDEX_N4p06dBm  , /**<  -4.0 dbm */
-    RF_POWER_INDEX_N4p64dBm  , /**<  -4.6 dbm */
-    RF_POWER_INDEX_N5p59dBm  , /**<  -5.6 dbm */
-    RF_POWER_INDEX_N6p72dBm  , /**<  -6.7 dbm */
-    RF_POWER_INDEX_N7p57dBm  , /**<  -7.6 dbm */
-    RF_POWER_INDEX_N8p52dBm  , /**<  -8.5 dbm */
-    RF_POWER_INDEX_N10p28dBm , /**<  -10.3 dbm */
-    RF_POWER_INDEX_N11p67dBm , /**<  -11.7 dbm */
-    RF_POWER_INDEX_N14p37dBm , /**<  -14.4 dbm */
-    RF_POWER_INDEX_N16p82dBm , /**<  -16.8 bm */
-    RF_POWER_INDEX_N20p25dBm , /**<  -20.3 dbm */
-    RF_POWER_INDEX_N26p20dBm , /**<  -26.2 dbm */
-    RF_POWER_INDEX_N31p73dBm , /**<  -31.7 dbm */
+    RF_POWER_INDEX_P4p50dBm,  /**<    4.5 dbm */
+    RF_POWER_INDEX_P4p00dBm,  /**<    4.0 dbm */
+    RF_POWER_INDEX_P3p50dBm,  /**<    3.5 dbm */
+    RF_POWER_INDEX_P3p00dBm,  /**<    3.0 dbm */
+    RF_POWER_INDEX_P2p50dBm,  /**<    2.5 dbm */
+    RF_POWER_INDEX_P2p00dBm,  /**<    2.0 dbm */
+    RF_POWER_INDEX_P1p50dBm,  /**<    1.5 dbm */
+    RF_POWER_INDEX_P1p00dBm,  /**<    1.0 dbm */
+    RF_POWER_INDEX_P0p50dBm,  /**<    0.5 dbm */
+    RF_POWER_INDEX_P0p00dBm,  /**<    0.0 dbm */
+    RF_POWER_INDEX_N0p50dBm,  /**<   -0.5 dbm */
+    RF_POWER_INDEX_N1p00dBm,  /**<  -1.00 dbm */
+    RF_POWER_INDEX_N1p50dBm,  /**<  -1.50 dbm */
+    RF_POWER_INDEX_N2p00dBm,  /**<  -2.00 dbm */
+    RF_POWER_INDEX_N2p50dBm,  /**<  -2.50 dbm */
+    RF_POWER_INDEX_N3p00dBm,  /**<  -3.00 dbm */
+    RF_POWER_INDEX_N3p50dBm,  /**<  -3.50 dbm */
+    RF_POWER_INDEX_N4p00dBm,  /**<  -4.00 dbm */
+    RF_POWER_INDEX_N4p50dBm,  /**<  -4.50 dbm */
+    RF_POWER_INDEX_N5p00dBm,  /**<  -5.00 dbm */
+    RF_POWER_INDEX_N5p50dBm,  /**<  -5.50 dbm */
+    RF_POWER_INDEX_N6p50dBm,  /**<  -6.50 dbm */
+    RF_POWER_INDEX_N7p50dBm,  /**<  -7.50 dbm */
+    RF_POWER_INDEX_N8p50dBm,  /**<  -8.50 dbm */
+    RF_POWER_INDEX_N9p50dBm,  /**<  -9.50 dbm */
+    RF_POWER_INDEX_N10p90dBm, /**<  -10.90 dbm */
+    RF_POWER_INDEX_N12p30dBm, /**<  -12.30 dbm */
+    RF_POWER_INDEX_N14p20dBm, /**<  -14.20 dbm */
+    RF_POWER_INDEX_N16p50dBm, /**<  -16.50 dbm */
+    RF_POWER_INDEX_N20p00dBm, /**<  -20.00 dbm */
+    RF_POWER_INDEX_N25p30dBm, /**<  -25.30 dbm */
+
 } rf_power_level_index_e;
 
 /**
@@ -1166,10 +1147,9 @@ void rf_pn_disable(void);
  * @brief      This function serve to adjust tx/rx settle timing sequence.
  * @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
  * @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
- * @return       0                   -  Correct configuration.
- *              -1                   -  Incorrect configuration.
+ * @return     none
  */
-signed char rf_fast_settle_config(rf_tx_fast_settle_time_e tx_settle_us, rf_rx_fast_settle_time_e rx_settle_us);
+void rf_fast_settle_config(rf_tx_fast_settle_time_e tx_settle_us, rf_rx_fast_settle_time_e rx_settle_us);
 
 
 /**
@@ -1197,6 +1177,7 @@ void rf_rx_fast_settle_en(void);
  *  @brief      This function serve to disable the rx timing sequence adjusted.
  *  @param[in]  none
  *  @return     none
+ *  @note        This interface needs to be called after rf mode initialization (e.g. after rf_set_ble_1M_NO_PN_mode)
 */
 void rf_rx_fast_settle_dis(void);
 
@@ -1213,6 +1194,63 @@ void rf_get_rccal_cal_val(rf_rccal_cal_t *rccal_cal);
  *  @return     none
  */
 void rf_set_rccal_cal_val(rf_rccal_cal_t rccal_cal);
+/**
+ *  @brief      This function is used to set the tx fast_settle calibration value.
+ *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_59US, other parameters are invalid.
+ *                              (When tx_settle_us is 15us or 59us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @return     none
+*/
+void rf_tx_fast_settle_update_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsigned char chn);
+
+/**
+ *  @brief      This function is used to set the rx fast_settle calibration value.
+ *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
+ *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @return     none
+*/
+void rf_rx_fast_settle_update_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn);
+
+/**
+ *  @brief      This function is used to get the tx fast_settle calibration value.
+ *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_59US, other parameters are invalid.
+ *                              (When tx_settle_us is 15us or 59us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_tx_fast_settle_get_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
+
+/**
+ *  @brief      This function is used to set the tx fast_settle calibration value.
+ *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_59US, other parameters are invalid.
+ *                              (When tx_settle_us is 15us or 59us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_tx_fast_settle_set_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
+
+/**
+ *  @brief      This function is used to get the rx fast_settle calibration value.
+ *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
+ *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_rx_fast_settle_get_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
+
+/**
+ *  @brief      This function is used to set the rx fast_settle calibration value.
+ *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
+ *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_rx_fast_settle_set_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
 
 /**
  * @brief      This function serves to set the tx wait time during the rx2tx process
@@ -1274,29 +1312,26 @@ _attribute_ram_code_sec_noinline_ void rf_reset_register_value(void);
 void rf_set_power_level_singletone(rf_power_level_e level);
 
 /**
- *  @brief      This function is used to set the tx fast_settle calibration value.
- *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
- *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_51US, other parameters are invalid.
- *                              (When tx_settle_us is 15us or 51us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
- *  @return     none
-*/
-void rf_tx_fast_settle_update_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsigned char chn);
-
-/**
- *  @brief      This function is used to set the rx fast_settle calibration value.
- *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
- *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
- *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
- *  @return     none
-*/
-void rf_rx_fast_settle_update_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn);
-
-/**
  * @brief       This function serves to set rf fpga channel for all mode.The actual channel set by this function is 2400+chn.
  * @param[in]   chn
  * @return      none.
  */
 void rf_fpga_set_chn(signed char chn);
+
+void rf_set_fcal_value(unsigned char fcal_value);
+
+/**
+ * @brief      This interface is used to configure the BLE debug port IO.
+ * @return     none.
+ * @note       This function is only used for BLE mode debugging and testing.
+ *              PA1  - ble_tx_en
+ *              PA2  - ble_tx_on
+ *              PA3  - ble_rx_en
+ *              PA5  - ble_rx_hit_sync
+ *              PA8  - ble_rx_data_vld
+ */
+void rf_set_ble_bb_debugport(void);
+
 #endif
 
 

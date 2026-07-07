@@ -551,7 +551,7 @@ typedef enum
     PROBE_CLK_I2S0      = 19,
     PROBE_CLK_I2S2      = 20,
     PROBE_CLK_DMIC      = 21,
-    PROBE_DSM_DEBUG     = 22,
+    PROBE_CLK_AUDIO     = 22,
     PROBE_CODEC_ADC_CLK_6M = 23,
     PROBE_CODEC_ADC_CLK_1M = 24,
     PROBE_CLK_7816         = 25,
