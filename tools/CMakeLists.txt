@@ -100,6 +100,7 @@ file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/dma.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/lpc.c
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/lpd.c
+	${TL_BLE_SRC_DIR}/drivers/${SOC}/pem.c
 	${TL_BLE_SRC_DIR}/vendor/common/flash_prot.c
 	${TL_BLE_SRC_DIR}/vendor/common/ble_flash.c
 )
