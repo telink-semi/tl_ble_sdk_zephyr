@@ -2361,14 +2361,14 @@ enum
 
 enum
 {
-    FLD_RF_RX_LNA_PUP_OW             = BIT(0),
-    FLD_RF_RX_LNA_HGAIN_OW           = BIT(1),
-    FLD_RF_RX_LNA_LGAIN_OW           = BIT(2),
-    FLD_RF_RX_LNA_ATTN_OW            = BIT(3),
-    FLD_RF_RX_MIX_PUP_OW             = BIT(4),
-    FLD_RF_TX_PA_PUP_OW              = BIT(5),
-    FLD_RF_TX_PA_PWR_OW              = BIT(6),
-    FLD_RF_PA_RAMP_TSEQ_OR_TX_ON_SEL = BIT(7),
+    FLD_RF_RX_LNA_PUP_OW         = BIT(0),
+    FLD_RF_RX_LNA_HGAIN_OW       = BIT(1),
+    FLD_RF_RX_LNA_LGAIN_OW       = BIT(2),
+    FLD_RF_RX_LNA_ATTN_OW        = BIT(3),
+    FLD_RF_RX_MIX_PUP_OW         = BIT(4),
+    FLD_RF_TX_PA_PUP_OW          = BIT(5),
+    FLD_RF_TX_PA_PWR_OW          = BIT(6),
+    FLD_RF_PA_RAMP_TSEQ_OR_TX_ON = BIT(7),
 };
 
 #define reg_rf_pa_ow_val REG_ADDR8(REG_TL_RADIO_BASE_ADDR + 0x17c)

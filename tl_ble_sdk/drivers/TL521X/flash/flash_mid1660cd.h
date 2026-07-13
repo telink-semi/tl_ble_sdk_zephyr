@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    flash_mid156085.h
+ * @file    flash_mid1660cd.h
  *
  * @brief   This is the header file for tl521x
  *
@@ -21,60 +21,64 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef __MID156085_H__
-#define __MID156085_H__
+#ifndef __MID1660CD_H__
+#define __MID1660CD_H__
 
 /*
- * @brief     MID = 0x156085 Flash include P25Q16SU.
+ * @brief     MID = 0x1660cd Flash include TH25Q32U.
  */
 
 
 /**
  * @brief   define the section of the protected memory area which is read-only and unalterable.
- * @note    when data protection, only enumeration items in mid156085_lock_block_e can be selected,
- *          to ensure that the values returned by the interface flash_get_lock_block_mid156085 are in the mid156085_lock_block_e.
+ * @note    when data protection, only enumeration items in mid1660cd_lock_block_e can be selected,
+ *          to ensure that the values returned by the interface flash_get_lock_block_mid1660cd are in the mid1660cd_lock_block_e.
  */
 typedef enum
 {
     //---------WPS=0, CMP bit = 0-----------------//
-    FLASH_LOCK_NONE_MID156085     = 0x0000, //000000h-000000h   //0x0020 0x407c...
-    FLASH_LOCK_UP_64K_MID156085   = 0x0004, //1F0000h-1FFFFFh
-    FLASH_LOCK_UP_128K_MID156085  = 0x0008, //1E0000h-1FFFFFh
-    FLASH_LOCK_UP_256K_MID156085  = 0x000c, //1C0000h-1FFFFFh
-    FLASH_LOCK_UP_512K_MID156085  = 0x0010, //180000h-1FFFFFh
-    FLASH_LOCK_UP_1M_MID156085    = 0x0014, //100000h-1FFFFFh  //0x4034
-    FLASH_LOCK_LOW_64K_MID156085  = 0x0024, //000000h-00FFFFh
-    FLASH_LOCK_LOW_128K_MID156085 = 0x0028, //000000h-01FFFFh
-    FLASH_LOCK_LOW_256K_MID156085 = 0x002c, //000000h-03FFFFh
-    FLASH_LOCK_LOW_512K_MID156085 = 0x0030, //000000h-07FFFFh
-    FLASH_LOCK_LOW_1M_MID156085   = 0x0034, //000000h-0FFFFFh  //0x4014
-    FLASH_LOCK_UP_4K_MID156085    = 0x0044, //1FF000h-1FFFFFh
-    FLASH_LOCK_UP_8K_MID156085    = 0x0048, //1FE000h-1FFFFFh
-    FLASH_LOCK_UP_16K_MID156085   = 0x004c, //1FC000h-1FFFFFh
-    FLASH_LOCK_UP_32K_MID156085   = 0x0050, //1F8000h-1FFFFFh   //0x0054
-    FLASH_LOCK_LOW_4K_MID156085   = 0x0064, //000000h-000FFFh
-    FLASH_LOCK_LOW_8K_MID156085   = 0x0068, //000000h-001FFFh
-    FLASH_LOCK_LOW_16K_MID156085  = 0x006c, //000000h-003FFFh
-    FLASH_LOCK_LOW_32K_MID156085  = 0x0070, //000000h-007FFFh   //0x0074
+    FLASH_LOCK_NONE_MID1660CD     = 0x0000, //000000h-000000h  //0x0020 0x407c...
+    FLASH_LOCK_UP_64K_MID1660CD    = 0x0004, //3F0000h-3FFFFFh
+    FLASH_LOCK_UP_128K_MID1660CD   = 0x0008, //3E0000h-3FFFFFh
+    FLASH_LOCK_UP_256K_MID1660CD   = 0x000c, //3C0000h-3FFFFFh
+    FLASH_LOCK_UP_512K_MID1660CD   = 0x0010, //380000h-3FFFFFh
+    FLASH_LOCK_UP_1M_MID1660CD     = 0x0014, //300000h-3FFFFFh
+    FLASH_LOCK_UP_2M_MID1660CD    = 0x0018, //200000h-3FFFFFh  //0x4038
+    FLASH_LOCK_LOW_64K_MID1660CD  = 0x0024, //000000h-00FFFFh
+    FLASH_LOCK_LOW_128K_MID1660CD = 0x0028, //000000h-01FFFFh
+    FLASH_LOCK_LOW_256K_MID1660CD = 0x002c, //000000h-03FFFFh
+    FLASH_LOCK_LOW_512K_MID1660CD = 0x0030, //000000h-07FFFFh
+    FLASH_LOCK_LOW_1M_MID1660CD   = 0x0034, //000000h-0FFFFFh
+    FLASH_LOCK_LOW_2M_MID1660CD   = 0x0038, //000000h-1FFFFFh  //0x007c 0x4018...
+    FLASH_LOCK_UP_4K_MID1660CD    = 0x0044, //3FF000h-3FFFFFh
+    FLASH_LOCK_UP_8K_MID1660CD    = 0x0048, //3FE000h-3FFFFFh
+    FLASH_LOCK_UP_16K_MID1660CD   = 0x004c, //3FC000h-3FFFFFh
+    FLASH_LOCK_UP_32K_MID1660CD   = 0x0058, //3F8000h-3FFFFFh  //0x0050 0x0054
+    FLASH_LOCK_LOW_4K_MID1660CD   = 0x0064, //000000h-000FFFh
+    FLASH_LOCK_LOW_8K_MID1660CD   = 0x0068, //000000h-001FFFh
+    FLASH_LOCK_LOW_16K_MID1660CD  = 0x006c, //000000h-003FFFh
+    FLASH_LOCK_LOW_32K_MID1660CD  = 0x0078, //000000h-007FFFh  //0x0070 0x0074
     //----------------WPS=0, CMP bit = 1---------------//
-    FLASH_LOCK_LOW_1984K_MID156085 = 0x4004, //000000h-1EFFFFh
-    FLASH_LOCK_LOW_1920K_MID156085 = 0x4008, //000000h-1DFFFFh
-    FLASH_LOCK_LOW_1792K_MID156085 = 0x400c, //000000h-1BFFFFh
-    FLASH_LOCK_LOW_1536K_MID156085 = 0x4010, //000000h-17FFFFh
-    FLASH_LOCK_UP_1984K_MID156085  = 0x4024, //010000h-1FFFFFh
-    FLASH_LOCK_UP_1920K_MID156085  = 0x4028, //020000h-1FFFFFh
-    FLASH_LOCK_UP_1792K_MID156085  = 0x402c, //040000h-1FFFFFh
-    FLASH_LOCK_UP_1536K_MID156085  = 0x4030, //080000h-1FFFFFh
-    FLASH_LOCK_LOW_2044K_MID156085 = 0x4044, //000000h-1FEFFFh
-    FLASH_LOCK_LOW_2040K_MID156085 = 0x4048, //000000h-1FDFFFh
-    FLASH_LOCK_LOW_2032K_MID156085 = 0x404c, //000000h-1FBFFFh
-    FLASH_LOCK_LOW_2016K_MID156085 = 0x4050, //000000h-1F7FFFh   //0x4054
-    FLASH_LOCK_UP_2044K_MID156085  = 0x4064, //001000h-1FFFFFh
-    FLASH_LOCK_UP_2040K_MID156085  = 0x4068, //002000h-1FFFFFh
-    FLASH_LOCK_UP_2032K_MID156085  = 0x406c, //004000h-1FFFFFh
-    FLASH_LOCK_UP_2016K_MID156085  = 0x4070, //008000h-1FFFFFh   //0x4074
-    FLASH_LOCK_ALL_2M_MID156085    = 0x007c, //000000h-1FFFFFh   //0x4000 0x4040 0x4020 0x4060...
-} mid156085_lock_block_e;
+    FLASH_LOCK_LOW_4032K_MID1660CD = 0x4004, //000000h-3EFFFFh
+    FLASH_LOCK_LOW_3968K_MID1660CD = 0x4008, //000000h-3DFFFFh
+    FLASH_LOCK_LOW_3840K_MID1660CD = 0x400c, //000000h-3BFFFFh
+    FLASH_LOCK_LOW_3584K_MID1660CD = 0x4010, //000000h-37FFFFh
+    FLASH_LOCK_LOW_3M_MID1660CD    = 0x4014, //000000h-2FFFFFh
+    FLASH_LOCK_UP_4032K_MID1660CD  = 0x4024, //010000h-3FFFFFh
+    FLASH_LOCK_UP_3968K_MID1660CD  = 0x4028, //020000h-3FFFFFh
+    FLASH_LOCK_UP_3840K_MID1660CD  = 0x402c, //040000h-3FFFFFh
+    FLASH_LOCK_UP_3584K_MID1660CD  = 0x4030, //080000h-3FFFFFh
+    FLASH_LOCK_UP_3M_MID1660CD     = 0x4034, //100000h-3FFFFFh
+    FLASH_LOCK_LOW_4092K_MID1660CD = 0x4044, //000000h-3FEFFFh
+    FLASH_LOCK_LOW_4088K_MID1660CD = 0x4048, //000000h-3FDFFFh
+    FLASH_LOCK_LOW_4080K_MID1660CD = 0x404c, //000000h-3FBFFFh
+    FLASH_LOCK_LOW_4064K_MID1660CD = 0x4058, //000000h-3F7FFFh  //0x4050 0x4054
+    FLASH_LOCK_UP_4092K_MID1660CD  = 0x4064, //001000h-3FFFFFh
+    FLASH_LOCK_UP_4088K_MID1660CD  = 0x4068, //002000h-3FFFFFh
+    FLASH_LOCK_UP_4080K_MID1660CD  = 0x406c, //004000h-3FFFFFh
+    FLASH_LOCK_UP_4064K_MID1660CD  = 0x4078, //008000h-3FFFFFh  //0x4070 0x4074
+    FLASH_LOCK_ALL_4M_MID1660CD    = 0x4000, //000000h-3FFFFFh  //0x4000 0x4040 0x4020 0x4060...
+} mid1660cd_lock_block_e;
 
 /**
  * @brief   the options of qe 
@@ -82,52 +86,52 @@ typedef enum
  */
 typedef enum
 {
-    FLASH_QE_DISABLE_MID156085 = 0x0000,
-    FLASH_QE_ENABLE_MID156085  = 0x0200,
-} mid156085_qe_e;
+    FLASH_QE_DISABLE_MID1660CD = 0x0000,
+    FLASH_QE_ENABLE_MID1660CD  = 0x0200,
+} mid1660cd_qe_e;
 
 /**
  * @brief     The starting address of the Security Registers.
  */
 typedef enum
 {
-    FLASH_OTP_0x001000_1024B_MID156085 = 0x001000, //001000h-0013FFh
-    FLASH_OTP_0x002000_1024B_MID156085 = 0x002000, //002000h-0023FFh
-    FLASH_OTP_0x003000_1024B_MID156085 = 0x003000, //003000h-0033FFh
-} mid156085_otp_block_e;
+    FLASH_OTP_0x001000_1024B_MID1660CD = 0x001000, //001000h-0013FFh
+    FLASH_OTP_0x002000_1024B_MID1660CD = 0x002000, //002000h-0023FFh
+    FLASH_OTP_0x003000_1024B_MID1660CD = 0x003000, //003000h-0033FFh
+} mid1660cd_otp_block_e;
 
 /**
  * @brief     the lock area of the Security Registers.
  */
 typedef enum
 {
-    FLASH_LOCK_OTP_0x001000_1024B_MID156085 = 0x0800, //001000h-0013FFh
-    FLASH_LOCK_OTP_0x002000_1024B_MID156085 = 0x1000, //002000h-0023FFh
-    FLASH_LOCK_OTP_0x003000_1024B_MID156085 = 0x2000, //003000h-0033FFh
-} mid156085_lock_otp_e;
+    FLASH_LOCK_OTP_0x001000_1024B_MID1660CD = 0x0800, //001000h-0013FFh
+    FLASH_LOCK_OTP_0x002000_1024B_MID1660CD = 0x1000, //002000h-0023FFh
+    FLASH_LOCK_OTP_0x003000_1024B_MID1660CD = 0x2000, //003000h-0033FFh
+} mid1660cd_lock_otp_e;
 
 /**
  * @brief     the range of masks to be modified when writing status.
  */
 typedef enum
 {
-    FLASH_WRITE_STATUS_BP_MID156085  = 0x407c, //the values that can be set can refer to mid156085_lock_block_e
-    FLASH_WRITE_STATUS_QE_MID156085  = 0x0200, //the values that can be set can refer to mid156085_qe_e
-    FLASH_WRITE_STATUS_OTP_MID156085 = 0x3800, //the values that can be set can refer to mid156085_lock_otp_e
+    FLASH_WRITE_STATUS_BP_MID1660CD  = 0x407c, //the values that can be set can refer to mid1660cd_lock_block_e
+    FLASH_WRITE_STATUS_QE_MID1660CD  = 0x0200, //the values that can be set can refer to mid1660cd_qe_e
+    FLASH_WRITE_STATUS_OTP_MID1660CD = 0x3800, //the values that can be set can refer to mid1660cd_lock_otp_e
 
-    /*Related to flash hardware protection.When using this function, you need to pay attention.
-     *If the #WP pin of the flash is grounded and the hardware protection is set at this time,
+    /*Related to flash hardware protection.When using this function, you need to pay attention. 
+     *If the #WP pin of the flash is grounded and the hardware protection is set at this time, 
      *the status register of the flash will be locked and irreversible.*/
-    FLASH_WRITE_STATUS_SRP_MID156085 = 0x0180,
-} mid156085_write_status_mask_e;
+    FLASH_WRITE_STATUS_SRP_MID1660CD = 0x0180,
+} mid1660cd_write_status_mask_e;
 
 /**
  * @brief     the range of bits to be modified when writing configure.
  */
 typedef enum
 {
-    FLASH_WRITE_CONFIGURE_WPS_MID156085 = 0x04,
-} mid156085_write_config_bit_e;
+    FLASH_WRITE_CONFIGURE_WPS_MID166085 = 0x04,
+} mid1660cd_write_config_bit_e;
 
 /**
  * @brief       This function reads the status of flash.
@@ -142,11 +146,11 @@ typedef enum
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned short flash_read_status_mid156085(void);
+unsigned short flash_read_status_mid1660cd(void);
 /**
  * @brief       This function write the status of flash.
  * @param[in]   data    - the status value of the flash after the mask.
- * @param[in]   mask        - mid156085_write_status_mask_e.
+ * @param[in]   mask        - mid1660cd_write_status_mask_e.
  * @return      1: success, 0: error, 2: parameter error.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -158,11 +162,11 @@ unsigned short flash_read_status_mid156085(void);
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_write_status_mid156085(unsigned short data, unsigned int mask);
+unsigned char flash_write_status_mid1660cd(unsigned short data, unsigned int mask);
 
 /**
  * @brief       This function serves to set the protection area of the flash.
- * @param[in]   data    - mid156085_lock_block_e.
+ * @param[in]   data    - mid1660cd_lock_block_e.
  * @return      1: success, 0: error, 2: parameter error.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -174,7 +178,7 @@ unsigned char flash_write_status_mid156085(unsigned short data, unsigned int mas
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_lock_mid156085(unsigned int data);
+unsigned char flash_lock_mid1660cd(unsigned int data);
 
 /**
  * @brief       This function serves to flash release protection.
@@ -189,11 +193,11 @@ unsigned char flash_lock_mid156085(unsigned int data);
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_unlock_mid156085(void);
+unsigned char flash_unlock_mid1660cd(void);
 
 /**
  * @brief       This function serves to get the protection area of the flash.
- * @return      mid156085_lock_block_e.
+ * @return      mid1660cd_lock_block_e.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
  *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
@@ -204,7 +208,7 @@ unsigned char flash_unlock_mid156085(void);
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned int flash_get_lock_block_mid156085(void);
+unsigned int flash_get_lock_block_mid1660cd(void);
 
 /**
  * @brief       This function serves to read data from the Security Registers of the flash.
@@ -225,7 +229,7 @@ unsigned int flash_get_lock_block_mid156085(void);
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_read_otp_mid156085(unsigned long addr, unsigned long len, unsigned char *buf);
+void flash_read_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief       This function serves to write data to the Security Registers of the flash you choose.
@@ -246,7 +250,7 @@ void flash_read_otp_mid156085(unsigned long addr, unsigned long len, unsigned ch
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_write_otp_mid156085(unsigned long addr, unsigned long len, unsigned char *buf);
+void flash_write_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief       This function serves to erase the data of the Security Registers that you choose.
@@ -268,7 +272,7 @@ void flash_write_otp_mid156085(unsigned long addr, unsigned long len, unsigned c
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_erase_otp_mid156085(mid156085_otp_block_e addr);
+void flash_erase_otp_mid1660cd(mid1660cd_otp_block_e addr);
 
 /**
  * @brief       This function serves to provide the write protect control to the Security Registers.
@@ -287,22 +291,6 @@ void flash_erase_otp_mid156085(mid156085_otp_block_e addr);
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_lock_otp_mid156085(mid156085_lock_otp_e data);
+void flash_lock_otp_mid1660cd(mid1660cd_lock_otp_e data);
 
-/**
- * @brief       This function write the configure of flash.
- * @param[in]   data    - the value of configure.
- * @param[in]   bit     - the range of bits to be modified when writing configure.
- * @return      none.
- * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-void flash_write_config_mid156085(unsigned char data, mid156085_write_config_bit_e bit);
 #endif

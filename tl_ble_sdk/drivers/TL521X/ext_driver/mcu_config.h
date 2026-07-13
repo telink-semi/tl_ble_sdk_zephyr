@@ -35,17 +35,17 @@
 /**
  * @brief   Public Device Address Company ID for this chip
  */
-#define PDA_COMPANY_ID                                          0xC0A3C7
+#define PDA_COMPANY_ID                                          0x888225
 
 
 
 /*
     Flash Type  uid CMD     MID         Company
-    P25Q80U     0x4b        0x146085    PUYA
+    P25Q80SU    0x4b        0x146085    PUYA
     P25Q16SU    0x4b        0x156085    PUYA
-    P25Q32SU    0x4b        0x166085    PUYA
-    P25Q128L    0x4b        0x186085    PUYA
+    GD25LE80E   0x4b        0x1460c8    GD
     GD25LQ16E   0x4b        0x1560c8    GD
+    TH25Q32U    0x4b        0x1660cd    TH
  */
 #define FLASH_P25Q80U_SUPPORT_EN                                0
 #define FLASH_P25Q80SU_SUPPORT_EN                               1
@@ -58,6 +58,7 @@
 #define FLASH_GD25LE16E_SUPPORT_EN                              1
 #define FLASH_GD25LQ16E_SUPPORT_EN                              0
 
+#define FLASH_TH25Q32U_SUPPORT_EN                               1
 
 /**
  * @brief   RF THREE CHANNEL CALIBRATION

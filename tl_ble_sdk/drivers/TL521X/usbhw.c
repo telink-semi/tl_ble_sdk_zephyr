@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    usbhw.c
  *
- * @brief   This is the source file for tl323x
+ * @brief   This is the source file for tl521x
  *
  * @author  Driver Group
  * @date    2025
@@ -30,12 +30,8 @@
  */
 void usbhw_init(void)
 {
-//    pm_set_dig_module_power_switch(FLD_PD_USB_EN, PM_POWER_UP);
-
-    //BM_SET(reg_rst0, FLD_RST0_USB);
-   // BM_SET(reg_clk_en0, FLD_CLK0_USB_EN);
-
-//    clock_bbpll_config(PLL_CLK);
+    BM_SET(reg_rst7, FLD_RST7_USB);
+    BM_SET(reg_clk_en7, FLD_CLK7_USB1_EN);
     write_reg8(SC_BASE_ADDR + 0x3b, sys_clk.pll_clk / 48); // Split the PLL clock to the USB clock
 }
 

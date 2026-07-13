@@ -202,6 +202,7 @@ enum
 {
     //RSVD
     FLD_RST7_USB    = BIT(0),
+    FLD_RST7_CAN0   = BIT(1),
     FLD_RST6_I3C0   = BIT(3)
     //RSVD
 };
@@ -306,7 +307,7 @@ enum
 
 enum
 {
-    FLD_CLK6_RZ_EN  = BIT(0),
+    FLD_CLK6_RZ_EN   = BIT(0),
     //RSVD
 };
 
@@ -315,6 +316,7 @@ enum
 enum
 {
     FLD_CLK7_USB1_EN    = BIT(0),
+    FLD_CLK7_CAN0_EN    = BIT(1),
     //RSVD
 };
 

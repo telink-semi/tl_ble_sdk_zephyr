@@ -24,6 +24,7 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
+#include "audio_reg.h"
 #include "gpio_reg.h"
 #include "soc.h"
 #include "analog_reg.h"
@@ -47,4 +48,5 @@
 #include "analog_afe3v_reg.h"
 #include "analog_afe1v_reg.h"
 #include "ir_learn_reg.h"
+#include "can_reg.h"
 #endif
