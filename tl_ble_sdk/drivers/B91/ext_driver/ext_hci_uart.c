@@ -205,5 +205,10 @@ void ext_hci_uartReceData(unsigned char *addr, unsigned int len)
     ReceAddr = addr;
     core_interrupt_enable();
 }
+
+void ext_hci_uartDisRxIrq(void)
+{
+   //todo
+}
 #endif
 

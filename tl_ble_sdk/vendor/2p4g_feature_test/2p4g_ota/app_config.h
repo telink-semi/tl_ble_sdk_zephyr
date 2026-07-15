@@ -23,11 +23,12 @@
  *******************************************************************************************************/
 #pragma once
 #include "config.h"
+#include "../feature_config.h"
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
-
+#if (FEATURE_TEST_MODE == OTA)
 
 /* Enable C linkage for C++ Compilers: */
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
@@ -78,10 +79,13 @@ extern "C"
 #define APP_LOG_EN           1
 #define APP_KEY_LOG_EN       1
 
-#define JTAG_DEBUG_DISABLE   1 //if use JTAG, change this
+   
 
 
 #include "../common/default_config.h"
+
+
+#endif //(FEATURE_TEST_MODE == OTA)
 
 ///* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)

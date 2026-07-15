@@ -24,6 +24,9 @@
 
 #ifndef _OTA_H_
 #define _OTA_H_
+#include "app_config.h"
+#if (FEATURE_TEST_MODE == OTA)
+
 
 #define OTA_SLAVE_BIN_ADDR_0x40000        0x40000
 #define OTA_SLAVE_BIN_ADDR_0x20000        0x20000
@@ -162,5 +165,5 @@ extern void OTA_RxIrq(unsigned char *Data);
 extern void OTA_TxIrq(unsigned char *Data);
 extern void OTA_RxTimeoutIrq(unsigned char *Data);
 
-
+#endif // FEATURE_TEST_MODE == OTA
 #endif /*_OTA_H_*/

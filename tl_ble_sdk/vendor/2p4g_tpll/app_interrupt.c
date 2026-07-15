@@ -25,7 +25,7 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "../stack/2p4g/tpll/tpll.h"
-#if (TPLL_MODE == TPLL_PTX)
+#if (TPLL_MODE == TPLL_PTX || TPLL_MODE == TPLL_PTX_3BIT)
 
 volatile unsigned int tx_irq_cnt_tx          = 0;
 volatile unsigned int tx_irq_cnt_invalid_pid = 0;
@@ -35,8 +35,11 @@ volatile unsigned int tx_irq_cnt_rx_dr       = 0;
 volatile unsigned int math_cnt               = 0;
 volatile unsigned int unmath_cnt             = 0;
 
-extern volatile unsigned char rx_flag, ds_flag, maxretry_flag, tx_done_flag;
-
+volatile unsigned char rx_flag       = 0;
+volatile unsigned char ds_flag       = 0;
+volatile unsigned char tx_done_flag  = 0;
+volatile unsigned char maxretry_flag = 0;
+volatile unsigned char rx_dr_flag    = 0;
 __attribute__((section(".ram_code"))) __attribute__((optimize("-Os"))) void rf_irq_handler(void)
 {
     unsigned char pipe = TPLL_GetTXPipe();
@@ -71,7 +74,7 @@ __attribute__((section(".ram_code"))) __attribute__((optimize("-Os"))) void rf_i
         //The RX_DR IRQ is asserted by a new packet arrival even
         reg_rf_irq_status = FLD_RF_IRQ_RX_DR;
         tx_irq_cnt_rx_dr++;
-        rx_flag = 1;
+        rx_dr_flag = 1;
     }
     if (rf_get_irq_status(FLD_RF_IRQ_PKT_MATCH)) {
         math_cnt++;
@@ -85,7 +88,7 @@ __attribute__((section(".ram_code"))) __attribute__((optimize("-Os"))) void rf_i
     }
 }
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
-#elif (TPLL_MODE == TPLL_PRX)
+#elif (TPLL_MODE == TPLL_PRX || TPLL_MODE == TPLL_PRX_3BIT)
 volatile unsigned int rx_irq_cnt_rx_dr       = 0;
 volatile unsigned int rx_irq_cnt_invalid_pid = 0;
 volatile unsigned int rx_irq_cnt_rx          = 0;
@@ -94,7 +97,11 @@ volatile unsigned int rx_irq_cnt_tx_ds       = 0;
 volatile unsigned int math_cnt               = 0;
 volatile unsigned int unmath_cnt             = 0;
 
-extern unsigned char rx_flag;
+volatile unsigned char rx_flag       = 0;
+volatile unsigned char ds_flag       = 0;
+volatile unsigned char tx_done_flag  = 0;
+volatile unsigned char maxretry_flag = 0;
+volatile unsigned char rx_dr_flag    = 0;
 
 __attribute__((section(".ram_code"))) __attribute__((optimize("-Os"))) void rf_irq_handler(void)
 {

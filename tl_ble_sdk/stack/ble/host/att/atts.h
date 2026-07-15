@@ -24,9 +24,6 @@
 #pragma once
 
 #include "types.h"
-// #include "stack/ble/ble_common.h"
-
-
 #include "att.h"
 
 #define ATTS_SET_WRITE_CBACK           0x01

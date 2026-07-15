@@ -1,20 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-if(APPLE)
-    # Prevent macOS toolchain flags (e.g. -arch arm64) from leaking into cross builds.
-    set(CMAKE_SYSTEM_NAME Generic CACHE STRING "" FORCE)
-    if(TOOLCHAIN_NAME STREQUAL "RISC-V GCC/Newlib" AND EXISTS "${TOOLCHAIN_PATH}/bin/riscv32-unknown-elf-gcc")
-        set(CMAKE_SYSTEM_PROCESSOR riscv32 CACHE STRING "" FORCE)
-    elseif(TOOLCHAIN_NAME STREQUAL "RISC-V GCC/Newlib")
-        set(CMAKE_SYSTEM_PROCESSOR riscv64 CACHE STRING "" FORCE)
-    else()
-        set(CMAKE_SYSTEM_PROCESSOR riscv32 CACHE STRING "" FORCE)
-    endif()
-    set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
-    set(CMAKE_OSX_SYSROOT "" CACHE PATH "" FORCE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "" FORCE)
-endif()
-
 if(NOT DEFINED PROJECT_NAME)
     file(GLOB_RECURSE JSON_FILES "${CMAKE_SOURCE_DIR}/cmake_configs/*_cmake.json")
     list(LENGTH JSON_FILES FILE_COUNT)
@@ -55,13 +40,7 @@ endif()
 if (TOOLCHAIN_NAME STREQUAL "TC32-GCC Toolchain")
     set(TOOL_PRE "tc32-elf-")
 elseif(TOOLCHAIN_NAME STREQUAL "RISC-V GCC/Newlib")
-    if (EXISTS "${TOOLCHAIN_PATH}/bin/riscv32-unknown-elf-gcc${SUFFIX}")
-        set(TOOL_PRE "riscv32-unknown-elf-")
-    else()
-        set(TOOL_PRE "riscv64-unknown-elf-")
-    endif()
-elseif (TOOLCHAIN_NAME STREQUAL "xPack GNU RISC-V GCC14.2")
-    set(TOOL_PRE "riscv-none-elf-")
+    set(TOOL_PRE "riscv64-unknown-elf-")
 else()
     set(TOOL_PRE "riscv32-elf-")
 endif()
@@ -333,19 +312,13 @@ foreach(INDEX RANGE 0 ${TARGETS_LAST_INDEX})
     string(JSON OBJ_COPY GET ${TARGET_JSON} obj_copy)
     if(OBJ_COPY)  
         json_to_list(${OBJ_COPY} OBJ_COPY_LIST)
-        add_custom_command(TARGET ${TARGET_NAME} 
-            POST_BUILD COMMAND ${CMAKE_OBJCOPY} ${OBJ_COPY_LIST} ${TARGET_NAME}.elf ${TARGET_NAME}.bin
-            BYPRODUCTS ${TARGET_NAME}.bin
-        )
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_OBJCOPY} ${OBJ_COPY_LIST} ${TARGET_NAME}.elf ${TARGET_NAME}.bin)
     endif()
 
     string(JSON OBJ_DUMP GET ${TARGET_JSON} obj_dump)
     if(OBJ_DUMP)  
         json_to_list(${OBJ_DUMP} OBJ_DUMP_LIST)
-        add_custom_command(TARGET ${TARGET_NAME} 
-            POST_BUILD COMMAND ${CMAKE_OBJDUMP} ${OBJ_DUMP_LIST} ${TARGET_NAME}.elf > ${TARGET_NAME}.lst
-            BYPRODUCTS ${TARGET_NAME}.lst
-        )
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_OBJDUMP} ${OBJ_DUMP_LIST} ${TARGET_NAME}.elf > ${TARGET_NAME}.lst)
     endif()
 
     string(JSON PRINT_SIZE GET ${TARGET_JSON} print_size)

@@ -929,7 +929,7 @@ static void app_esl_add_objects(void)
 
     eslsRegParam.maxImageIndex = maxImageNum > 0 ? maxImageNum - 1 : maxImageNum;
 }
-#define HOST_MALLOC_BUFF_SIZE      (4 * 1024)
+#define HOST_MALLOC_BUFF_SIZE      (512)
 
 static _attribute_data_retention_ u8 hostMallocBuffer[HOST_MALLOC_BUFF_SIZE];
 void app_esl_init(void)

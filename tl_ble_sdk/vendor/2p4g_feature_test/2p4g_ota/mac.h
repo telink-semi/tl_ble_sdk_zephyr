@@ -24,6 +24,9 @@
 
 #ifndef _MAC_H_
 #define _MAC_H_
+#include "app_config.h"
+
+#if (FEATURE_TEST_MODE == OTA)
 
 typedef void (*MAC_Cb)(unsigned char *Data);
 
@@ -47,4 +50,5 @@ extern void MAC_RxTimeOutHandler(void);
 extern void MAC_RxFirstTimeOutHandler(void);
 void        MAC_TxIrqHandler(void);
 
+#endif // FEATURE_TEST_MODE == OTA
 #endif /* _MAC_H_ */

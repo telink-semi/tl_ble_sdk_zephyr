@@ -127,7 +127,7 @@ void blc_readFlashSize_autoConfigCustomFlashSector(void)
         tlkapi_printf(APP_FLASH_INIT_LOG_EN, "[FLASH][INI] 2M Flash, MAC on %x\r\n", flash_sector_mac_address);
     }
 #endif
-#if (FLASH_P25Q32SU_SUPPORT_EN) //4M
+#if (FLASH_P25Q32SU_SUPPORT_EN || FLASH_TH25Q32U_SUPPORT_EN) //4M
     else if (blc_flash_capacity == FLASH_SIZE_4M) {
         flash_sector_mac_address = CFG_ADR_MAC_4M_FLASH;
         flash_sector_calibration = CFG_ADR_CALIBRATION_4M_FLASH;

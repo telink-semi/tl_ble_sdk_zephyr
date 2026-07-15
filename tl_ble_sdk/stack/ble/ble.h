@@ -47,8 +47,8 @@
 #include "service/device_information.h"
 #include "service/hids.h"
 #include "service/uuid.h"
-#include "stack/ble/debug/debug.h"
 
+#include "stack/ble/debug/debug.h"
 
 
 

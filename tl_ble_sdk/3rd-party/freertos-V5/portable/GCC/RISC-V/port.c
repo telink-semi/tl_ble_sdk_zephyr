@@ -227,8 +227,7 @@ void vApplicationMallocFailedHook( void )
 
 #if (OS_SEPARATE_STACK_SPACE) //BLE SDK use
 _attribute_data_retention_sec_ volatile unsigned int  g_plic_switch_sp_flag=0;
-//static
-_attribute_ble_data_retention_ __attribute__ ((aligned(16))) unsigned long plicISRStack[ configISR_PLIC_STACK_SIZE ] = { 0 };
+ static __attribute__ ((aligned(16))) unsigned long plicISRStack[ configISR_PLIC_STACK_SIZE ] = { 0 };
 _attribute_data_retention_sec_ unsigned long tlk_plicISRStackTop = ( unsigned long ) &( plicISRStack[ configISR_PLIC_STACK_SIZE & ~0x000f ] );
 #endif
 

@@ -2542,8 +2542,6 @@ int app_ap_prf_event_callback(u16 aclHandle, int evtID, u8 *pData, u16 dataLen)
 
 void app_ap_loop(void)
 {
-    app_parse_loop();
-
     if (clock_time_exceed(currentTimeTick, 10*1000))
     {
         currentTimeTick = clock_time();

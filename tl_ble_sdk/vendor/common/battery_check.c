@@ -69,7 +69,10 @@ _attribute_ram_code_ void adc_bat_detect_init(void)
 {
     hal_adc_cfg_t adc_cfg = {0};
 #if VBAT_CHANNEL_EN
-    adc_cfg.adc_mode = HAL_ADC_MODE_VBAT;  // Configure ADC to GPIO mode
+    adc_cfg.adc_mode = HAL_ADC_MODE_VBAT;  // Configure ADC to VBAT mode
+    #if (MCU_CORE_TYPE == MCU_CORE_TL521X)
+        adc_cfg.dma_chn  = 0xFF;
+    #endif
 #else
     adc_cfg.adc_mode = HAL_ADC_MODE_GPIO;  // Configure ADC to GPIO mode
     adc_cfg.dma_chn  = 0xFF;      // no used

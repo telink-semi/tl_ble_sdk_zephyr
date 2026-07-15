@@ -45,6 +45,17 @@ typedef unsigned short     uint16;
 typedef unsigned int       uint32;
 typedef unsigned long long uint64;
 
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+typedef signed char        int8_t;
+typedef signed short       int16_t;
+typedef signed long        int32_t;
+typedef signed long long   int64_t;
+#endif // BLC_ZEPHYR_BLE_INTEGRATION
+
+typedef unsigned char uchar;
+typedef unsigned int  uint;
+typedef unsigned long ulong;
+
 #ifndef NULL
     #define NULL 0
 #endif

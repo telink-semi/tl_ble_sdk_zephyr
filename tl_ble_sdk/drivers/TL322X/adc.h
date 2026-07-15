@@ -270,6 +270,22 @@ typedef enum{
     FLD_CLOCK_XTL,
     FLD_CLOCK_PLL,
 }adc_dig_clk_src_e;
+
+typedef enum
+{
+    ADC_EVENT_RX_THRESHOLD = 0,
+    ADC_EVENT_RX_DATA_FIFO_WR,
+    ADC1_EVENT_RX_THRESHOLD,
+    ADC1_EVENT_RX_DATA_FIFO_WR,
+} adc_event_e;
+
+typedef enum
+{
+    ADC_TASK_SINGLE_ADC_TRIG = 0,
+    ADC1_TASK_SINGLE_ADC_TRIG = 2,
+} adc_task_e;
+
+
 /**********************************************************************************************************************
  *                                         DMA and NDMA common interface                                              *
  **********************************************************************************************************************/
@@ -589,14 +605,16 @@ static inline void adc_trigger_start(adc_num_e sar_adc_num)
  * @param[in]  event_signal - to select the event signal.
  * @return     none.
  */
-void adc_set_pem_event(adc_num_e sar_adc_num,pem_chn_e chn,unsigned char adc_sel);
+void adc_set_pem_event(adc_num_e sar_adc_num, pem_chn_e chn, adc_event_e event_signal);
+
 /**
  * @brief      This function serves to configure the PEM task.
  * @param[in]  sar_adc_num - SAR0/SAR1.
  * @param[in]  chn - to select the PEM channel.
  * @return     none.
  */
-void adc_set_pem_task(adc_num_e sar_adc_num,pem_chn_e chn);
+void adc_set_pem_task(adc_num_e sar_adc_num, pem_chn_e chn, adc_task_e task_signal);
+
 /**
  * @brief      This function sets adc digital clock and analog clock.
  * @param[in]  sar_adc_num - SAR0/SAR1.

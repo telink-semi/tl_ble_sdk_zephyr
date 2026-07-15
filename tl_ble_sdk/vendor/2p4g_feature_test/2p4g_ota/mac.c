@@ -26,6 +26,7 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "../stack/2p4g/genfsk_ll/genfsk_ll.h"
+#if (FEATURE_TEST_MODE == OTA)
 
 #define MAC_TX_BUF_LEN 64
 #define MAC_RX_BUF_LEN 128
@@ -238,3 +239,5 @@ void MAC_RxFirstTimeOutHandler(void)
         mac_Info.RxFirstTimeoutCb(NULL);
     }
 }
+#endif // FEATURE_TEST_MODE == OTA
+

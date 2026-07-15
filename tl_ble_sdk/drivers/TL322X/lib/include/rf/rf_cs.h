@@ -236,6 +236,23 @@ typedef struct __attribute__((packed))
 }ble_pkt_extend_info_t, *ble_pkt_extend_info_t_ptr;
 
 
+/**
+ *  @brief  set the modulation index.
+ */
+/* defined in rf_common.h */
+//typedef enum {
+//    RF_MI_P0p00 = 0,          /**< MI = 0 */
+//    RF_MI_P0p076 = 76,        /**< MI = 0.076 */
+//    RF_MI_P0p32 = 320,        /**< MI = 0.32 */
+//    RF_MI_P0p50 = 500,        /**< MI = 0.5 */
+//    RF_MI_P0p60 = 600,        /**< MI = 0.6 */
+//    RF_MI_P0p70 = 700,        /**< MI = 0.7 */
+//    RF_MI_P0p80 = 800,        /**< MI = 0.8 */
+//    RF_MI_P0p90 = 900,        /**< MI = 0.9 */
+//    RF_MI_P1p20 = 1200,       /**< MI = 1.2 */
+//    RF_MI_P1p30 = 1300,       /**< MI = 1.3 */
+//    RF_MI_P1p40 = 1400,       /**< MI = 1.4 */
+//}rf_mi_value_e;
 
 /**
  * @brief   select baseband transmission unit
@@ -917,7 +934,8 @@ static inline void rf_ble1m_no_pn_tx_customer_mode_en(void)
   * @param[in]  mi_value- the value of modulation_index*100.
   * @return     none.
   */
-void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
+/* defined in rf_common.h */
+//void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
 
 
 /**

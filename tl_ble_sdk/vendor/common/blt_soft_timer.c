@@ -21,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "stack/pm/pm_sys.h"
 #include "stack/ble/ble.h"
 #include "tl_common.h"
 #include "blt_soft_timer.h"

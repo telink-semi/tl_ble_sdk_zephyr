@@ -30,16 +30,14 @@
     #define PTX_PIPE        0
     #define PRI_FLT_MODE_EN 0
     #define TX_PAYLOAD_LEN  16
-unsigned char ptx_buffer[TPLL_PIPE_NUM * TPLL_TX_FIFO_SIZE * TPLL_TX_FIFO_NUM] __attribute__((aligned(4))) = {}; //tx buffer should big than pipe_num *fifo_size*32
+unsigned char ptx_buffer[TPLL_TX_FIFO_SIZE + TPLL_PIPE_NUM * TPLL_TX_FIFO_SIZE * TPLL_TX_FIFO_NUM] __attribute__((aligned(4))) = {}; //tx buffer should big than pipe_num *fifo_size*32
 unsigned char rx_buf[TPLL_PIPE_RX_FIFO_SIZE * TPLL_PIPE_RX_FIFO_NUM] __attribute__((aligned(4)))           = {};
 
 static unsigned char   tx_data[32]   = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
-volatile unsigned char rx_flag       = 0;
-volatile unsigned char ds_flag       = 0;
-volatile unsigned char tx_done_flag  = 0;
-volatile unsigned char maxretry_flag = 0;
 volatile unsigned char preamble_len  = 0;
 volatile unsigned char tmp           = 1;
+
+extern volatile unsigned char rx_flag, ds_flag, maxretry_flag, tx_done_flag, rx_dr_flag;
 
 TPLL_CrcConfig_t TPLL_CrcConfig = {
     .init_value    = 0xffffffff,
@@ -103,8 +101,8 @@ void user_init_normal(void)
     #endif
 
     //rf configuration
-    TPLL_SetFormatMode(TPLL_MODE_GENERIC_FORMAT);
-    TPLL_SetBitrate(TPLL_BITRATE_2MBPS);
+    TPLL_SetFormatMode(TPLL_MODE_LEGACY_FORMAT);
+    TPLL_SetBitrate(TPLL_BITRATE_250KBPS);
     TPLL_SetOutputPower(TPLL_POWER_INDEX_P0p0dBm);
     TPLL_SetAddressWidth(ADDRESS_WIDTH_5BYTES);
     #if (PRI_FLT_MODE_EN)
@@ -172,9 +170,6 @@ _attribute_no_inline_ void main_loop(void)
     #if (TLKAPI_DEBUG_ENABLE)
     tlkapi_debug_handler();
     #endif
-
-    preamble_len = TPLL_Preamble_Read();
-
 
     if (ds_flag || maxretry_flag) {
         if (ds_flag) {

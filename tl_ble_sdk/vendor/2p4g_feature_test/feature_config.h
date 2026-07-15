@@ -28,9 +28,11 @@
 #include "config.h"
 /////////////////// TEST FEATURE SELECTION /////////////////////////////////
 #define OTA               1
+#define PER                                   2
+#define PM                                    3
 
 
-#define FEATURE_TEST_MODE OTA
+#define FEATURE_TEST_MODE PM
 
 
 #endif /* FEATURE_CONFIG_H_ */

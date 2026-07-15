@@ -230,7 +230,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|3rd-party|src/boot.c|div_mod.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|3rd-party|src/boot.c|div_mod.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -405,7 +405,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/broadcast_sender|vendor/broadcast_receiver|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/broadcast_sender|vendor/broadcast_receiver|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -581,7 +581,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_connection_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|3rd-party|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_peripheral_demo|vendor/acl_connection_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|3rd-party|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -757,7 +757,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -873,7 +873,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnumcueclipse.managedbuild.cross.riscv.option.c.linker.libs.165135680" name="Libraries (-l)" superClass="ilg.gnumcueclipse.managedbuild.cross.riscv.option.c.linker.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="m"/>
-									<listOptionValue builtIn="false" value="lt_B92_AP"/>
+									<listOptionValue builtIn="false" value="lt_B92"/>
 									<listOptionValue builtIn="false" value="dsp"/>
 								</option>
 								<option id="ilg.gnumcueclipse.managedbuild.cross.riscv.option.c.linker.other.1152389644" name="Other linker flags" superClass="ilg.gnumcueclipse.managedbuild.cross.riscv.option.c.linker.other" useByScannerDiscovery="false" value="-mcmodel=medium -mcpu=d25f -ffunction-sections -fdata-sections -mext-dsp -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fno-jump-tables" valueType="string"/>
@@ -932,7 +932,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/acl_peripheral_demo|vendor/eslp_esl_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/acl_peripheral_demo|vendor/eslp_esl_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/ble_controller|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -1107,7 +1107,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="vendor/acl_peripheral_demo|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="vendor/ble_remote|vendor/acl_peripheral_demo|vendor/eslp_esl_demo|vendor/eslp_ap_demo|vendor/2p4g_tpll|vendor/2p4g_gen_fsk|vendor/2p4g_feature_test|3rd-party|boot/TL721X|drivers/TL721X|drivers/TL321X|boot/TL321X|drivers/B96|boot/B96|vendor/feature_test|vendor/product_cis_source|vendor/product_cis_sink|vendor/product_bis_source|vendor/product_bis_sink|algorithm/audio_alg|algorithm/lc3/gcc7|vendor/cis_peripheral|vendor/cis_central|vendor/feature_demo|vendor/internal_test|vendor/acl_connection_demo|vendor/acl_central_demo|vendor/audio_broadcast_assistant|vendor/audio_broadcast_source|vendor/audio_broadcast_sink|vendor/audio_unicast_server|vendor/audio_unicast_client|boot/B91|drivers/B91|vendor/BQB_controller|src/boot.c|div_mod.S|usbstd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

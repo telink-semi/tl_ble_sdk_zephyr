@@ -47,6 +47,7 @@
 #include "uart_reg.h"
 #include "stimer_reg.h"
 #include "adc_reg.h"
+#include "swire_reg.h"
 #include "qdec_reg.h"
 #include "plic_sw_reg.h"
 #include "plmt_reg.h"
@@ -55,4 +56,6 @@
 #if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #include "ir_learn_reg.h"
 #endif
+#include "pem_reg.h"
+
 #endif

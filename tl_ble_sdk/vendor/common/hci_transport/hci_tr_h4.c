@@ -58,8 +58,8 @@ typedef struct
     hci_fifo_t *pRxFifo;    /*!< Point to H4 rx fifo.  */
     u8         *pBackUpBuf;
     u32         flushTimer;
-    u8          backupCnt;
-    u8          align[3];
+    u16         backupCnt;
+    u8          align[2];
 } HciH4TrCb_t;
 
 static HciH4TrCb_t  hciH4TrCB;

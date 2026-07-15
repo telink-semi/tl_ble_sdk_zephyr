@@ -27,9 +27,6 @@
 #include "vendor/common/user_config.h"
 
 
-#include "vendor/common/backtrace/trap_entry/trap_entry.h"
-#include "vendor/common/backtrace/rvbacktrace/rvbacktrace.h"
-
 /**
  * @brief Enables the common logging functionality for the application
  */

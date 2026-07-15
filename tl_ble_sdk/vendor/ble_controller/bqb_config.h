@@ -38,6 +38,7 @@
  */
 #define APP_LE_2M_CODED_PHY_EN 1
 
+
 /**
  * @brief         enable the channel selection algorithm 2.
  * @note          default to enable.
@@ -49,6 +50,12 @@
  * @brief         enable the periodic advertisement module.
  */
 #define APP_LE_PERIODIC_ADV_EN 1
+
+
+/**
+ * @brief         enable the periodic advertisement with response module.
+ */
+#define APP_LE_PAWR_ADV_EN 1
 
 
 /**
@@ -68,20 +75,30 @@
  */
 #define APP_SYNCHRONIZED_RECEIVER_EN 0
 
+
+/**
+ * @brief         enable the advertising coding selection module.
+ */
+#define APP_ADVERTISING_CODING_SELECT_EN 0
+
+
 /**
  * @brief         enable the PHY test module.
  */
 #define APP_LE_PHY_TEST_EN 0
+
 
 /**
  * @brief         enable the ChnClassification feature.
  */
 #define APP_CHN_CLASS_EN 0
 
+
 /**
  * @brief         enable the channel sounding feature.
  */
 #define APP_LE_CHANNEL_SOUNDING 0
+
 
 /**
  * @brief         enable the subrate feature.

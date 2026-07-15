@@ -104,7 +104,7 @@ pem_event_config_t adc_pem_event_config={
             .sig_sel        = 0,
             .clk_sel        = PCLK,
             .lvl            = PULSE,
-            .edge_detect    = RISING_EDGE,
+            .edge_detect    = 0,
             .inv            = 0,
 };
 
@@ -539,6 +539,31 @@ void adc_set_pem_event(adc_num_e sar_adc_num,pem_chn_e chn,unsigned char adc_sel
 }
 
 #endif
+
+void adc_set_pem_event(adc_num_e sar_adc_num, pem_chn_e chn, adc_event_e event_signal)
+{
+    reg_pem_enable(sar_adc_num) |= FLD_PEM_EVENT1_ENABLE;
+
+    adc_pem_event_config.sig_sel = event_signal;
+    if(event_signal == ADC_EVENT_RX_THRESHOLD)
+    {
+        adc_pem_event_config.lvl = LEVEL;
+    }
+    else
+    {
+        adc_pem_event_config.lvl = PULSE;
+    }
+
+    pem_event_config(chn, adc_pem_event_config);
+}
+
+void adc_set_pem_task(adc_num_e sar_adc_num, pem_chn_e chn, adc_task_e task_signal)
+{
+    reg_pem_enable(sar_adc_num) |= FLD_PEM_TASK_ENABLE;
+
+    adc_pem_task_config.sig_sel = task_signal;
+    pem_task_config(chn, adc_pem_task_config);
+}
 
 /**
  * @brief This function is used to initialize the ADC.

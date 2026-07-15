@@ -31,6 +31,7 @@
 #define PM_POWER_OPTIMIZATION           1
 #define PM_WFI_OPTIMIZATION             0 //2.4G use
 
+#define ATE_CALI_OPTIMIZATION_EN              0 //2.4G use
 
 /**
  * @brief these analog register can store data in deep sleep mode or deep sleep with SRAM retention mode.
@@ -221,10 +222,11 @@ extern unsigned char                                g_areg_aon_7f;
 extern unsigned char                                g_areg_aon_35;
 extern unsigned char                                g_areg_aon_3a;
 extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
+extern _attribute_data_retention_sec_ unsigned char g_pm_active_power_cfg;
 extern _attribute_data_retention_sec_ unsigned char g_areg_aon_0a;
 #if (PM_POWER_OPTIMIZATION)
 extern _attribute_data_retention_sec_ volatile unsigned char g_areg_aon_06;
-extern _attribute_data_retention_sec_ volatile unsigned char g_areg_aon_0x05;
+extern _attribute_data_retention_sec_ volatile unsigned char g_areg_aon_05;
 extern _attribute_data_retention_sec_ volatile unsigned char g_areg_0x101;
 extern _attribute_data_retention_sec_ volatile unsigned char g_areg_0x102;
 #endif
@@ -296,13 +298,13 @@ do {                                                                            
 {                                                                                               \
     /* 1. power on 24M RC */                                                                    \
     unsigned int r  = core_interrupt_disable();                                                 \
-    g_areg_aon_0x05 &= ~(FLD_24M_RC_PD);                                                        \
-    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_0x05);                                  \
+    g_areg_aon_05 &= ~(FLD_24M_RC_PD);                                                        \
+    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_05);                                  \
     /* 2. set cclk/hclk/pclk 24M */                                                             \
     write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | XTAL_24M | CLK_DIV1);                   \
     /* 3. power down 24M RC */                                                                  \
-    g_areg_aon_0x05 |= FLD_24M_RC_PD;                                                           \
-    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_0x05);                                  \
+    g_areg_aon_05 |= FLD_24M_RC_PD;                                                           \
+    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_05);                                  \
     /* 4. power on pll */                                                                       \
     g_areg_aon_06 &= (~FLD_PD_BBPLL_LDO);                                                       \
     analog_write_reg8_pwr_opt(areg_aon_0x06, g_areg_aon_06); /*ana_reg_0x06[0]=1'0*/            \
@@ -324,12 +326,12 @@ do {                                                                            
     analog_write_reg8_pwr_opt(areg_0x101, g_areg_0x101);/*ana_reg_0x101[7]=1'1,power down pll*/ \
     g_bbpll_is_used = 0;                                                                        \
     /* 2. power on 24M RC */                                                                    \
-    g_areg_aon_0x05 &= ~(FLD_24M_RC_PD);                                                        \
-    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_0x05);                                  \
+    g_areg_aon_05 &= ~(FLD_24M_RC_PD);                                                        \
+    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_05);                                  \
     /* Configure the CCLK clock frequency. clock source. 0:rc 24m, 1:xtl_24m, 2:pll*/           \
     write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | XTAL_24M | CLK_DIV12);                  \
-    g_areg_aon_0x05 |= FLD_24M_RC_PD;                                                           \
-    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_0x05);                                  \
+    g_areg_aon_05 |= FLD_24M_RC_PD;                                                           \
+    analog_write_reg8_pwr_opt(areg_aon_0x05, g_areg_aon_05);                                  \
     core_restore_interrupt(r);                                                                  \
 }
 
@@ -386,6 +388,17 @@ void pm_set_wakeup_time_param(pm_r_delay_cycle_s param);
  * @note        Those parameters will be lost after reboot or deep sleep, so it required to be reconfigured.
  */
 void pm_set_xtal_stable_timer_param(unsigned int delay_us, unsigned int loopnum);
+
+/**
+ * @brief       This function is used to configure whether to turn on the power switches of
+ *              the baseband/USB/AUDIO during initialization. The default configuration is to enable all of them.
+ *              If these modules will not be used throughout the entire operation process,
+ *              then this interface needs to be configured to be disabled, which will save power consumption.
+ * @param[in]   value - whether to power on/off the baseband/USB/AUDIO.
+ * @param[in]   on_off - select power on or off.
+ * @return      none.
+ */
+void pm_set_active_power_cfg(pm_pd_module_e value, pm_power_sel_e on_off);
 
 /**
  * @brief       This function serves to set baseband/usb/npe power on/off before suspend sleep,If power
@@ -447,14 +460,6 @@ _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wa
 pm_sw_reboot_reason_e pm_get_sw_reboot_event(void);
 
 /**
- * @brief       This function serves to switch digital module power.
- * @param[in]   module - digital module.
- * @param[in]   power_sel - power up or power down.
- * @return      none.
- */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
-
-/**
  * @brief       This function serves to update wakeup status.
  * @param[in]   clr_en  - Whether to set the value of the status register to a fixed value.
  *                        If the interface is called twice, the first time it is not modified, clr_en=0;
@@ -493,7 +498,11 @@ _attribute_ram_code_sec_noinline_ void pm_set_power_mode(power_mode_e power_mode
  *              3.When adjusting this voltage, no access ram operation is allowed, disable swire.
  *              4.If the check configuration fails, reboot.
  */
+#if ATE_CALI_OPTIMIZATION_EN
+_attribute_ram_code_sec_noinline_ drv_api_status_e pm_set_dig_ldo(pm_dig_vol_mode_e vol, unsigned int dma_timeout_us, unsigned int report_rate);
+#else
 _attribute_ram_code_sec_noinline_ drv_api_status_e pm_set_dig_ldo(pm_dig_vol_mode_e vol, unsigned int dma_timeout_us);
+#endif
 
 /********************************************************************************************************
  *                                          internal

@@ -66,7 +66,6 @@ _attribute_data_retention_sec_ static volatile unsigned char  uart_dma_send_flag
 _attribute_data_retention_sec_ static volatile CpltCallback   RxCpltCallback;
 _attribute_data_retention_sec_ static volatile CpltCallback   TxCpltCallback;
 _attribute_data_retention_sec_ static volatile unsigned char  *ReceAddr;
-
 /**
  * @brief   hci uart initialization
  * @param   none
@@ -82,6 +81,9 @@ ext_hci_StatusTypeDef_e ext_hci_uartInit(ext_hci_InitTypeDef * uart)
    {
         return EXT_UART_ERROR;
    }
+   dma_chn_dis(EXT_HCI_UART_DMA_CHN_TX);
+
+   dma_chn_dis(EXT_HCI_UART_DMA_CHN_RX);
 
     uart_reset(EXT_HCI_UART_CHANNEL);
 
@@ -93,23 +95,13 @@ ext_hci_StatusTypeDef_e ext_hci_uartInit(ext_hci_InitTypeDef * uart)
 
     uart_init(EXT_HCI_UART_CHANNEL, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
 
-    uart_set_tx_dma_config(EXT_HCI_UART_CHANNEL, EXT_HCI_UART_DMA_CHN_TX);
 
-    uart_set_rx_dma_config(EXT_HCI_UART_CHANNEL, EXT_HCI_UART_DMA_CHN_RX);
-
-
-    uart_set_irq_mask(EXT_HCI_UART_CHANNEL, UART_TXDONE_MASK);
-
-    uart_set_irq_mask(EXT_HCI_UART_CHANNEL, UART_RXDONE_MASK);
-
-    plic_interrupt_enable(EXT_HCI_UART_IRQ);
 
      //cts function
      if((uart->HwFlowCtl != 0) && (uart->cts_Pin != 0))
      {
         uart_cts_config(EXT_HCI_UART_CHANNEL,uart->cts_Pin,STOP_VOLT);
         uart_set_cts_en(EXT_HCI_UART_CHANNEL);
-
      }
      //rts function
      if((uart->HwFlowCtl != 0) && (uart->rts_Pin != 0))
@@ -121,13 +113,29 @@ ext_hci_StatusTypeDef_e ext_hci_uartInit(ext_hci_InitTypeDef * uart)
      uart_dma_send_flag = 1;
      TxCpltCallback = uart->TxCpltCallback;
      RxCpltCallback = uart->RxCpltCallback;
+
+
+
+     uart_set_tx_dma_config(EXT_HCI_UART_CHANNEL, EXT_HCI_UART_DMA_CHN_TX);
+
+     uart_set_rx_dma_config(EXT_HCI_UART_CHANNEL, EXT_HCI_UART_DMA_CHN_RX);
+
+
+     uart_set_irq_mask(EXT_HCI_UART_CHANNEL, UART_TXDONE_MASK);
+
+     uart_set_irq_mask(EXT_HCI_UART_CHANNEL, UART_RXDONE_MASK);
+
+     plic_interrupt_enable(EXT_HCI_UART_IRQ);
+
+
      return EXT_UART_OK;
 }
+
 
 /**
  * @brief  uart interrupt function
  */
-_attribute_ram_code_
+_attribute_ram_code_sec_noinline_
 _attribute_ram_code_sec_ void ext_hci_irq_handler(void){
     //transmit
      if(uart_get_irq_status(EXT_HCI_UART_CHANNEL,UART_TXDONE_IRQ_STATUS))
@@ -205,5 +213,11 @@ void ext_hci_uartReceData(unsigned char *addr, unsigned int len)
     ReceAddr = addr;
     core_interrupt_enable();
 }
+
+void ext_hci_uartDisRxIrq(void)
+{
+    uart_clr_irq_mask(EXT_HCI_UART_CHANNEL, UART_RXDONE_MASK);
+}
+
 #endif
 

@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    cstartup_flash.S
+ * @file    cstartup_TL521X.S
  *
  * @brief   This is the boot file for tl521x
  *

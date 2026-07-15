@@ -29,6 +29,7 @@
 #include "../stack/2p4g/genfsk_ll/genfsk_ll.h"
 #include "app_config.h"
 
+#if (FEATURE_TEST_MODE == OTA)
 #define MSG_QUEUE_LEN 4
 
 typedef struct
@@ -1310,3 +1311,5 @@ int OTA_Batch_SlaveStart(void)
 }
     #endif
 #endif /*OTA_MASTER_EN*/
+
+#endif // FEATURE_TEST_MODE == OTA

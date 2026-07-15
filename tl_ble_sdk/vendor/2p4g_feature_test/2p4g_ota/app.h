@@ -25,7 +25,7 @@
 #define VENDOR_APP_H_
 
 #include "app_config.h"
-
+#if (FEATURE_TEST_MODE == OTA)
 /**
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]   none
@@ -56,4 +56,5 @@ int main_idle_loop(void);
  * @return     none.
  */
 void main_loop(void);
+#endif // FEATURE_TEST_MODE == OTA
 #endif /* VENDOR_APP_H_ */

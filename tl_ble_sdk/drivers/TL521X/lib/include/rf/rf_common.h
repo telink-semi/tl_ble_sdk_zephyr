@@ -233,7 +233,8 @@ typedef struct
  */
 typedef struct
 {
-    unsigned char CBPF_CCODE_RCCAL;
+    unsigned char CBPF_CCODE_L;
+    unsigned char CBPF_CCODE_H;
 } rf_rccal_cal_t;
 
 typedef struct
@@ -1333,6 +1334,7 @@ void rf_ldot_ldo_rxtxlf_bypass_en(void);
  *              automatically perform the calibration function after closing.
  * @param[in]   none.
  * @return      none.
+ * @note        Since this function distinguishes between RF modes, the function call must be made after the RF mode configuration function.
  */
 void rf_ldot_ldo_rxtxlf_bypass_dis(void);
 

@@ -28,6 +28,8 @@
 #include "mac.h"
 #include "ota.h"
 
+#if (FEATURE_TEST_MODE == OTA)
+
 #define GPIO_KEY1 GPIO_PB3
 #define GPIO_KEY2 GPIO_PB5
 #define GPIO_KEY3 GPIO_PB6
@@ -287,3 +289,5 @@ _attribute_no_inline_ void main_loop(void)
 {
     main_idle_loop();
 }
+
+#endif // FEATURE_TEST_MODE == OTA

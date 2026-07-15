@@ -28,15 +28,20 @@
  *  @brief  Antenna Switch Configuration
  */
 #ifndef ANTENNA_SWITCHING_AUTO_EN
-    #define ANTENNA_SWITCHING_AUTO_EN 0
+    #define ANTENNA_SWITCHING_AUTO_EN 1
 #endif
 
 #ifndef NUM_ANT_SUPPORT
-    #define NUM_ANT_SUPPORT 0x01
+    #define NUM_ANT_SUPPORT 0x02
 #endif
 
 #ifndef MAX_ANT_PATHS_SUPPORT
-    #define MAX_ANT_PATHS_SUPPORT 0X02
+    #define MAX_ANT_PATHS_SUPPORT 0X04
+#endif
+
+#if (ANTENNA_SWITCHING_AUTO_EN)
+    #define ANTENNA_SWITCHING_SEL_0_PIN GPIO_PD3
+    #define ANTENNA_SWITCHING_CTRL_BASE     0
 #endif
 
 #ifndef BLE_AUDIO_ENABLE
@@ -173,7 +178,8 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN ADC_GPIO_PB0
+        #define ADC_INPUT_PIN_CHN_P     SD_ADC_GPIO_PB6P
+        #define ADC_INPUT_PIN_CHN_N     0
     #endif
 #endif
 

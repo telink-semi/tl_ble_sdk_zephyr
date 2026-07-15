@@ -64,10 +64,8 @@ SECTIONS
     PROVIDE (_IRAM_BSS_VMA_END = .);
     
     . = ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8);
-    PROVIDE (__stext = .);
     .text           : AT(ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8)) 
         { *(.text .stub .text.* .gnu.linkonce.t.* ) KEEP(*(.text.*personality* )) *(.gnu.warning )  }
-    PROVIDE (__etext = .);
     .rodata         : AT(ALIGN(LOADADDR (.text) + SIZEOF (.text), ALIGNOF(.rodata))) 
         { *(.rodata .rodata.* .gnu.linkonce.r.* )}
     .eh_frame_hdr   : AT(ALIGN(LOADADDR (.rodata) + SIZEOF (.rodata), ALIGNOF(.eh_frame_hdr)))

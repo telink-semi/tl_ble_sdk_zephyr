@@ -50,17 +50,51 @@
 
 #define TEST_PER_ADV_SYNC            30 //Periodic ADV Sync demo
 
+#define TEST_PAWR_ADV                17
+
+#define TEST_PAWR_SYNC               31
+
+#define TEST_CIS_CENTRAL             10 //CIS Central demo
+
+#define TEST_CIS_PERIPHERAL          11 //CIS Peripheral demo
+
+#define TEST_BIS_BCST                12 //BIS Broadcast demo
+
+#define TEST_BIS_SYNC                13 //BIS synchronization demo
+
+#define TEST_PRIVACY_PERIPHERAL      14
+
+#define TEST_PRIVACY_CENTRAL         15
+
+#define TEST_GATTC_SDP               16 //GATT Client SDP demo
+
+#define TEST_GAPC_SDP                18 //GATT Client SDP demo
+
 #define TEST_OTA                     20
 
 #define TEST_SOFT_TIMER              22
 
+#define TEST_MULTIPLE_LOCAL_DEVICE   23
+
+#define TEST_SUBRATE_CENTRAL         24
+
+#define TEST_SUBRATE_PERIPHR         25
 
 #define TEST_BLE_PHY                 32 // BQB PHY_TEST demo
 
 #define TEST_L2CAP_COC               33
 
+#define TEST_LONG_RANGE              34
+
+#define TEST_CURRENT                 35
+
+#define TEST_FEATURE_DEBUG_LOG       100
+
+#define TEST_MISC_FUNC               190
 
 #define TEST_FEATURE_BACKUP          200
+
+#define TEST_AUTO                    201
 
 #define FEATURE_TEST_MODE            TEST_FEATURE_BACKUP
 

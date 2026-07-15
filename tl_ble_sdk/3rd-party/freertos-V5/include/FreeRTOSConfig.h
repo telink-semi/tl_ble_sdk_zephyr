@@ -51,7 +51,7 @@
 #ifdef CFG_SIMU
 #define configMINIMAL_STACK_SIZE                ( 1024 )
 #else
-#define configMINIMAL_STACK_SIZE                ( 256 )
+#define configMINIMAL_STACK_SIZE                ( 512 )
 #endif
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_16_BIT_TICKS                  0
@@ -78,10 +78,22 @@
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering definitions. */
+#if (__PROJECT_SNIF_MAIN_NODE__ || __PROJECT_SNIF_FOB_NODE__)
+#define configUSE_APPLICATION_TASK_TAG          1
+#define configGENERATE_RUN_TIME_STATS           0
+#define configUSE_TRACE_FACILITY                1       // Awareness debugging used
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
+
+#if configGENERATE_RUN_TIME_STATS
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()  configure_timer_for_run_time_stats()
+#define portGET_RUN_TIME_COUNTER_VALUE()          (reg_system_tick/SYSTEM_TIMER_TICK_1US)
+#endif
+#else
 #define configUSE_APPLICATION_TASK_TAG          0
 #define configGENERATE_RUN_TIME_STATS           0
 #define configUSE_TRACE_FACILITY                1       // Awareness debugging used
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
+#endif
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES                   0
@@ -91,8 +103,8 @@
 #define configUSE_TIMERS                        1
 #define configTIMER_TASK_PRIORITY               ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH                5
-#ifndef  configTIMER_TASK_STACK_DEPTH
-#define configTIMER_TASK_STACK_DEPTH            ( configMINIMAL_STACK_SIZE * 2 )
+#ifndef configTIMER_TASK_STACK_DEPTH
+#define configTIMER_TASK_STACK_DEPTH            (2 * 256)//( configMINIMAL_STACK_SIZE * 2 )
 #endif
 
 #define configISR_STACK_SIZE_WORDS              256

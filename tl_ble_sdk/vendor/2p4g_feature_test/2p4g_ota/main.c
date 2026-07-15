@@ -24,6 +24,8 @@
 #include "app_config.h"
 #include "tl_common.h"
 #include "drivers.h"
+#if (FEATURE_TEST_MODE == OTA)
+
 extern void user_init_deepRetn(void);
 extern void user_init_normal(void);
 extern void main_loop(void);
@@ -113,15 +115,36 @@ void app_flash_protection_operation(u8 flash_op_evt, u32 op_addr_begin, u32 op_a
  */
 __INLINE void blc_app_system_init(void)
 {
-#if (CHIP_TYPE == CHIP_TYPE_TL321X)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
+    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_B92)
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    wd_32k_stop();
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
+    sys_init(DCDC_0P94_DCDC_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
     sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
     pm_update_status_info(1);
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
     wd_32k_stop();
     wd_stop();
     PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
-#else
-    #error "2.4G Only buteo is supported now!"
+#elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
+    sys_init(LDO_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_shutdown(GPIO_ALL);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_144M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M;
 #endif
 }
 
@@ -166,3 +189,5 @@ _attribute_ram_code_ int main(void)
     }
     return 0;
 }
+
+#endif // FEATURE_TEST_MODE == OTA

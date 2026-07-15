@@ -276,7 +276,7 @@ void generateRandomNum(int len, unsigned char *data);
 *  RX buffer size : ((buffer_len + 15)/16) *16
 *
 */
-#define     CS_EXTRAINFO_LEN                                                 80
+#define     CS_EXTRAINFO_LEN                                                 144
 #define     CS_ALIGN_16(len)                                                 (((len + 15)>>4) <<4)
 #define     CS_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(80*20 + CS_EXTRAINFO_LEN + 4)
 #define     CS_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + CS_EXTRAINFO_LEN + 4)

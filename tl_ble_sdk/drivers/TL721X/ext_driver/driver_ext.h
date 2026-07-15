@@ -37,5 +37,4 @@
 
 
 
-
 #endif /* DRIVERS_TL721X_EXT_DRIVER_DRIVER_EXT_H_ */
