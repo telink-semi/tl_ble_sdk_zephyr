@@ -125,13 +125,6 @@ typedef enum
     FLASH_WRITE_STATUS_SRP_MID1660CD = 0x0180,
 } mid1660cd_write_status_mask_e;
 
-/**
- * @brief     the range of bits to be modified when writing configure.
- */
-typedef enum
-{
-    FLASH_WRITE_CONFIGURE_WPS_MID166085 = 0x04,
-} mid1660cd_write_config_bit_e;
 
 /**
  * @brief       This function reads the status of flash.

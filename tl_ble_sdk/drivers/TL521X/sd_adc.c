@@ -134,6 +134,7 @@ void sd_adc_set_vref(sd_adc_vref_e vref)
 
     } else if (vref == SD_ADC_VMID) { 
         analog_write_reg8(areg_0x10c, analog_read_reg8(areg_0x10c) & (~FLD_L_VREF_SEL));//vmid only for audio
+        analog_write_reg8(areg_0x10e, (analog_read_reg8(areg_0x10e) & (~FLD_AUDIO_PD_VMID)));
     }
 }
 /**

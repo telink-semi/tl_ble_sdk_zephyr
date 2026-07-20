@@ -307,7 +307,8 @@ enum
 
 enum
 {
-    FLD_CLK6_RZ_EN   = BIT(0),
+    FLD_CLK6_RZ_EN      = BIT(0),
+    FLD_CLK6_GSPI1_EN   = BIT(1),
     //RSVD
 };
 
@@ -318,6 +319,14 @@ enum
     FLD_CLK7_USB1_EN    = BIT(0),
     FLD_CLK7_CAN0_EN    = BIT(1),
     //RSVD
+};
+
+#define reg_gspi1_clk_set REG_ADDR16(SC_BASE_ADDR + 0x48)
+
+enum
+{
+    FLD_GSPI1_CLK_MOD    = BIT_RNG(0, 7),
+    FLD_GSPI1_DIV_IN_SEL = BIT_RNG(8, 9), //0:rc24m   1:xtl 24m  2:pll
 };
 
 #define reg_cclk_sel REG_ADDR8(SC_BASE_ADDR + 0x28)
@@ -456,14 +465,16 @@ enum
 
 #define reg_wakeup_en REG_ADDR8(SC_BASE_ADDR + 0x2e)
 
-enum
+typedef enum
 {
     FLD_USB_PWDN_I    = BIT(0),
-    FLD_GPIO_WAKEUP_I = BIT(1),
-    FLD_QDEC_RESUME   = BIT(2),
-    FLD_USB_RESUME    = BIT(4),
-    FLD_STANDBY_EX    = BIT(5),
-};
+    FLD_GPIO_WAKEUP_I  = BIT(1),
+    FLD_QDEC_RESUME    = BIT(2),
+    FLD_KS_WAKEUP_I    = BIT(3),
+    FLD_QDEC1_WAKEUP_I = BIT(4),
+    FLD_USB_RESUME     = BIT(6),
+    FLD_STANDBY_EX     = BIT(7),
+} soc_core_wakeup_mask_e;
 
 /**
  * this register is to configure RF related reset.
@@ -496,6 +507,16 @@ enum
     FLD_CLK0_ZB_HCLK_EN = BIT(2),
     FLD_CLK0_DMA_BB_EN  = BIT(7),
 };
+
+#define BOOT_IDCODE_ADDR     (SC_BASE_ADDR + 0x5c)
+
+#define reg_boot_idcode(i)   REG_ADDR8(SC_BASE_ADDR + 0x5c + (i)) /* i[0-8] */
+
+#define SRAM_INTF_CFG_0              (SC_BASE_ADDR + 0x68)
+#define SRAM_INTF_CFG_1              (SC_BASE_ADDR + 0x69)
+
+#define reg_sram_intf_cfg_0          REG_ADDR8(SC_BASE_ADDR + 0x68)
+#define reg_sram_intf_cfg_1          REG_ADDR8(SC_BASE_ADDR + 0x69)
 
 #define reg_n22_clk_en1 REG_ADDR8(SC_BB_BASE_ADDR + 0x1b)
 

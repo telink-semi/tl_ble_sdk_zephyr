@@ -83,13 +83,36 @@ void tlksdk_thd_initInsertTask1_module(void);
 void tlksdk_thd_enableInsertTask1(thd_task_en_e enable);
 
 
+/**
+ * @brief       Get the post tick value of thread insert task 1
+ * @param       none
+ * @return      The post tick value (in system tick units) of insert task 1
+ */
+u32 tlksdk_thd_getInsertTask1PostTick(void);
+
+
+/**
+ * @brief       Check whether the task currently being executed by the
+ *              scheduler is the thread insert task 1.
+ *              Typically called in an IRQ/main-loop context to decide
+ *              whether RF is currently owned by 802.15.4 (Thread/Zigbee).
+ * @param       none
+ * @return      true  - the current scheduler task is insert task 1
+ *              false - otherwise
+ */
+bool tlksdk_thd_checkIsInsertTask1(void);
+
 extern void (*thd_insertTsk_switch_to_802154_cb)(void);
 extern void (*thd_insertTsk_switch_to_ble_cb)(void);
 extern void (*tlksdk_switch_to_802154_rf_cb)(void);
 extern void (*tlksdk_switch_to_ble_rf_cb)(void);
+void (*tlksdk_switch_to_802154_rf_isr_cb)(const void *);
+void (*tlksdk_switch_to_ble_rf_isr_cb)(const void *);
+
 
 void tlksdk_thd_registerModeChangeCb(void (*to_802154_cb)(void), void (*to_ble_cb)(void));
 void tlksdk_thd_registerSwitchTo802154RfCb(void (*switch_to_802154_rf_cb)(void), void (*switch_to_ble_rf_cb)(void));
+void tlksdk_thd_registerRfIsrCb(void (*switch_to_802154_rf_isr_cb)(const void *), void (*switch_to_ble_rf_isr_cb)(const void *));
 
 #endif
 

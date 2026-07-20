@@ -280,4 +280,6 @@ ble_sts_t blc_hci_readSuggestedDefaultTxDataLength(u8 *tx, u8 *txtime);
 ble_sts_t blc_hci_writeSuggestedDefaultTxDataLength(u16 tx, u16 txtime);
 ble_sts_t blc_hci_readMaximumDataLength(hci_le_readMaxDataLengthCmd_retParam_t *para);
 
+void blc_ll_set_acl_flush_timeout(u32 timeout_us);
+
 #endif /* ACL_CONN_H_ */

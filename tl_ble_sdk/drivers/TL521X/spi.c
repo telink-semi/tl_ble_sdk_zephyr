@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    spi.c
  *
- * @brief   This is the source file for tl323x
+ * @brief   This is the source file for tl521x
  *
  * @author  Driver Group
- * @date    2025
+ * @date    2026
  *
- * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2026, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -27,27 +27,26 @@
 static unsigned char s_gspi_tx_dma_chn;
 static unsigned char s_gspi_master_rx_dma_chn;
 static unsigned char s_gspi_slave_rx_dma_chn;
-static unsigned char s_lspi_tx_dma_chn;
-static unsigned char s_lspi_master_rx_dma_chn;
-static unsigned char s_lspi_slave_rx_dma_chn;
+static unsigned char s_gspi1_tx_dma_chn;
+static unsigned char s_gspi1_master_rx_dma_chn;
+static unsigned char s_gspi1_slave_rx_dma_chn;
 dma_chain_config_t   g_spi_rx_dma_list_cfg;
 dma_chain_config_t   g_spi_tx_dma_list_cfg;
 
 spi_timeout_error_t g_spi_timeout_error[2] = {
     {
      .g_spi_error_timeout_us   = 0xffffffff,
-     .spi_timeout_handler      = lspi_timeout_handler,
+     .spi_timeout_handler      = gspi_timeout_handler,
      .g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE,
      },
     {
      .g_spi_error_timeout_us   = 0xffffffff,
-     .spi_timeout_handler      = gspi_timeout_handler,
+     .spi_timeout_handler      = gspi1_timeout_handler,
      .g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE,
      }
 };
-
 dma_config_t gspi_tx_dma_config = {
-    //.dst_req_sel    = DMA_REQ_GSPI_TX,    //tx req.
+    .dst_req_sel    = DMA_REQ_GSPI_TX,    //tx req.
     .src_req_sel    = 0,
     .dst_addr_ctrl  = DMA_ADDR_FIX,
     .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment.
@@ -63,7 +62,7 @@ dma_config_t gspi_tx_dma_config = {
 };
 dma_config_t gspi_master_rx_dma_config = {
     .dst_req_sel    = 0,
-   // .src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
+    .src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
@@ -78,7 +77,7 @@ dma_config_t gspi_master_rx_dma_config = {
 };
 dma_config_t gspi_slave_rx_dma_config = {
     .dst_req_sel    = 0,
-    //.src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
+    .src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
@@ -91,72 +90,70 @@ dma_config_t gspi_slave_rx_dma_config = {
     .write_num_en   = 1,                  //When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
     .auto_en        = 0,                  //must 0.
 };
-dma_config_t lspi_tx_dma_config = {
-    //.dst_req_sel    = DMA_REQ_LSPI_TX,    //tx req.
+dma_config_t gspi1_tx_dma_config = {
+    .dst_req_sel    = DMA_REQ_GSPI1_TX,
     .src_req_sel    = 0,
     .dst_addr_ctrl  = DMA_ADDR_FIX,
-    .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment.
-    .dstmode        = DMA_HANDSHAKE_MODE, //handshake.
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT,
+    .dstmode        = DMA_HANDSHAKE_MODE,
     .srcmode        = DMA_NORMAL_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .src_burst_size = 0,                  //only master tx dma support burst4/2/1(4/2/1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH,
+    .srcwidth       = DMA_CTR_WORD_WIDTH,
+    .src_burst_size = 0,
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0, //must 0.
+    .auto_en        = 0,
 };
-
-dma_config_t lspi_master_rx_dma_config = {
+dma_config_t gspi1_master_rx_dma_config = {
     .dst_req_sel    = 0,
-    //.src_req_sel    = DMA_REQ_LSPI_RX, //rx req.
+    .src_req_sel    = DMA_REQ_GSPI1_RX,
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .src_burst_size = 0,                  //only master rx dma support burst2/1(2/1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH,
+    .srcwidth       = DMA_CTR_WORD_WIDTH,
+    .src_burst_size = 0,
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0, //must 0.
+    .auto_en        = 0,
 };
-dma_config_t lspi_slave_rx_dma_config = {
+dma_config_t gspi1_slave_rx_dma_config = {
     .dst_req_sel    = 0,
-    //.src_req_sel    = DMA_REQ_LSPI_RX, //rx req.
+    .src_req_sel    = DMA_REQ_GSPI1_RX,
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
-    .src_burst_size = 0,                  //slave not support burst.
+    .dstwidth       = DMA_CTR_WORD_WIDTH,
+    .srcwidth       = DMA_CTR_WORD_WIDTH,
+    .src_burst_size = 0,
     .read_num_en    = 0,
     .priority       = 0,
-    .write_num_en   = 1,                  //When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
-    .auto_en        = 0,                  //must 0.
+    .write_num_en   = 1,
+    .auto_en        = 0,
 };
 
 /**
  * @brief     This function serves to record the api status.
- * @param[in] spi_api_status - spi_api_error_timeout_code_e.
+ * @param[in] spi_error_timeout_code - spi_api_error_timeout_code_e.
  * @return    none.
  * @note      This function can be rewritten according to the application scenario.
  */
-__attribute__((weak)) void lspi_timeout_handler(unsigned int spi_error_timeout_code)
-{
-    g_spi_timeout_error[LSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
-}
-
 __attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_code)
 {
     g_spi_timeout_error[GSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
 }
 
+__attribute__((weak)) void gspi1_timeout_handler(unsigned int spi_error_timeout_code)
+{
+    g_spi_timeout_error[GSPI1_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
+}
+
 /**
   * @brief     This function serves to set the spi timeout(us).
-  * @param[in] spi_sel   - the spi module.
   * @param[in] timeout_us - the timeout(us).
   * @return    none.
   * @note      The default timeout (g_spi_error_timeout_us) is the larger value.If the timeout exceeds the feed dog time and triggers a watchdog restart,
@@ -177,54 +174,51 @@ void spi_set_error_timeout(spi_sel_e spi_sel, unsigned int timeout_us)
 }
 
 /**
-  * @brief     This function serves to return the spi api error timeout code.
-  * @param[in] spi_sel   - the spi module.
-  * @return    none.
-  */
+   * @brief     This function serves to return the spi api error timeout code.
+   * @return    none.
+   */
 spi_api_error_timeout_code_e spi_get_error_timeout_code(spi_sel_e spi_sel)
 {
     return g_spi_timeout_error[spi_sel].g_spi_error_timeout_code;
 }
 
 /**
-  * @brief      This function servers to determine whether the txfifo is full.
-  * @param[in]  spi_sel     - the spi module.
-  * @return     1:Indicates that the txfifo is full. 0:Indicates that the txfifo is not full.
-  */
+ * @brief       This function servers to determine whether the txfifo is full.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      1:Indicates that the txfifo is full. 0:Indicates that the txfifo is not full.
+ */
 bool spi_txfifo_is_full(spi_sel_e spi_sel)
 {
     return reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_FULL;
 }
 
 /**
-  * @brief      This function servers to determine whether the rxfifo is empty.
-  * @param[in]  spi_sel     - the spi module.
-  * @return     1:Indicates that the rxfifo is empty. 0:Indicates that the rxfifo is not empty.
-  */
+ * @brief       This function servers to determine whether the rxfifo is empty.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      1:Indicates that the rxfifo is empty. 0:Indicates that the rxfifo is not empty.
+ */
 bool spi_rxfifo_is_empty(spi_sel_e spi_sel)
 {
     return reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_EMPTY;
 }
 
 /**
-  * @brief      This function determines whether tx_fifo can continue to write a word.
-  * @param[in]  spi_sel     - the spi module.
-  * @return     1: cannot continue to write. 0: can continue to write.
-  */
+ * @brief       This function determines whether tx_fifo can continue to write a word.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      1: cannot continue to write. 0: can continue to write.
+ */
 bool spi_txfifo_num_is_word(spi_sel_e spi_sel)
 {
-    unsigned char tx_fifo_depth = 0;
-
-    (spi_sel == LSPI_MODULE) ? (tx_fifo_depth = 20) : (tx_fifo_depth = 8);
+    unsigned char tx_fifo_depth = 20;
 
     return (tx_fifo_depth - (reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_ENTRIES) < 4);
 }
 
 /**
-  * @brief      This function determines whether rx_fifo can continue to read a word.
-  * @param[in]  spi_sel     - the spi module.
-  * @return     1:cannot continue to read. 0:can continue to read.
-  */
+ * @brief       This function determines whether rx_fifo can continue to read a word.
+ * @param[in]   spi_sel     - the spi module.
+ * @return      1:cannot continue to read. 0:can continue to read.
+ */
 bool spi_rxfifo_num_is_word(spi_sel_e spi_sel)
 {
     return ((reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_ENTRIES) < 4);
@@ -259,11 +253,29 @@ void gspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
 }
 
 /**
+ * @brief      This function selects  pin  for gspi1 master or slave mode.
+ * @param[in]  pin       - the selected pin.
+ * @param[in]  function  - pin-multiplexing function.
+ * @return     none.
+ */
+void gspi1_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
+{
+    if (pin != GPIO_NONE_PIN) {
+        if (GSPI1_CN_IO == function) {
+            gpio_set_up_down_res((gpio_pin_e)pin, GPIO_PIN_PULLUP_20K);
+        }
+        gpio_input_en((gpio_pin_e)pin);
+        reg_gpio_func_mux(pin) = function;
+        gpio_function_dis((gpio_pin_e)pin);
+    }
+}
+
+/**
  * @brief       This function enable gspi csn pin.
  * @param[in]   pin - the csn pin.
  * @return      none.
  */
-void gspi_cs_pin_en(gpio_pin_e pin)
+void gspi_cs_pin_en(gpio_func_pin_e pin)
 {
     gspi_set_pin_mux((gpio_func_pin_e)pin, GSPI_CN0_IO);
 }
@@ -273,12 +285,12 @@ void gspi_cs_pin_en(gpio_pin_e pin)
  * @param[in]   pin - the csn pin.
  * @return      none.
  */
-void gspi_cs_pin_dis(gpio_pin_e pin)
+void gspi_cs_pin_dis(gpio_func_pin_e pin)
 {
-    gpio_output_en(pin);
-    gpio_input_dis(pin);
-    gpio_set_high_level(pin);
-    gpio_function_en(pin); //gpio_function_en must be set at the end
+    gpio_output_en((gpio_pin_e)pin);
+    gpio_input_dis((gpio_pin_e)pin);
+    gpio_set_high_level((gpio_pin_e)pin);
+    gpio_function_en((gpio_pin_e)pin); //gpio_function_en must be set at the end
 }
 
 /**
@@ -287,39 +299,10 @@ void gspi_cs_pin_dis(gpio_pin_e pin)
  * @param[in]   next_csn_pin - the next csn pin.
  * @return      none.
  */
-void gspi_change_csn_pin(gpio_pin_e current_csn_pin, gpio_pin_e next_csn_pin)
+void gspi_change_csn_pin(gpio_func_pin_e current_csn_pin, gpio_func_pin_e next_csn_pin)
 {
     gspi_cs_pin_dis(current_csn_pin);
     gspi_cs_pin_en(next_csn_pin);
-}
-
-/**
- * @brief      This function selects  pin  for lspi master or slave mode.
- * @param[in]  pin       - the selected pin.
- * @param[in]  function  - pin-multiplexing function.
- * @return     none.
- */
-void lspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
-{
-    if (pin != GPIO_NONE_PIN) {
-        /**
-         * When configuring the mux pin of SPI, pull up the CSN configuration.
-         * The chip SPI defaults to the master, and when the slave configures the pin as CSN, since the CSN is floating and in the input state,
-         * an end interrupt may be generated by external influences.
-         * Added by pengxiang
-         */
-        (void)function;
-//        if (LSPI_CN_IO == function) {
-//            gpio_set_up_down_res((gpio_pin_e)pin, GPIO_PIN_PULLUP_20K);
-//            reg_gpio_func_mux(pin) = function;
-//        }
-        /**
-         * Move the operation of gpio_input_en() to the first.
-         * Added by jiarong.ji on July 22, 2021
-         */
-        gpio_input_en((gpio_pin_e)pin);
-        gpio_function_dis((gpio_pin_e)pin);
-    }
 }
 
 /**
@@ -338,33 +321,18 @@ void gspi_set_pin(gspi_pin_config_t *spi_pin_config)
 }
 
 /**
- * @brief       This function servers to set gspi pin for XIP.
- * @param[in]   gspi_xip_pin_config - the pointer of pin config struct.
- * @return      none.
- */
-void gspi_set_xip_pin(gspi_xip_pin_config_t *gspi_xip_pin_config)
-{
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_clk_pin, GSPI_CK_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn0_pin, GSPI_CN0_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn1_pin, GSPI_MOSI_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn2_pin, GSPI_MISO_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io2_pin, GSPI_IO2_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io3_pin, GSPI_IO3_IO);
-}
-
-/**
- * @brief       This function servers to set lspi pin.
+ * @brief       This function servers to set gspi1 pin.
  * @param[in]   spi_pin_config - the pointer of pin config struct.
  * @return      none.
  */
-void lspi_set_pin(lspi_pin_config_t *spi_pin_config)
+void gspi1_set_pin(gspi_pin_config_t *spi_pin_config)
 {
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_clk_pin, (gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_csn_pin, (gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_mosi_io0_pin, (gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_miso_io1_pin, (gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io2_pin, (gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io3_pin, (gpio_func_e)0);
+    gspi1_set_pin_mux(spi_pin_config->spi_clk_pin, GSPI1_CK_IO);
+    gspi1_set_pin_mux(spi_pin_config->spi_csn_pin, GSPI1_CN_IO);
+    gspi1_set_pin_mux(spi_pin_config->spi_mosi_io0_pin, GSPI1_MOSI_IO);
+    gspi1_set_pin_mux(spi_pin_config->spi_miso_io1_pin, GSPI1_MISO_IO);
+    gspi1_set_pin_mux(spi_pin_config->spi_io2_pin, GSPI1_IO2_IO);
+    gspi1_set_pin_mux(spi_pin_config->spi_io3_pin, GSPI1_IO3_IO);
 }
 
 /**
@@ -405,24 +373,24 @@ void spi_slave_set_pin(sspi_pin_config_t *spi_pin_config)
     /*  initialize sspi*/
     reg_rst1 |= FLD_RST1_SPISLV;
     reg_clk_en1 |= FLD_RST1_SPISLV;
-    if ((spi_pin_config->spi_csn_pin != GPIO_FC_PC0)) {
-        if ((reg_gpio_func_mux(GPIO_FC_PC0) == SSPI_CN_I) && ((reg_gpio_func(GPIO_FC_PC0) & GPIO_PC0) == 0)) {
-            gpio_function_en(GPIO_PC0);
+    if ((spi_pin_config->spi_csn_pin != GPIO_FC_PD0)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PD0) == SSPI_CN_I) && ((reg_gpio_func(GPIO_FC_PD0) & GPIO_PD0) == 0)) {
+            gpio_function_en(GPIO_PD0);
         }
     }
-    if ((spi_pin_config->spi_clk_pin != GPIO_FC_PC1)) {
-        if ((reg_gpio_func_mux(GPIO_FC_PC1) == SSPI_CK_I) && ((reg_gpio_func(GPIO_FC_PC1) & GPIO_PC1) == 0)) {
-            gpio_function_en(GPIO_PC1);
+    if ((spi_pin_config->spi_clk_pin != GPIO_FC_PD1)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PD1) == SSPI_CK_I) && ((reg_gpio_func(GPIO_FC_PD1) & GPIO_PD1) == 0)) {
+            gpio_function_en(GPIO_PD1);
         }
     }
-    if ((spi_pin_config->spi_mosi_io0_pin != GPIO_FC_PC2)) {
-        if ((reg_gpio_func_mux(GPIO_FC_PC2) == SSPI_SI_IO) && ((reg_gpio_func(GPIO_FC_PC2) & GPIO_PC2) == 0)) {
-            gpio_function_en(GPIO_PC2);
+    if ((spi_pin_config->spi_mosi_io0_pin != GPIO_FC_PD2)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PD2) == SSPI_SI_IO) && ((reg_gpio_func(GPIO_FC_PD2) & GPIO_PD2) == 0)) {
+            gpio_function_en(GPIO_PD2);
         }
     }
-    if ((spi_pin_config->spi_miso_io1_pin != GPIO_FC_PC3)) {
-        if ((reg_gpio_func_mux(GPIO_FC_PC3) == SSPI_SO_IO) && ((reg_gpio_func(GPIO_FC_PC3) & GPIO_PC3) == 0)) {
-            gpio_function_en(GPIO_PC3);
+    if ((spi_pin_config->spi_miso_io1_pin != GPIO_FC_PD3)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PD3) == SSPI_SO_IO) && ((reg_gpio_func(GPIO_FC_PD3) & GPIO_PD3) == 0)) {
+            gpio_function_en(GPIO_PD3);
         }
     }
 
@@ -446,45 +414,37 @@ void spi_slave_set_pin(sspi_pin_config_t *spi_pin_config)
  * @return      none.
  * @note        - When using the spi master module, this interface must be configured first, otherwise the following interfaces will not take effect.
  *              - If the master is not connected or if there are other slave devices that can receive a higher frequency, spi_clk on the io output from the master will be 48M max.
- *              - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula(spi_clock_in(output from master clk_pin )  <= slave clk/4), the maximum value of spi_clk on the io is 12M.
+ *              - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula(spi_clock_in(output from master clk_pin )  <= slave clk/4), the maximum value of spi_clk on the io is 96/4=24M.
+ *              - Due to the divider register bit width limitation,The limits between src_clk and spi_clock are as follows.
+ *               src_clk                    GSPI(spi_clk  minimum)=src_clk/255
+ *               SRC_CLK_XTAL_24M                          94117
  */
 void spi_master_init(spi_sel_e spi_sel, unsigned short div_clock, spi_mode_type_e mode)
 {
-    switch (spi_sel) {
-    case LSPI_MODULE:
-       // reg_rst0 |= FLD_RST0_LSPI;
-        reg_clk_en0 |= FLD_CLK0_LSPI_EN;
-        if (div_clock > 15) { //LSPI clock source select pll_clk when div_clock <= 15,select xtl 24m when div_clock > 15.
-//            clock_bbpll_config(PLL_CLK);
-            reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)(div_clock * 24 / (sys_clk.pll_clk))) | (1 << 4));
-        } else {
-            reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)div_clock) | (2 << 4));
-        }
-        break;
-    case GSPI_MODULE:
+    if (spi_sel == GSPI1_MODULE) {
+        reg_rst6 |= FLD_RST6_GPSI1;
+        reg_clk_en6 |= FLD_CLK6_GSPI1_EN;
+    } else {
         reg_rst1 |= FLD_RST1_GSPI;
         reg_clk_en1 |= FLD_CLK1_GSPI_EN;
-        if (div_clock > 255) { //GSPI clock source select pll_clk when div_clock <= 255,select xtl 24m when div_clock > 255.
-//            clock_bbpll_config(PLL_CLK);
+    }
+    if (div_clock > 255) { //GSPI clock source select pll_clk when div_clock <= 255,select xtl 24m when div_clock > 255.
+        if (spi_sel == GSPI1_MODULE) {
+            reg_gspi1_clk_set = ((FLD_GSPI1_CLK_MOD & (unsigned char)(div_clock * 24 / (sys_clk.pll_clk))) | (1 << 8));
+        } else {
             reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)(div_clock * 24 / (sys_clk.pll_clk))) | (1 << 8));
+        }
+    } else {
+        if (spi_sel == GSPI1_MODULE) {
+            reg_gspi1_clk_set = ((FLD_GSPI1_CLK_MOD & (unsigned char)div_clock) | (2 << 8));
         } else {
             reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)div_clock) | (2 << 8));
         }
-        break;
-
-    default:
-        break;
     }
-
     reg_spi_ctrl3(spi_sel) |= (FLD_SPI_MASTER_MODE | FLD_SPI_AUTO_HREADY_EN);                 //master
     reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2)); // select SPI mode, support four modes.
-    if (spi_sel == GSPI_MODULE) {
-        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=8-4=4.
-    } else if (spi_sel == LSPI_MODULE) {
-        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel, 16);                                                     //default lspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=20-4=16.
-    }
+    spi_rx_irq_trig_cnt(spi_sel, 4);                                                          //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+    spi_tx_irq_trig_cnt(spi_sel, 4);                                                          //default gspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=8-4=4.
     spi_xip_dis(spi_sel);
 }
 
@@ -500,34 +460,31 @@ void spi_master_init(spi_sel_e spi_sel, unsigned short div_clock, spi_mode_type_
  * @return      none.
  * @note       - When using the spi slave module, this interface must be configured first, otherwise the following interfaces will not take effect.
  *             - spi_clock_in(output from master clk_pin )  <= slave clk/4.
- *             - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula, the maximum value of spi_clk on the io is 12M.
+ *             - The master connects to the telink's slave, since the maximum clock of the slave spi module is 96M, according to the formula, the maximum value of spi_clk on the io is 24M.
+ *                The limits between src_clk and spi_clock  are as follows.
+ *              src_clk (sys_clk.pll_clk)                GPSI(spi_clk maximum )=src_clk/4
+ *               SRC_CLK_PLL_144M                             (144M/2)/4=18000000
+ *               SRC_CLK_PLL_156M                             (156M/2)/4=19500000
+ *               SRC_CLK_PLL_180M                             (180M/2)/4=22500000
+ *               SRC_CLK_PLL_192M                             (192M/2)/4=24000000
  */
 void spi_slave_init(spi_sel_e spi_sel, spi_mode_type_e mode)
 {
-    switch (spi_sel) {
-    case LSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
-       // reg_rst0 |= FLD_RST0_LSPI;
-        reg_clk_en0 |= FLD_CLK0_LSPI_EN;
-        reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 4));
-        break;
-    case GSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
+    if (spi_sel == GSPI1_MODULE) {
+        reg_rst6 |= FLD_RST6_GPSI1;
+        reg_clk_en6 |= FLD_CLK6_GSPI1_EN;
+        reg_gspi1_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 8));
+    } else {
         reg_rst1 |= FLD_RST1_GSPI;
         reg_clk_en1 |= FLD_CLK1_GSPI_EN;
-        reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 8));
-        break;
-    default:
-        break;
+        reg_gspi_clk_set = ((FLD_GSPI1_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 8));
     }
     reg_spi_ctrl3(spi_sel) &= (~FLD_SPI_MASTER_MODE);                                         //slave.
     reg_spi_ctrl3(spi_sel) |= FLD_SPI_AUTO_HREADY_EN;                                         //slave.
     reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2)); // select SPI mode, support four modes.
-    if (spi_sel == GSPI_MODULE) {
-        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=8-4=4.
-    } else if (spi_sel == LSPI_MODULE) {
-        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel, 8);                                                      //default lspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=12-4=8.
-    }
+
+    spi_rx_irq_trig_cnt(spi_sel, 4);                                                          //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+    spi_tx_irq_trig_cnt(spi_sel, 4);                                                          //default gspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=8-4=4.
     spi_xip_dis(spi_sel);
 }
 
@@ -552,6 +509,7 @@ void spi_set_dummy_cnt(spi_sel_e spi_sel, unsigned char dummy_cnt)
 void spi_set_transmode(spi_sel_e spi_sel, spi_tans_mode_e mode)
 {
     reg_spi_ctrl2(spi_sel) = ((reg_spi_ctrl2(spi_sel) & (~FLD_SPI_TRANSMODE)) | ((mode & 0xf) << 4));
+    reg_spi_slv_trans_mode(spi_sel) = ((reg_spi_slv_trans_mode(spi_sel) & (~FLD_SPI_SLV_TRANS_MODE)) | (mode & 0x0f));
 }
 
 /**
@@ -597,7 +555,6 @@ void spi_master_config_plus(spi_sel_e spi_sel, spi_wr_rd_config_t *config)
     spi_set_io_mode(spi_sel, config->spi_io_mode);
     spi_set_addr_len(spi_sel, config->spi_addr_len);
     spi_set_dummy_cnt(spi_sel, config->spi_dummy_cnt);
-    spi_set_token_val(spi_sel, config->spi_token_val_sel);
 
     if (1 == config->spi_cmd_en) {
         spi_cmd_en(spi_sel);
@@ -650,7 +607,6 @@ drv_api_status_e spi_master_send_cmd(spi_sel_e spi_sel, unsigned char cmd)
 /**
  * @brief       This function servers to write spi fifo.
  * tx_fifo_depth are fixed sizes.
- * lspi with txfifo deepth = 20 bytes.
  * gspi with txfifo deepth = 8 bytes.
  * @param[in]   spi_sel - the spi module.
  * @param[in]   data    - the pointer to the data for write.
@@ -664,7 +620,8 @@ drv_api_status_e spi_write(spi_sel_e spi_sel, unsigned char *data, unsigned int 
 {
     unsigned int  word_len   = len >> 2;
     unsigned char single_len = len & 3;
-    //When the remaining size in tx_fifo is not less than 4 bytes, the MCU moves the data according to the word length.
+
+    //The tx _fifo depth of the gspi is 8 bytes. When the remaining size in the tx_fifo is not less than 4 bytes, the MCU will move the data according to the word length.
     for (unsigned int i = 0; i < word_len; i++) {
         if (SPI_WAIT(spi_txfifo_num_is_word, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_NUM_WORD)) {
             return DRV_API_TIMEOUT;
@@ -684,7 +641,6 @@ drv_api_status_e spi_write(spi_sel_e spi_sel, unsigned char *data, unsigned int 
 /**
  * @brief       This function servers to read spi fifo.
  * rx_fifo_depth are fixed sizes.
- * lspi with rxfifo deepth = 12 bytes.
  * gspi with rxfifo deepth = 8 bytes.
  * @param[in]   spi_sel - the spi module.
  * @param[in]   data    - the pointer to the data for read.
@@ -806,8 +762,8 @@ drv_api_status_e spi_master_write_plus(spi_sel_e spi_sel, unsigned char cmd, uns
  * @param[in]   data        - the pointer to the data for write.
  * @param[in]   len         - write length.
  * @param[in]   repeat_time - number of times to write data repeatedly.
- * @return      DRV_API_SUCCESS:master write data successfully. others:master write data failed.
- *              DRV_API_TIMEOUT:timeout exit(solution refer to the note for spi_set_error_timeout).
+ * @return     DRV_API_SUCCESS:master write data successfully. others:master write data failed.
+ *             DRV_API_TIMEOUT:timeout exit(solution refer to the note for spi_set_error_timeout).
  */
 drv_api_status_e spi_master_write_repeat(spi_sel_e spi_sel, unsigned char *data, unsigned int len, unsigned int repeat_time)
 {
@@ -933,12 +889,12 @@ drv_api_status_e spi_master_write_read_plus(spi_sel_e spi_sel, unsigned char cmd
  */
 void spi_set_master_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel) {
+    if (spi_sel == GSPI1_MODULE) {
+        s_gspi1_master_rx_dma_chn = chn;
+        dma_config(chn, &gspi1_master_rx_dma_config);
+    } else {
         s_gspi_master_rx_dma_chn = chn;
         dma_config(chn, &gspi_master_rx_dma_config);
-    } else if (LSPI_MODULE == spi_sel) {
-        s_lspi_master_rx_dma_chn = chn;
-        dma_config(chn, &lspi_master_rx_dma_config);
     }
 }
 
@@ -950,12 +906,12 @@ void spi_set_master_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
  */
 void spi_set_slave_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel) {
+    if (spi_sel == GSPI1_MODULE) {
+        s_gspi1_slave_rx_dma_chn = chn;
+        dma_config(chn, &gspi1_slave_rx_dma_config);
+    } else {
         s_gspi_slave_rx_dma_chn = chn;
         dma_config(chn, &gspi_slave_rx_dma_config);
-    } else if (LSPI_MODULE == spi_sel) {
-        s_lspi_slave_rx_dma_chn = chn;
-        dma_config(chn, &lspi_slave_rx_dma_config);
     }
 }
 
@@ -967,12 +923,12 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
  */
 void spi_set_tx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel) {
+    if (spi_sel == GSPI1_MODULE) {
+        s_gspi1_tx_dma_chn = chn;
+        dma_config(chn, &gspi1_tx_dma_config);
+    } else {
         s_gspi_tx_dma_chn = chn;
         dma_config(chn, &gspi_tx_dma_config);
-    } else if (LSPI_MODULE == spi_sel) {
-        s_lspi_tx_dma_chn = chn;
-        dma_config(chn, &lspi_tx_dma_config);
     }
 }
 
@@ -1002,12 +958,7 @@ void spi_set_dma(dma_chn_e spi_dma_chn, unsigned int src_addr, unsigned int dst_
  */
 void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len)
 {
-    unsigned char tx_dma_chn;
-    if (GSPI_MODULE == spi_sel) {
-        tx_dma_chn = s_gspi_tx_dma_chn;
-    } else {
-        tx_dma_chn = s_lspi_tx_dma_chn;
-    }
+    unsigned char tx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_tx_dma_chn : s_gspi_tx_dma_chn;
     spi_tx_dma_en(spi_sel);
     dma_set_address(tx_dma_chn, (unsigned int)src_addr, reg_spi_data_buf_adr(spi_sel));
     dma_set_size(tx_dma_chn, len, DMA_WORD_WIDTH);
@@ -1030,12 +981,7 @@ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len
  */
 void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char *dst_addr, unsigned int len)
 {
-    unsigned char rx_dma_chn;
-    if (GSPI_MODULE == spi_sel) {
-        rx_dma_chn = s_gspi_slave_rx_dma_chn;
-    } else {
-        rx_dma_chn = s_lspi_slave_rx_dma_chn;
-    }
+    unsigned char rx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_slave_rx_dma_chn : s_gspi_slave_rx_dma_chn;
     spi_rx_dma_en(spi_sel);
     dma_set_address(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr));
     dma_set_size(rx_dma_chn, len, DMA_WORD_WIDTH);
@@ -1052,17 +998,11 @@ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char *dst_addr, unsigned int len
  */
 void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len)
 {
-    unsigned char tx_dma_chn;
+    unsigned char tx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_tx_dma_chn : s_gspi_tx_dma_chn;
     spi_tx_fifo_clr(spi_sel);
     spi_tx_dma_en(spi_sel);
     spi_tx_cnt(spi_sel, len);
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_ONLY);
-    if (GSPI_MODULE == spi_sel) {
-        tx_dma_chn = s_gspi_tx_dma_chn;
-    } else {
-        tx_dma_chn = s_lspi_tx_dma_chn;
-    }
-
     spi_set_dma(tx_dma_chn, (unsigned int)src_addr, reg_spi_data_buf_adr(spi_sel), len);
     spi_set_cmd(spi_sel, 0x00);
 }
@@ -1082,14 +1022,8 @@ void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned i
  */
 void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned int addr_len, unsigned char *data, unsigned int data_len)
 {
-    unsigned char tx_dma_chn, rx_dma_chn;
-    if (GSPI_MODULE == spi_sel) {
-        tx_dma_chn = s_gspi_tx_dma_chn;
-        rx_dma_chn = s_gspi_master_rx_dma_chn;
-    } else {
-        tx_dma_chn = s_lspi_tx_dma_chn;
-        rx_dma_chn = s_lspi_master_rx_dma_chn;
-    }
+    unsigned char tx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_tx_dma_chn : s_gspi_tx_dma_chn;
+    unsigned char master_rx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_master_rx_dma_chn : s_gspi_master_rx_dma_chn;
     spi_tx_fifo_clr(spi_sel);
     spi_rx_fifo_clr(spi_sel);
     spi_tx_dma_en(spi_sel);
@@ -1099,7 +1033,7 @@ void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned 
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_READ);
 
     spi_set_dma(tx_dma_chn, (unsigned int)(addr), reg_spi_data_buf_adr(spi_sel), addr_len);
-    spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(data), data_len);
+    spi_set_dma(master_rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(data), data_len);
     spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
 }
 
@@ -1116,18 +1050,12 @@ void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned 
  */
 void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int addr, unsigned char *data, unsigned int data_len, spi_wr_tans_mode_e wr_mode)
 {
-    unsigned char tx_dma_chn;
+    unsigned char tx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_tx_dma_chn : s_gspi_tx_dma_chn;
     spi_tx_fifo_clr(spi_sel);
     spi_tx_dma_en(spi_sel);
     spi_tx_cnt(spi_sel, data_len);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)wr_mode);
     spi_set_address(spi_sel, addr);
-    if (GSPI_MODULE == spi_sel) {
-        tx_dma_chn = s_gspi_tx_dma_chn;
-    } else {
-        tx_dma_chn = s_lspi_tx_dma_chn;
-    }
-
     spi_set_dma(tx_dma_chn, (unsigned int)data, reg_spi_data_buf_adr(spi_sel), data_len);
     spi_set_cmd(spi_sel, cmd);
 }
@@ -1145,18 +1073,13 @@ void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned in
  */
 void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int addr, unsigned char *dst_addr, unsigned int data_len, spi_rd_tans_mode_e rd_mode)
 {
-    unsigned char rx_dma_chn;
-    if (GSPI_MODULE == spi_sel) {
-        rx_dma_chn = s_gspi_master_rx_dma_chn;
-    } else {
-        rx_dma_chn = s_lspi_master_rx_dma_chn;
-    }
+    unsigned char master_rx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_master_rx_dma_chn : s_gspi_master_rx_dma_chn;
     spi_rx_fifo_clr(spi_sel);
     spi_rx_dma_en(spi_sel);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)rd_mode);
     spi_rx_cnt(spi_sel, data_len);
     spi_set_address(spi_sel, addr);
-    spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr), data_len);
+    spi_set_dma(master_rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr), data_len);
     spi_set_cmd(spi_sel, cmd);
 }
 
@@ -1178,7 +1101,8 @@ void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int
  */
 void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned char *addr, unsigned int addr_len, unsigned char *rd_data, unsigned int rd_len, spi_rd_tans_mode_e rd_mode)
 {
-    unsigned char tx_dma_chn, rx_dma_chn;
+    unsigned char tx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_tx_dma_chn : s_gspi_tx_dma_chn;
+    unsigned char master_rx_dma_chn = (spi_sel == GSPI1_MODULE) ? s_gspi1_master_rx_dma_chn : s_gspi_master_rx_dma_chn;
     spi_tx_fifo_clr(spi_sel);
     spi_rx_fifo_clr(spi_sel);
     spi_tx_dma_en(spi_sel);
@@ -1186,15 +1110,8 @@ void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsign
     spi_tx_cnt(spi_sel, addr_len);
     spi_rx_cnt(spi_sel, rd_len);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)rd_mode);
-    if (GSPI_MODULE == spi_sel) {
-        tx_dma_chn = s_gspi_tx_dma_chn;
-        rx_dma_chn = s_gspi_master_rx_dma_chn;
-    } else {
-        tx_dma_chn = s_lspi_tx_dma_chn;
-        rx_dma_chn = s_lspi_master_rx_dma_chn;
-    }
     spi_set_dma(tx_dma_chn, (unsigned int)(addr), reg_spi_data_buf_adr(spi_sel), addr_len);
-    spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(rd_data), rd_len);
+    spi_set_dma(master_rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(rd_data), rd_len);
     spi_set_cmd(spi_sel, cmd); //when  cmd  disable that  will not sent cmd,just trigger spi send .
 }
 
@@ -1259,48 +1176,6 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
 }
 
 /**
- * @brief       This function serves to set master rx dma burst size
- * @param[in]   spi_sel      - the spi module.
- * @param[in]   burst_size   - dma burst size.
- * @return      none.
- * @note        - lspi tx dma support burst4/burst2/burst1,gpsi tx dma only support burst1.
- *              - If the set burst size is larger than burst1 (burst2/burst4), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
- *              - Must be configured after spi_set_tx_dma_config().
- */
-void spi_set_dma_tx_burst(spi_sel_e spi_sel, dma_burst_size_e burst_size)
-{
-    unsigned char tx_fifo_depth = 0;
-
-    if (spi_sel == LSPI_MODULE) {
-        tx_fifo_depth = 20;
-        dma_set_burst_size(s_lspi_tx_dma_chn, burst_size);
-    } else if (spi_sel == GSPI_MODULE) {
-        tx_fifo_depth = 8;
-        dma_set_burst_size(s_gspi_tx_dma_chn, burst_size);
-    }
-    spi_tx_irq_trig_cnt(spi_sel, tx_fifo_depth - ((DMA_BURST_1_WORD == burst_size) ? 4 : (8 * burst_size)));
-}
-
-/**
- * @brief       This function serves to set master rx dma burst size
- * @param[in]   spi_sel     - the spi module.
- * @param[in]   burst_size   - dma burst size
- * @return      none.
- * @note        - lspi rx dma support burst2/burst1,gpsi rx dma only support burst1.
- *              - If the set burst size is larger than burst1 (burst2), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
- *              - Must be configured after spi_set_master_rx_dma_config().
- */
-void spi_set_dma_rx_burst(spi_sel_e spi_sel, dma_burst_size_e burst_size)
-{
-    if (spi_sel == LSPI_MODULE) {
-        dma_set_burst_size(s_lspi_master_rx_dma_chn, burst_size);
-    } else if (spi_sel == GSPI_MODULE) {
-        dma_set_burst_size(s_gspi_master_rx_dma_chn, burst_size);
-    }
-    spi_rx_irq_trig_cnt(spi_sel, (DMA_BURST_1_WORD == burst_size) ? 4 : (8 * burst_size));
-}
-
-/**
  * @brief     This function serves to config slave rx_dma channel llp.
  * @param[in] spi_sel   - the spi module.
  * @param[in] chn          - dma channel.
@@ -1315,7 +1190,7 @@ void spi_set_slave_rx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn, unsigned c
     /*
      * Dma sof function needs to be disabled for rx.
      */
-    spi_set_llp_sof_mode(chn, 0);
+    dma_set_llp_sof_mode(chn, 0);
     spi_rx_dma_en(spi_sel);
     dma_set_address(chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr));
     dma_set_size(chn, data_len, DMA_WORD_WIDTH);
@@ -1367,14 +1242,14 @@ void spi_slave_rx_dma_chain_init(spi_sel_e spi_sel, dma_chn_e chn, unsigned char
  */
 void spi_set_slave_tx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn, unsigned char *src_addr, unsigned int data_len, dma_chain_config_t *head_of_list)
 {
-    if (GSPI_MODULE == spi_sel) {
+    if (spi_sel == GSPI1_MODULE) {
+        dma_config(chn, &gspi1_tx_dma_config);
+    } else {
         dma_config(chn, &gspi_tx_dma_config);
-    } else if (LSPI_MODULE == spi_sel) {
-        dma_config(chn, &lspi_tx_dma_config);
     }
     /* The sof function of dma needs to be started at tx otherwise data anomalies will occur.
      */
-    spi_set_llp_sof_mode(chn, 1);
+    dma_set_llp_sof_mode(chn, 1);
     spi_tx_dma_en(spi_sel);
     dma_set_address(chn, (unsigned int)(src_addr), reg_spi_data_buf_adr(spi_sel));
     dma_set_size(chn, data_len, DMA_WORD_WIDTH);

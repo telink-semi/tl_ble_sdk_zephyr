@@ -972,6 +972,21 @@ typedef struct __attribute__((packed))
     u8  feature[248];
 } hci_le_readAllRemoteFeaturesCompleteEvt_t;
 
+
+/**
+ *  @brief  Event Parameters for "7.7.65.X LE Connection Rate Complete event"
+ */
+typedef struct {
+    u8  subEventCode;
+    u8  status;
+    u16 connHandle;
+    u16 connInterval;
+    u16 subrate_factor;
+    u16 peripheral_latency;
+    u16 conti_num;
+    u16 supervisionTimeout;
+} hci_le_connectionRateCompleteEvt_t;
+
 typedef struct __attribute__((packed))
 {
     u8  Subevent_Code;

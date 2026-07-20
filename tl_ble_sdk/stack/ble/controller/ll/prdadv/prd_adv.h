@@ -27,8 +27,12 @@
 
 /* maximum number of periodic advertising this SDK can support */
 #define PERIODIC_ADV_NUMBER_MAX 2
-#define PERD_ADV_PARAM_LENGTH   1840
 
+#if LL_FEATURE_ENABLE_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER
+#define         PERD_ADV_PARAM_LENGTH                           1840  //user can't modify this value !!! sizeof(st_prd_adv_t)
+#else
+#define         PERD_ADV_PARAM_LENGTH                           508
+#endif
 
 
 /**

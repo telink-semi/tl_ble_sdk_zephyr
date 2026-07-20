@@ -1,12 +1,12 @@
 /********************************************************************************************************
- * @file    flash_mid1660cd.c
+ * @file    flash_mid1471cd.h
  *
- * @brief   This is the source file for tl521x
+ * @brief   This is the header file for tl323x
  *
  * @author  Driver Group
- * @date    2026
+ * @date    2025
  *
- * @par     Copyright (c) 2026, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,9 +21,99 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#ifndef __MID1471CD_H__
+#define __MID1471CD_H__
+
+/*
+ * @brief     MID = 0x1471cd Flash include P25Q80U.
+ */
 
 
-#include "flash_type.h"
+/**
+ * @brief   define the section of the protected memory area which is read-only and unalterable.
+ * @note    when data protection, only enumeration items in mid1471cd_lock_block_e can be selected,
+ *          to ensure that the values returned by the interface flash_get_lock_block_mid1471cd are in the mid1471cd_lock_block_e.
+ */
+typedef enum{
+    //---------------- CMP bit = 0---------------//
+    FLASH_LOCK_NONE_MID1471CD           =   0x0000, //000000h-000000h   //0x0020 0x407c...
+    FLASH_LOCK_UP_64K_MID1471CD         =   0x0004, //0F0000h-0FFFFFh
+    FLASH_LOCK_UP_128K_MID1471CD        =   0x0008, //0E0000h-0FFFFFh
+    FLASH_LOCK_UP_256K_MID1471CD        =   0x000c, //0C0000h-0FFFFFh
+    FLASH_LOCK_UP_512K_MID1471CD        =   0x0010, //080000h-0FFFFFh   //0x4030
+    FLASH_LOCK_LOW_64K_MID1471CD        =   0x0024, //000000h-00FFFFh
+    FLASH_LOCK_LOW_128K_MID1471CD       =   0x0028, //000000h-01FFFFh
+    FLASH_LOCK_LOW_256K_MID1471CD       =   0x002c, //000000h-03FFFFh
+    FLASH_LOCK_LOW_512K_MID1471CD       =   0x0030, //000000h-07FFFFh   //0x4010
+    FLASH_LOCK_UP_4K_MID1471CD          =   0x0044, //0FF000h-0FFFFFh
+    FLASH_LOCK_UP_8K_MID1471CD          =   0x0048, //0FE000h-0FFFFFh
+    FLASH_LOCK_UP_16K_MID1471CD         =   0x004c, //0FC000h-0FFFFFh
+    FLASH_LOCK_UP_32K_MID1471CD         =   0x0050, //0F8000h-0FFFFFh   //0x0054
+    FLASH_LOCK_LOW_4K_MID1471CD         =   0x0064, //000000h-000FFFh
+    FLASH_LOCK_LOW_8K_MID1471CD         =   0x0068, //000000h-001FFFh
+    FLASH_LOCK_LOW_16K_MID1471CD        =   0x006c, //000000h-003FFFh
+    FLASH_LOCK_LOW_32K_MID1471CD        =   0x0070, //000000h-007FFFh   //0x0074
+    //---------------- CMP bit = 1---------------//
+    FLASH_LOCK_LOW_960K_MID1471CD       =   0x4004, //000000h-0EFFFFh
+    FLASH_LOCK_LOW_896K_MID1471CD       =   0x4008, //000000h-0DFFFFh
+    FLASH_LOCK_LOW_768K_MID1471CD       =   0x400c, //000000h-0BFFFFh
+    FLASH_LOCK_UP_960K_MID1471CD        =   0x4024, //010000h-0FFFFFh
+    FLASH_LOCK_UP_896K_MID1471CD        =   0x4028, //020000h-0FFFFFh
+    FLASH_LOCK_UP_768K_MID1471CD        =   0x402c, //040000h-0FFFFFh
+    FLASH_LOCK_LOW_1020K_MID1471CD      =   0x4044, //000000h-0FEFFFh
+    FLASH_LOCK_LOW_1016K_MID1471CD      =   0x4048, //000000h-0FDFFFh
+    FLASH_LOCK_LOW_1008K_MID1471CD      =   0x404c, //000000h-0FBFFFh
+    FLASH_LOCK_LOW_992K_MID1471CD       =   0x4050, //000000h-0F7FFFh   //0x4054
+    FLASH_LOCK_UP_1020K_MID1471CD       =   0x4064, //001000h-0FFFFFh
+    FLASH_LOCK_UP_1016K_MID1471CD       =   0x4068, //002000h-0FFFFFh
+    FLASH_LOCK_UP_1008K_MID1471CD       =   0x406c, //004000h-0FFFFFh
+    FLASH_LOCK_UP_992K_MID1471CD        =   0x4070, //008000h-0FFFFFh   //0x4074
+    FLASH_LOCK_ALL_1M_MID1471CD         =   0x007c, //000000h-0FFFFFh   //0x4000 0x4040 0x4020 0x4060...
+}mid1471cd_lock_block_e;
+
+/**
+ * @brief   the options of qe 
+ * 
+ */
+typedef enum
+{
+    FLASH_QE_DISABLE_MID1471CD = 0x0000,
+    FLASH_QE_ENABLE_MID1471CD  = 0x0200,
+} mid1471cd_qe_e;
+
+/**
+ * @brief     The starting address of the Security Registers.
+ */
+typedef enum{
+    FLASH_OTP_0x001000_512B_MID1471CD   =   0x001000,   //001000h-0011FFh
+    FLASH_OTP_0x002000_512B_MID1471CD   =   0x002000,   //002000h-0021FFh
+    FLASH_OTP_0x003000_512B_MID1471CD   =   0x003000,   //003000h-0031FFh
+}mid1471cd_otp_block_e;
+
+/**
+ * @brief     the lock area of the Security Registers.
+ */
+typedef enum{
+    FLASH_LOCK_OTP_0x001000_512B_MID1471CD  =   0x0800, //001000h-0011FFh
+    FLASH_LOCK_OTP_0x002000_512B_MID1471CD  =   0x1000, //002000h-0021FFh
+    FLASH_LOCK_OTP_0x003000_512B_MID1471CD  =   0x2000, //003000h-0031FFh
+}mid1471cd_lock_otp_e;
+
+/**
+ * @brief     the range of masks to be modified when writing status.
+ */
+typedef enum{
+    FLASH_WRITE_STATUS_BP_MID1471CD     =   0x407c, //the values that can be set can refer to mid1471cd_lock_block_e
+    FLASH_WRITE_STATUS_QE_MID1471CD     =   0x0200, //the values that can be set can refer to mid1471cd_qe_e
+    FLASH_WRITE_STATUS_OTP_MID1471CD    =   0x3800, //the values that can be set can refer to mid1471cd_lock_otp_e
+    
+    /*Related to flash hardware protection.When using this function, you need to pay attention. 
+     *If the #WP pin of the flash is grounded and the hardware protection is set at this time, 
+     *the status register of the flash will be locked and irreversible.*/
+    FLASH_WRITE_STATUS_SRP_MID1471CD    =   0x0180, 
+}mid1471cd_write_status_mask_e;
+
+
 
 /**
  * @brief       This function reads the status of flash.
@@ -38,17 +128,12 @@
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned short flash_read_status_mid1660cd(void)
-{
-    unsigned char status_low  = flash_read_status(FLASH_READ_STATUS_CMD_LOWBYTE);
-    unsigned char status_high = flash_read_status(FLASH_READ_STATUS_CMD_HIGHBYTE);
-    return (status_low | (status_high << 8));
-}
+unsigned short flash_read_status_mid1471cd(void);
 
 /**
  * @brief       This function write the status of flash.
  * @param[in]   data    - the status value of the flash after the mask.
- * @param[in]   mask        - mid1660cd_write_status_mask_e.
+ * @param[in]   mask        - mid1471cd_write_status_mask_e.
  * @return      1: success, 0: error, 2: parameter error.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -60,27 +145,11 @@ unsigned short flash_read_status_mid1660cd(void)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_write_status_mid1660cd(unsigned short data, unsigned int mask)
-{
-    if (0 != (data & ~mask)) {
-        return 2;
-    }
-    unsigned short status = flash_read_status_mid1660cd();
-    if (data != (status & mask)) //To reduce the operation of the status register.
-    {
-        status = data | (status & ~(mask));
-        flash_write_status(FLASH_TYPE_16BIT_STATUS_ONE_CMD, status);
-        status = flash_read_status_mid1660cd();
-    }
-    if (data == (status & mask)) {
-        return 1;
-    }
-    return 0;
-}
+unsigned char flash_write_status_mid1471cd(unsigned short data, unsigned int mask);
 
 /**
  * @brief       This function serves to set the protection area of the flash.
- * @param[in]   data    - mid1660cd_lock_block_e.
+ * @param[in]   data    - mid1471cd_lock_block_e.
  * @return      1: success, 0: error, 2: parameter error.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -92,10 +161,7 @@ unsigned char flash_write_status_mid1660cd(unsigned short data, unsigned int mas
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_lock_mid1660cd(unsigned int data)
-{
-    return flash_write_status_mid1660cd(data, FLASH_WRITE_STATUS_BP_MID1660CD);
-}
+unsigned char flash_lock_mid1471cd(unsigned int data);
 
 /**
  * @brief       This function serves to flash release protection.
@@ -110,14 +176,11 @@ unsigned char flash_lock_mid1660cd(unsigned int data)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned char flash_unlock_mid1660cd(void)
-{
-    return flash_write_status_mid1660cd(FLASH_LOCK_NONE_MID1660CD, FLASH_WRITE_STATUS_BP_MID1660CD);
-}
+unsigned char flash_unlock_mid1471cd(void);
 
 /**
  * @brief       This function serves to get the protection area of the flash.
- * @return      mid1660cd_lock_block_e.
+ * @return      mid1471cd_lock_block_e.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
  *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
@@ -128,18 +191,13 @@ unsigned char flash_unlock_mid1660cd(void)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-unsigned int flash_get_lock_block_mid1660cd(void)
-{
-    return flash_read_status_mid1660cd() & FLASH_WRITE_STATUS_BP_MID1660CD;
-}
-
-
+unsigned int flash_get_lock_block_mid1471cd(void);
 /**
  * @brief       This function serves to read data from the Security Registers of the flash.
  * @param[in]   addr    - the start address of the Security Registers.
- *                      the address of the  Security Registers #1 0x001000-0x0013ff
- *                      the address of the  Security Registers #2 0x002000-0x0023ff
- *                      the address of the  Security Registers #3 0x003000-0x0033ff
+ *                      the address of the  Security Registers #1 0x001000-0x0011ff
+ *                      the address of the  Security Registers #2 0x002000-0x0021ff
+ *                      the address of the  Security Registers #3 0x003000-0x0031ff
  * @param[in]   len     - the length(in byte, must be above 0) of the content to be read.
  * @param[out]  buf     - the starting address of the content to be read.
  * @return      none.
@@ -153,17 +211,14 @@ unsigned int flash_get_lock_block_mid1660cd(void)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_read_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned char *buf)
-{
-    flash_read_otp(addr, len, buf);
-}
+void flash_read_otp_mid1471cd(unsigned long addr, unsigned long len, unsigned char* buf);
 
 /**
  * @brief       This function serves to write data to the Security Registers of the flash you choose.
  * @param[in]   addr    - the start address of the Security Registers.
- *                      the address of the  Security Registers #1 0x001000-0x0013ff
- *                      the address of the  Security Registers #2 0x002000-0x0023ff
- *                      the address of the  Security Registers #3 0x003000-0x0033ff
+ *                      the address of the  Security Registers #1 0x001000-0x0011ff
+ *                      the address of the  Security Registers #2 0x002000-0x0021ff
+ *                      the address of the  Security Registers #3 0x003000-0x0031ff
  * @param[in]   len     - the length(in byte, must be above 0) of content to be written.
  * @param[in]   buf     - the starting address of the content to be written.
  * @return      none.
@@ -177,18 +232,15 @@ void flash_read_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned ch
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_write_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned char *buf)
-{
-    flash_write_otp(addr, len, buf);
-}
+void flash_write_otp_mid1471cd(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief       This function serves to erase the data of the Security Registers that you choose.
- *              You can erase 1024-byte one time.
+ *              You can erase 512-byte one time.
  * @param[in]   addr    - the address that you want to erase.
- *                      the address of the  Security Registers #1 0x001000-0x0013ff
- *                      the address of the  Security Registers #2 0x002000-0x0023ff
- *                      the address of the  Security Registers #3 0x003000-0x0033ff
+ *                      the address of the  Security Registers #1 0x001000-0x0011ff
+ *                      the address of the  Security Registers #2 0x002000-0x0021ff
+ *                      the address of the  Security Registers #3 0x003000-0x0031ff
  * @return      none.
  * @note        Even you choose the middle area of the Security Registers,it will erase the whole area.
  *
@@ -202,10 +254,7 @@ void flash_write_otp_mid1660cd(unsigned long addr, unsigned long len, unsigned c
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_erase_otp_mid1660cd(mid1660cd_otp_block_e addr)
-{
-    flash_erase_otp(addr);
-}
+void flash_erase_otp_mid1471cd(mid1471cd_otp_block_e addr);
 
 /**
  * @brief       This function serves to provide the write protect control to the Security Registers.
@@ -224,8 +273,7 @@ void flash_erase_otp_mid1660cd(mid1660cd_otp_block_e addr)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_lock_otp_mid1660cd(mid1660cd_lock_otp_e data)
-{
-    flash_write_status_mid1660cd(data, FLASH_WRITE_STATUS_OTP_MID1660CD);
-}
+void flash_lock_otp_mid1471cd(mid1471cd_lock_otp_e data);
 
+
+#endif

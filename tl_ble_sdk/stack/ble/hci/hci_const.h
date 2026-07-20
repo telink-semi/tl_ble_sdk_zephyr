@@ -121,8 +121,9 @@
 #define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE                    0x32 //core_6.0  7.7.65.45 LE CS Subevent Result Continue event
 #define HCI_SUB_EVT_LE_CS_TEST_END_COMPLETE                           0x33 //core_6.0  7.7.65.46 LE CS Test End Complete event
 #define HCI_SUB_EVT_LE_MONITORED_ADVERTISERS_REPORT                   0x34 //core_6.0  7.7.65.47 LE Monitored Advertises Report event
-#define HCI_SUB_EVT_LE_FRAME_SPACE_UPDATE_COMPLETE                    0x35 //core_6.0  7.7.65.48 LE Frame Space Update Complete event
-
+#define HCI_SUB_EVT_LE_FRAME_SPACE_UPDATE_COMPLETE                    0x35 //core_6.3  7.7.65.48 LE Frame Space Update Complete event
+#define HCI_SUB_EVT_LE_UTP_RECEIVE                                    0x36 //core_6.2  7.7.65.49 LE UTP Receive event
+#define HCI_SUB_EVT_LE_SCI_CONNECTION_RATE_COMPLETE                   0x37 //core_6.3  7.7.65.50 LE Connection Rate Change event
 
 #define HCI_SUB_EVT_MAX                                               0x24
 
@@ -236,12 +237,14 @@
 #define HCI_LE_EVT_MASK_2_CS_TEST_END_COMPLETE                           0x00040000 //channel sounding bit50
 #define HCI_LE_EVT_MASK_2_MONITORED_ADVERTISERS_REPORT                   0x00080000 // core6.0 - bit51
 #define HCI_LE_EVT_MASK_2_FRAME_SPACE_UPDATE_COMPLETE                    0x00100000 // core6.0 - bit52
+#define HCI_LE_EVT_MASK_2_SCI_CONNECTION_RATE_COMPLETE                   0x00400000 //SCI core 6.x
 
 //HDT LE EVNET MASK
 #define HCI_LE_EVT_MASK_2_HDT_LE_CIS_ESTABLISHED_V4                      0X04000000 // HIGHER DATA THROUGHPUT BIT58
 #define HCI_LE_EVT_MASK_2_HDT_LE_CREATE_BIG_COMPLETE_V2                  0X40000000 // HIGHER DATA THROUGHPUT BIT62
 
 #define HCI_LE_EVT_MASK_CONNECTION_ESTABLISH                             0x80000000
+
 
 
 #define HCI_LE_EVT_MASK_DEFAULT                                          0x0000001F
@@ -514,6 +517,14 @@
 #define HCI_CMD_LE_FRAME_SPACE_UPDATE                               0x9D
 //Frame space update end
 //core_6.0 end
+
+//core 6.2 begin
+#define HCI_CMD_LE_SCI_SET_HOST_FEATURE                0x97
+#define HCI_CMD_LE_SCI_CONNECTION_RATE_REQ             0xA1 
+#define HCI_CMD_LE_SCI_SET_DEFAULT_RATE_PARAMETERS     0xA2 
+#define HCI_CMD_LE_READ_MIN_SUPPORT_CONN_INTERVAL      0xA3
+
+//core 6.2 end
 
 // Higher data throughput Commands
 //-- OGF --

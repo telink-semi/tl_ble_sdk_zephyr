@@ -21,6 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#include "user_config.h"
+
 /**
  * @brief   Set "DP_THROUGH_SWIRE_DIS" as "1" to disable the "dp_through_swire" function. Set "DP_THROUGH_SWIRE_DIS" as "0" to enable the "dp_through_swire" function.
  *          Risk description:
@@ -87,6 +89,12 @@ _RESET_ENTRY:
 #ifdef RF_CERTIFICATION_CGF_EN
     .org 0x10
     .word(_RF_CERTIFICATION_CFG_ADDR_OFFSET)
+#endif
+
+/* used to check flash protection function consistency between the old and new  firmware when OTA upgrading */
+#if APP_FLASH_PROTECTION_ENABLE
+    .org 0x15    //correspond to "FIRMWARE_FLASH_PROTECTION_FLAG_ADDR" in mcu_boot.h
+    .byte (0x5A)
 #endif
     .org 0x18
     .word (BIN_SIZE)

@@ -44,6 +44,7 @@
 #include "pwm.h"
 #include "lib/include/stimer.h"
 
+#define INTERNAL_DEBUG 1
 /**
  * @brief ir_learn capture mode
  */
@@ -165,7 +166,11 @@ static inline void ir_learn_dis(void)
  */
 static inline void ir_learn_ana_rx_en(void)
 {
+    analog_write_reg8(0x14, (analog_read_reg8(0x14) & 0x0f)| 0x40);
     analog_write_reg8(0x0f, (analog_read_reg8(0x0f) | 0x08));
+#if INTERNAL_DEBUG
+    analog_write_reg8(0x11, (analog_read_reg8(0x11) & 0xf0) | 0x0e);//probe rx wave from pc2
+#endif
         analog_write_reg8(0x14, (analog_read_reg8(0x14) | 0x08));
         delay_us(1);
         analog_write_reg8(0x14, (analog_read_reg8(0x14) & 0xf7));

@@ -206,7 +206,7 @@ void mic_to_adpcm_split(signed short *ps, int len, signed short *pds, int start)
 //static int serial_id = 0;
 
 unsigned short adpcm_serial_num = 0;
-_attribute_data_retention_ static int predict_idx = 0;
+_attribute_data_retention_ static int predict_idx = 1;
 _attribute_data_retention_ static int predict = 0;
 
 void mic_to_adpcm_split (signed short *ps, int len, signed short *pds, int start)

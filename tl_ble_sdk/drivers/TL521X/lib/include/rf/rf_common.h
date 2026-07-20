@@ -474,6 +474,11 @@ typedef enum
     RF_48M_MODEM_RATE = 1,
 } rf_modem_rate_e;
 
+typedef enum {
+    ASYM_1M_TO_2M = 0,
+    ASYM_2M_TO_1M = 1,
+} rf_phy_switch_dir_e;
+
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
  *********************************************************************************************************************/
@@ -1356,6 +1361,27 @@ void rf_ldot_ldo_rxtxlf_bypass_dis(void);
  *
  */
 void rf_set_rxpara(void);
+
+/**
+ * @brief       Asymmetric PHY rate switching
+ * @param[in]   dir     Direction to switch
+ *                      - PHY_SWITCH_1M_TO_2M: Upgrade TX to 2Mbps
+ *                      - PHY_SWITCH_2M_TO_1M: Downgrade TX to 1Mbps
+ * @param[in]   enable  Asymmetric mode enable
+ *                      - true:  Asymmetric mode (only TX changes, RX unchanged)
+ *                      - false: Symmetric mode (TX and RX change together)
+ * @return      None
+ *
+ * @note        - RF transceiver is disabled during the switch
+ *              - Allow 80μs settling time after switching
+ *              - Ensure no ongoing packet transfer before calling
+ *
+ * @code
+ * // Enable asymmetric: TX=2M, RX=1M
+ * rf_phy_switch_asymmetric(ASYM_1M_TO_2M, true);
+ * @endcode
+ */
+_attribute_ram_code_sec_noinline_ void rf_phy_switch_asymmetric(rf_phy_switch_dir_e dir, _Bool enable);
 
 /**
  * @brief      This interface is used to configure the BLE debug port IO.

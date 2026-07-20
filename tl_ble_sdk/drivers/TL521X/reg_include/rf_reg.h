@@ -1069,6 +1069,31 @@ enum
     FLD_RF_NEW_2G4_LENGTH_ADJ = BIT_RNG(0, 5),
 };
 
+#define reg_rf_asym_phy0 REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x160)
+
+enum
+{
+    FLD_RF_ASYM_PHY_EN = BIT(0),
+    FLD_RF_ASYM_PHY_NOR_ESB_EN = BIT(1),
+};
+
+#define reg_rf_asym_phy1 REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x161)
+
+enum
+{
+    FLD_RF_BLE_1M_ASYM = BIT(0),
+    FLD_RF_BLE_IR_ASYM = BIT(1),
+    FLD_RF_HIG_RATE_4M_ASYM = BIT(2),
+    FLD_RF_NO_USED_BIT_0 = BIT(3),
+};
+
+#define reg_rf_asym_phy2 REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x162)
+
+enum
+{
+    FLD_RF_HEAD_MODE_ASYMB = BIT_RNG(0, 2),
+};
+
 /***********************************************************************************************/
 
 /**

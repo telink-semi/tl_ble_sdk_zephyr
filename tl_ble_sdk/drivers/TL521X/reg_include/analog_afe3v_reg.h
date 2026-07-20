@@ -95,8 +95,34 @@ enum
 };
 
 #define areg_aon_0x0c 0x0c
+enum
+{
+    FLD_DCDC_1V35_EN  = BIT(4),
+} ;
+
 #define areg_aon_0x0e 0x0e
 #define areg_aon_0x0f 0x0f
+
+#define areg_aon_0x27 0x27
+enum
+{
+    FLD_DIG_LDO_TRIM    = BIT_RNG(0, 3),
+    FLD_DIG_LDO_1V1_EN  = BIT(4),
+} ;
+
+#define areg_aon_0x28 0x28
+enum
+{
+    FLD_LDO_TRIM_1V25 = BIT_RNG(0, 3),
+    FLD_LDO_1V35_EN  = BIT(4),
+} ;
+
+#define areg_aon_0x29 0x29
+enum
+{
+    FLD_DCDC_TRIM_1V25 = BIT_RNG(0, 3),
+} ;
+
 #define areg_aon_0x13 0x13
 
 /**

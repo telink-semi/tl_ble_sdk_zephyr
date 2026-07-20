@@ -908,4 +908,21 @@ void gpio_set_pem_event(pem_chn_e chn, gpio_event_e pin, pem_event_pol_e pol);
  */
 void gpio_set_pem_task(pem_chn_e chn, gpio_task_e pin);
 
+/**
+ * @brief     This function serves to set jtag(4 wires) pin . where, PD[4]; PD[5]; PD[6]; PD[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag,
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void jtag_set_pin_en(void);
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin . where, PD[6]; PD[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag,
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void sdp_set_pin_en(void);
 #endif

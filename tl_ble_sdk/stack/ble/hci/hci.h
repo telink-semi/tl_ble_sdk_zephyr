@@ -64,6 +64,11 @@ typedef struct __attribute__((packed))
     u8 *p;
 } hci_fifo_t;
 
+extern hci_fifo_t bltHci_rxfifo;
+extern hci_fifo_t bltHci_txfifo;
+
+extern hci_fifo_t bltHci_outIsofifo;
+
 /**
  *  @brief  Definition for HCI packet type & HCI packet indicator
  */

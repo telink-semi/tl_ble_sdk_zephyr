@@ -118,6 +118,7 @@ typedef enum
     FLASH_SONOS_PUYA = 0x02006085, // 6085     bit[25]:SONOS:Byte Program Time == Page Programming Time
     FLASH_SONOS_TH   = 0x020060EB, // 60EB
     FLASH_SST_TH     = 0x040060CD, // 60CD     bit[26]:SST:  Byte Program Time != Page Programming Time
+    FLASH_NORD_TH    = 0x100070CD, // 70CD/71CD/51CD        bit[27]=1:NORD: Byte Program Time != Page Programming Time
 } flash_vendor_e;
 
 /**

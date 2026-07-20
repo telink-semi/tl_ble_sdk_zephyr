@@ -32,13 +32,13 @@
  */
 typedef enum
 {
-    LPC_INPUT_PB1 = 1,
-    LPC_INPUT_PB2 = 2,
-    LPC_INPUT_PB3 = 3,
-    LPC_INPUT_PB4 = 4,
-    LPC_INPUT_PB5 = 5,
-    LPC_INPUT_PB6 = 6,
-    LPC_INPUT_PB7 = 7,
+    LPC_INPUT_PB5 = 1,
+    LPC_INPUT_PB6 = 2,
+    LPC_INPUT_PB7 = 3,
+    LPC_INPUT_PC0 = 4,
+    LPC_INPUT_PC1 = 5,
+    LPC_INPUT_PC2 = 6,
+    LPC_INPUT_PC3 = 7,
 } lpc_input_channel_e;
 
 /**
@@ -123,7 +123,7 @@ static inline void lpc_set_scaling_coeff(lpc_scaling_e divider)
  */
 static inline unsigned char lpc_get_result(void)
 {
-    return ((analog_read_reg8(0x88) & 0x40) >> 6);
+    return (analog_read_reg8(0x108) & FLD_LC_COMP_OUT) ;
 }
 
 /**
@@ -133,3 +133,13 @@ static inline unsigned char lpc_get_result(void)
  * @return      none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
+
+/**
+ * @brief       This function is used to initialize GPIO voltage detection.
+ * @param[in]   mode    - lower power comparator working mode includes normal mode and low power mode.
+ * @param[in]   pin     - selected input channel.Input derived from external PortB(PB<1>~PB<7>).
+ * @param[in]   ref     - selected input reference voltage.
+ * @param[in]   divider - selected scaling coefficient.(%25,%50,%75,%100)
+ * @return      none.
+ */
+void lpc_gpio_vol_detect_init(lpc_mode_e mode, lpc_input_channel_e pin, lpc_reference_e ref,lpc_scaling_e divider);

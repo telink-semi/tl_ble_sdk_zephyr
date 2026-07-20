@@ -155,6 +155,16 @@ typedef enum
 } pm_power_sel_e;
 
 /**
+ * @brief dig voltage mode
+ * 
+ */
+typedef enum
+{
+    DIG_VOL_1V_MODE  = 0,
+    DIG_VOL_1V1_MODE,
+} pm_dig_vol_mode_e;
+
+/**
  * @brief   early wake up time
  */
 typedef struct
@@ -239,6 +249,24 @@ static _always_inline void pm_clr_irq_status(pm_wakeup_status_e status)
 static _always_inline void pm_set_wakeup_src(pm_sleep_wakeup_src_e wakeup_src)
 {
     analog_write_reg8(areg_aon_0x4b, wakeup_src);
+}
+
+/**
+ * @brief       This function serves to enable core wakeup.
+ * @return      none.
+ */
+static inline void pm_set_core_wakeup_mask(soc_core_wakeup_mask_e core_wakeup_mask)
+{
+    reg_wakeup_en |= core_wakeup_mask;
+}
+
+/**
+ * @brief       This function serves to disable core wakeup.
+ * @return      none.
+ */
+static inline void pm_clr_core_wakeup_mask(soc_core_wakeup_mask_e core_wakeup_mask)
+{
+    reg_wakeup_en &= ~core_wakeup_mask;
 }
 
 /**
@@ -362,6 +390,30 @@ pm_sw_reboot_reason_e pm_get_sw_reboot_event(void);
  *              and if it is called twice, the state will be fixed to one state, not the correct state.
  */
 _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_en);
+
+/**
+ * @brief       This function serves to set dig ldo mode.
+ * @param[in]   vol             - dig ldo mode.
+ * @param[in]   dma_timeout_us - wait dma all chn complete timeout.
+ * @return      DRV_API_SUCCESS - successful;
+ *              DRV_API_INVALID_PARAM - select the not support mode;
+ *              DRV_API_TIMEOUT - wait for dma all chn idle timeout to exit;
+ * @note        1.If the voltage goes up, after calling the interface first, then adjust the frequency;
+ *                If the voltage goes down, adjust the frequency first, then call the interface;
+ *              2.When adjusting this voltage, no access ram operation is allowed, so it will wait for dma idle in this interface,
+ *                modifying dma_timeout_us won't work if there are dma chains working all the time, and needs to be turned off by the upper layers themselves depending on the situation.
+ *              3.When adjusting this voltage, no access ram operation is allowed, disable swire.
+ *              4.If the check configuration fails, reboot.
+ */
+_attribute_ram_code_sec_noinline_ drv_api_status_e pm_set_dvdd(pm_dig_vol_mode_e vol, unsigned int dma_timeout_us);
+
+/**
+ * @brief      This function servers to get calibration value from EFUSE for retention LDO voltage.
+ * @param[in]  none
+ * @return     DRV_API_SUCCESS - the calibration value update, DRV_API_INVALID_PARAM - the calibration value is not valid,
+ *             DRV_API_TIMEOUT - efuse read timeout.
+ */
+drv_api_status_e pm_efuse_calib_ret_ldo_voltage(void);
 
 /********************************************************************************************************
  *                                          internal

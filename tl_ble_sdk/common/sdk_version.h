@@ -39,10 +39,10 @@
 #define CUSTOM_MINOR_VERSION 0
 
 
-#define TL_BLE_SDK_VERSION_NUM              CERTIFICATION_MARK.SOFT_STRUCTURE.MAJOR_VERSION.MINOR_VERSION
-#define SDK_VERSION_NUM                     TL_BLE_SDK_VERSION_NUM
+#define TL_BLE_SDK_VERSION_NUM        CERTIFICATION_MARK.SOFT_STRUCTURE.MAJOR_VERSION.MINOR_VERSION
+#define SDK_VERSION_NUM               TL_BLE_SDK_VERSION_NUM
 
-#define SDK_VERSION1(sdk_version_num)   "$$$tl_ble_sdk_V"#sdk_version_num"$$$"
+#define SDK_VERSION1(sdk_version_num) "$$$tl_ble_sdk_V" #sdk_version_num "$$$"
 
 
 

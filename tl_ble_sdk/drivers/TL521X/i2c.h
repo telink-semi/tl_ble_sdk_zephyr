@@ -4,9 +4,9 @@
  * @brief   This is the header file for tl521x
  *
  * @author  Driver Group
- * @date    2025
+ * @date    2026
  *
- * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
  *
  *  How to use this driver
  *  ==============
- The i2c has two modules: i2c/i2c1_m
+ *  supports uart: i2c0.
 - i2c(It can be used as a master or slave)
  -# i2c Master
   -# Initialization and Configuration
@@ -138,23 +138,7 @@
       - when the slave is used with the stretch function, Determine when the master reads the data and then use the fill data by interrupting I2C_SLAVE_WR_MASK (nodma:i2c_slave_write() dma:i2c_slave_set_tx_dma());
       - When the slave is not used with stretch function, if I2C_SLAVE_WR_MASK is used to interrupt to judge when the master reads and fills the data, the mcu cannot handle it. Therefore, it is necessary to fill the data in advance before the master read data (nodma:i2c_slave_write() dma:i2c_slave_set_tx_dma());
       - The i2c_master_send_stop() API is used to determine whether the master sends a stop signal after the sending or receiving is complete
-- i2c1_m(Only as master,only nodma)
-     -# Initialization and Configuration
-       - Initialize the sda/scl pin by i2c1_m_set_pin() API;
-       - Configure the speed by i2c1_m_set_master_clk() API;
-       - Enable master function by i2c1_m_master_init() API;
-     -# TX and RX(For write and read, you can optionally add an address)
-       - i2c1_m_master_write() API,if send the address, just put the address in the txbuff and send it together as data;
-       - i2c1_m_master_write_read() API;
-     -# the attention:
-       - The i2c1_m_master_send_stop() API is used to determine whether the master sends a stop signal after the sending or receiving is complete;
-- Timeout mechanism(i2c/i2c1_m)
-     -# i2c_set_error_timeout()/i2c1_m_set_error_timeout():define global variable g_i2c_error_timeout_us/g_i2c1_m_error_timeout_us,
-        the default value is a large value,can use the preceding interfaces to adjust the value based on actual applications.
-     -# i2c_get_error_timeout_code()/i2c1_m_get_error_timeout_code(): when an error timeout abnormally, can use the above interface to read which error belongs to i2c_api_error_code_e/i2c1_m_api_error_code_e.
-     -# i2c_timeout_handler()/i2c1_m_timeout_handler():when an error timeout exits abnormally,can do timeout processing at the application layer or the application layer redefines the interface.
  */
-
 #ifndef I2C_H
 #define I2C_H
 #include <stdbool.h>
@@ -171,8 +155,11 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-extern unsigned char i2c_slave_rx_index;
+extern unsigned char i2c_slave_rx_index[2];
 
+typedef enum{
+    I2C0=0,
+}i2c_chn_e;
 /**
  *  @brief  Define UART IRQ BIT MASK
  */
@@ -274,15 +261,15 @@ typedef enum
     I2C_API_ERROR_TIMEOUT_STOP       = 0x04,
 } i2c_api_error_timeout_code_e;
 
-/**
-* record i2c error code, can obtain the value through the i2c_get_error_timeout_code interface.
-*/
-extern volatile i2c_api_error_timeout_code_e g_i2c_error_timeout_code;
+typedef struct
+{
+    unsigned int                           g_i2c_error_timeout_us;   // i2c_x error timeout(us),a large value is set by default,can set it by i2c_set_error_timeout();
+    timeout_handler_fp                     i2c_timeout_handler;      // i2cx_timeout_handler;
+    volatile i2c_api_error_timeout_code_e g_i2c_error_timeout_code; // record i2c_x error timeout code, can obtain the value through the i2c_get_error_timeout_code() interface;
+} i2c_timeout_error_t;
 
-/**
- * i2c error timeout(us),a large value is set by default,can set it by i2c_set_error_timeout().
- */
-extern unsigned int g_i2c_error_timeout_us;
+
+extern i2c_timeout_error_t g_i2c_timeout_error[1];
 
 /**
  * @brief      The function of this API is to determine whether the bus is busy.
@@ -290,9 +277,9 @@ extern unsigned int g_i2c_error_timeout_us;
  * @note       If upper-layer application calls the interface, the interface may be stuck due to an exception on both sides of the communication.
  *             If the upper-layer uses the timeout processing mechanism, see set_i2c_error_timeout_us (time setting requirement).
  */
-static inline bool i2c_master_busy(void)
+static inline bool i2c_master_busy(i2c_chn_e chn)
 {
-    return reg_i2c_mst & FLD_I2C_MST_BUSY;
+    return reg_i2c_mst(chn) & FLD_I2C_MST_BUSY;
 }
 
 /**
@@ -300,9 +287,9 @@ static inline bool i2c_master_busy(void)
  *             when there is write data in the tx_fifo, this register is increased.
  * @return     The actual number of bytes in txfifo.
  */
-static inline unsigned char i2c_get_tx_buf_cnt(void)
+static inline unsigned char i2c_get_tx_buf_cnt(i2c_chn_e chn)
 {
-    return (reg_i2c_buf_cnt & FLD_I2C_TX_BUFCNT) >> 4;
+    return (reg_i2c_buf_cnt(chn) & FLD_I2C_TX_BUFCNT) >> 4;
 }
 
 /**
@@ -310,9 +297,9 @@ static inline unsigned char i2c_get_tx_buf_cnt(void)
  *             when there is read data in the rxfifo, FLD_I2C_RX_BUFCNT is decremented.
  * @return     The actual number of bytes in rxfifo.
  */
-static inline unsigned char i2c_get_rx_buf_cnt(void)
+static inline unsigned char i2c_get_rx_buf_cnt(i2c_chn_e chn)
 {
-    return (reg_i2c_buf_cnt & FLD_I2C_RX_BUFCNT);
+    return (reg_i2c_buf_cnt(chn) & FLD_I2C_RX_BUFCNT);
 }
 
 /**
@@ -321,13 +308,13 @@ static inline unsigned char i2c_get_rx_buf_cnt(void)
  * @param[in]  cnt - the interrupt trigger level,the range is less than 8.
  * @return     none
  */
-static inline void i2c_rx_irq_trig_cnt(unsigned char cnt)
+static inline void i2c_rx_irq_trig_cnt(i2c_chn_e chn,unsigned char cnt)
 {
     /*
        in the i2c_rx_irq_trig_cnt interface,originally first set i2c_rc_irq_trig_cnt to 0 and then assign,
        if the rx_buff mask is opened first, when set i2c_rc_irq_trig_cnt to 0,rx_fifo is empty, an interrupt will be triggered by mistake.
     */
-    reg_i2c_trig = (((reg_i2c_trig) & (~FLD_I2C_RX_IRQ_TRIG_LEV)) | (cnt & 0x0f));
+    reg_i2c_trig(chn) = (((reg_i2c_trig(chn)) & (~FLD_I2C_RX_IRQ_TRIG_LEV)) | (cnt & 0x0f));
 }
 
 /**
@@ -335,12 +322,13 @@ static inline void i2c_rx_irq_trig_cnt(unsigned char cnt)
  * @param[in]  mask - to select interrupt type.
  * @return     none
  */
-static inline void i2c_set_irq_mask(i2c_irq_mask_e mask)
+static inline void i2c_set_irq_mask(i2c_chn_e chn,i2c_irq_mask_e mask)
 {
     if (mask & I2C_STRETCH_IRQ) {
-        reg_i2c_ctrl2 |= FLD_I2C_MASK_STRETCH;
+        reg_i2c_ctrl2(chn) |= FLD_I2C_MASK_STRETCH;
     }
-    reg_i2c_mask0 |= mask;
+
+    reg_i2c_mask0(chn) |= mask;
 }
 
 /**
@@ -348,12 +336,13 @@ static inline void i2c_set_irq_mask(i2c_irq_mask_e mask)
  * @param[in]  mask - to select Interrupt type.
  * @return     none
  */
-static inline void i2c_clr_irq_mask(i2c_irq_mask_e mask)
+static inline void i2c_clr_irq_mask(i2c_chn_e chn,i2c_irq_mask_e mask)
 {
     if (mask & I2C_STRETCH_IRQ) {
-        reg_i2c_ctrl2 &= (~FLD_I2C_MASK_STRETCH);
+        reg_i2c_ctrl2(chn) &= (~FLD_I2C_MASK_STRETCH);
     }
-    reg_i2c_mask0 &= (~mask);
+
+    reg_i2c_mask0(chn) &= (~mask);
 }
 
 /**
@@ -363,12 +352,13 @@ static inline void i2c_clr_irq_mask(i2c_irq_mask_e mask)
  * @retval     zero   - the interrupt did not occur.
  *
  */
-static inline unsigned char i2c_get_irq_status(i2c_irq_status_e status)
+static inline unsigned char i2c_get_irq_status(i2c_chn_e chn,i2c_irq_status_e status)
 {
     if (status & I2C_STRETCH_IRQ) {
-        return i2c_slave_status1 & FLD_I2C_SS_SCL_IRQ;
+        return i2c_slave_status1(chn) & FLD_I2C_SS_SCL_IRQ;
     }
-    return reg_i2c_status0 & status;
+
+    return reg_i2c_status0(chn) & status;
 }
 
 /**
@@ -384,21 +374,23 @@ static inline unsigned char i2c_get_irq_status(i2c_irq_status_e status)
  *               because after suspend wakes up, the chip is equivalent to performing a i2c_reset,
  *               so the software read pointer also needs to be cleared to zero.
  */
-static inline void i2c_slave_clr_rx_index(void)
+static inline void i2c_slave_clr_rx_index(i2c_chn_e chn)
 {
-    i2c_slave_rx_index = 0;
+    i2c_slave_rx_index[chn] = 0;
 }
 
 /**
  * @brief     This function serves to i2c finite state machine reset(the configuration register is still there and does not need to be reconfigured).
  * @return    none.
  */
-static inline void i2c_hw_fsm_reset(void)
+static inline void i2c_hw_fsm_reset(i2c_chn_e chn)
 {
-    reg_rst0 &= (~FLD_RST0_I2C);
-    reg_rst0 |= FLD_RST0_I2C;
-    i2c_slave_clr_rx_index();
-    g_i2c_error_timeout_code = I2C_API_ERROR_TIMEOUT_NONE;
+    if(chn == I2C0){
+        reg_rst0 &= (~FLD_RST0_I2C);
+        reg_rst0 |= FLD_RST0_I2C;
+    }
+    i2c_slave_clr_rx_index(chn);
+    g_i2c_timeout_error[chn].g_i2c_error_timeout_code = I2C_API_ERROR_TIMEOUT_NONE;
 }
 
 /**
@@ -406,7 +398,7 @@ static inline void i2c_hw_fsm_reset(void)
  * @param[in]  status - to select interrupt status type.
  * @return     none
  */
-static inline void i2c_clr_irq_status(i2c_irq_status_e status)
+static inline void i2c_clr_irq_status(i2c_chn_e chn,i2c_irq_status_e status)
 {
     /**
       [0]:ss_read    read only
@@ -416,12 +408,12 @@ static inline void i2c_clr_irq_status(i2c_irq_status_e status)
       [6]:ss_scl_irq    Write 1 to clear zero
      */
     if (status & I2C_STRETCH_STATUS) {
-        i2c_slave_status1 = FLD_I2C_SS_SCL_IRQ;
+        i2c_slave_status1(chn) = FLD_I2C_SS_SCL_IRQ;
     }
     if (status & I2C_RX_BUF_STATUS) {
-        i2c_slave_clr_rx_index();
+        i2c_slave_clr_rx_index(chn);
     }
-    reg_i2c_status0 = status;
+    reg_i2c_status0(chn) = status;
 }
 
 /**
@@ -430,7 +422,8 @@ static inline void i2c_clr_irq_status(i2c_irq_status_e status)
  *                  ID|0x01 indicate read. ID&0xfe indicate write.
  * @return     none
  */
-void i2c_slave_init(unsigned char id);
+void i2c_slave_init(i2c_chn_e chn,unsigned char id);
+
 
 /**
  * @brief      The function of this API is to ensure that the data can be successfully sent out.
@@ -448,7 +441,8 @@ void i2c_slave_init(unsigned char id);
  *             1: write successfully;
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len);
+unsigned char i2c_master_write(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len);
+
 
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device.
@@ -465,7 +459,7 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
  *             1: the master receive the data successfully;
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_read(unsigned char id, unsigned char *data, unsigned int len);
+unsigned char i2c_master_read(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len);
 
 /**
  * @brief      This function serves to write data and read data,
@@ -485,7 +479,8 @@ unsigned char i2c_master_read(unsigned char id, unsigned char *data, unsigned in
  *             1: the master receive the data successfully.
  *             DRV_API_TIMEOUT: timeout return(solution refer to the note for i2c_set_error_timeout);
  */
-unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, unsigned int wr_len, unsigned char *rd_data, unsigned int rd_len);
+unsigned char i2c_master_write_read(i2c_chn_e chn,unsigned char id, unsigned char *wr_data, unsigned int wr_len, unsigned char *rd_data, unsigned int rd_len);
+
 
 /**
  * @brief      The function of this API is just to write data to the i2c tx_fifo by DMA.
@@ -498,7 +493,8 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  * @return     none.
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
-void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int len);
+void i2c_master_write_dma(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len);
+
 
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device by dma.
@@ -510,7 +506,8 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
  * @return     none
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to read the next batch of data.
  */
-void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int len);
+void i2c_master_read_dma(i2c_chn_e chn,unsigned char id, unsigned char *rx_data, unsigned int len);
+
 
 /**
  * @brief      Send an amount of data in DMA mode
@@ -519,7 +516,8 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
  * @return     none.
  * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
-void i2c_slave_set_tx_dma(unsigned char *data, unsigned int len);
+void i2c_slave_set_tx_dma(i2c_chn_e chn,unsigned char *data, unsigned int len);
+
 
 /**
 @brief         This function serves to receive a packet of data from master device.
@@ -534,7 +532,8 @@ void i2c_slave_set_tx_dma(unsigned char *data, unsigned int len);
                   for example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
                 -# After DMA transfer completion, the interface needs to be invoked again to read the next batch of data.
 */
-void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len);
+void i2c_slave_set_rx_dma(i2c_chn_e chn,unsigned char *data, unsigned int len);
+
 
 /**
  * @brief     This function serves to receive data .
@@ -542,7 +541,8 @@ void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len);
  * @param[in]  len - The total length of the data
  * @return    none
  */
-void i2c_slave_read(unsigned char *data, unsigned int len);
+void i2c_slave_read(i2c_chn_e chn,unsigned char *data, unsigned int len);
+
 
 /**
  * @brief     This function serves to receive i2c data by byte with not DMA method.
@@ -550,7 +550,8 @@ void i2c_slave_read(unsigned char *data, unsigned int len);
  * @param[in]  len - The total length of the data.
  * @return    none
  */
-void i2c_slave_write(unsigned char *data, unsigned int len);
+void i2c_slave_write(i2c_chn_e chn,unsigned char *data, unsigned int len);
+
 
 /**
  * @brief      This function serves to set the i2c clock frequency.The i2c clock is consistent with the pclk.
@@ -558,21 +559,21 @@ void i2c_slave_write(unsigned char *data, unsigned int len);
  *             I2C frequency = pclk/ (4*DivClock).
  * @return     none
  */
-void i2c_set_master_clk(unsigned char clock);
+void i2c_set_master_clk(i2c_chn_e chn,unsigned char clock);
 
 /**
  * @brief     This function serves to set i2c tx_dma channel and config dma tx default.
  * @param[in] chn: dma channel.
  * @return    none
  */
-void i2c_set_tx_dma_config(dma_chn_e chn);
+void i2c_set_tx_dma_config(i2c_chn_e chn,dma_chn_e dma_chn);
 
 /**
  * @brief     This function serves to set i2c rx_dma channel and config dma rx default.
  * @param[in] chn: dma channel.
  * @return    none
  */
-void i2c_set_rx_dma_config(dma_chn_e chn);
+void i2c_set_rx_dma_config(i2c_chn_e chn,dma_chn_e dma_chn);
 
 /**
  *@brief     This function serves to enable i2c slave stretch function,conjunction with stretch function of master,
@@ -580,18 +581,18 @@ void i2c_set_rx_dma_config(dma_chn_e chn);
  *           when TX_FIFO of slave terminal is empty or RX_FIFO of slave terminal is full, the interrupt state is up and the clock line is pulled down.
  *@return    none.
  */
-static inline void i2c_slave_stretch_en(void)
+static inline void i2c_slave_stretch_en(i2c_chn_e chn)
 {
-    reg_i2c_ctrl3 |= FLD_I2C_SLAVE_STRETCH_EN;
+    reg_i2c_ctrl3(chn) |= FLD_I2C_SLAVE_STRETCH_EN;
 }
 
 /**
  *@brief     This function serves to disable i2c slave stretch function.
  *@return    none.
  */
-static inline void i2c_slave_stretch_dis(void)
+static inline void i2c_slave_stretch_dis(i2c_chn_e chn)
 {
-    reg_i2c_ctrl3 &= ~FLD_I2C_SLAVE_STRETCH_EN;
+    reg_i2c_ctrl3(chn) &= ~FLD_I2C_SLAVE_STRETCH_EN;
 }
 
 /**
@@ -599,18 +600,18 @@ static inline void i2c_slave_stretch_dis(void)
  *           When this interface is called, clk will be pulled, it should be noted that this interface can only be called when the master is in the idle state.
  *@return    none.
  */
-static inline void i2c_slave_manual_stretch_en(void)
+static inline void i2c_slave_manual_stretch_en(i2c_chn_e chn)
 {
-    reg_i2c_status |= FLD_I2C_R_MANUAL_STRETCH;
+    reg_i2c_status(chn) |= FLD_I2C_R_MANUAL_STRETCH;
 }
 
 /**
  *@brief     This function serves to clear i2c slave manual stretch function,When the interface is called, clk recovers.
  *@return    none.
  */
-static inline void i2c_slave_manual_stretch_clr(void)
+static inline void i2c_slave_manual_stretch_clr(i2c_chn_e chn)
 {
-    reg_i2c_status |= FLD_I2C_MANUAL_STRETCH_CLR;
+    reg_i2c_status(chn) |= FLD_I2C_MANUAL_STRETCH_CLR;
 }
 
 /**
@@ -618,18 +619,18 @@ static inline void i2c_slave_manual_stretch_clr(void)
  *           If stretch is enabled on the slave, it needs to be enabled,by default, it is enabled on the interface i2c_master_init.
  *@return    none.
  */
-static inline void i2c_master_stretch_en(void)
+static inline void i2c_master_stretch_en(i2c_chn_e chn)
 {
-    reg_i2c_ctrl2 |= FLD_I2C_MASTER_STRETCH_EN;
+    reg_i2c_ctrl2(chn) |= FLD_I2C_MASTER_STRETCH_EN;
 }
 
 /**
  *@brief     This function serves to disable i2c master stretch function.
  *@return    none.
  */
-static inline void i2c_master_stretch_dis(void)
+static inline void i2c_master_stretch_dis(i2c_chn_e chn)
 {
-    reg_i2c_ctrl2 &= ~(FLD_I2C_MASTER_STRETCH_EN);
+    reg_i2c_ctrl2(chn) &= ~(FLD_I2C_MASTER_STRETCH_EN);
 }
 
 /**
@@ -639,18 +640,18 @@ static inline void i2c_master_stretch_dis(void)
  *                otherwise, the stop signal cannot be sent, resulting in the busy state of the master,this interface is enabled by default on the i2c_master_init interface.
  * @return     none.
  */
-static inline void i2c_master_detect_nack_en(void)
+static inline void i2c_master_detect_nack_en(i2c_chn_e chn)
 {
-    reg_i2c_ctrl2 |= FLD_I2C_MASTER_NAK_STOP_EN;
+    reg_i2c_ctrl2(chn) |= FLD_I2C_MASTER_NAK_STOP_EN;
 }
 
 /**
  * @brief      This function serves to disable i2c master nack stop function.
  * @return     none.
  */
-static inline void i2c_master_detect_nack_dis(void)
+static inline void i2c_master_detect_nack_dis(i2c_chn_e chn)
 {
-    reg_i2c_ctrl2 &= ~(FLD_I2C_MASTER_NAK_STOP_EN);
+    reg_i2c_ctrl2(chn) &= ~(FLD_I2C_MASTER_NAK_STOP_EN);
 }
 
 /**
@@ -658,21 +659,21 @@ static inline void i2c_master_detect_nack_dis(void)
  * @param[in] len - the maximum transmission length of i2c is 0xffffff bytes, so dont'n over this length.
  * @return    none
  */
-void i2c_master_set_len(unsigned int len);
+void i2c_master_set_len(i2c_chn_e chn,unsigned int len);
 
 /**
  *@brief     in slave ,judge whether the master is sending a read cmd or a write cmd.
  *@return    1:if return 1,it means that the slave is to get master read cmd.
  *           0:if return 0,it means that the slave is to get master write cmd.
  */
-i2c_slave_wr_e i2c_slave_get_cmd(void);
+i2c_slave_wr_e i2c_slave_get_cmd(i2c_chn_e chn);
 
 /**
  * @brief     in master,judge whether master is to read or write
  * @return    1:if return 1,it means that the state of the master is read status.
  *            0:if return 0,it means that the state of the master is not read status.
  */
-i2c_master_wr_e i2c_get_master_wr_status(void);
+i2c_master_wr_e i2c_get_master_wr_status(i2c_chn_e chn);
 
 /**
  * @brief      The function of this interface is equivalent to that after the user finishes calling the write or read interface, the stop signal is not sent,
@@ -680,7 +681,7 @@ i2c_master_wr_e i2c_get_master_wr_status(void);
  * @param[in]  en - Input parameters.Decide whether to disable the stop function after each write or read interface
  * @return     none
  */
-void i2c_master_send_stop(unsigned char en);
+void i2c_master_send_stop(i2c_chn_e chn,unsigned char en);
 
 /**
  * @brief      This function selects a pin port for I2C interface.
@@ -688,13 +689,14 @@ void i2c_master_send_stop(unsigned char en);
  * @param[in]  scl_pin - the pin port selected as I2C scl pin port.
  * @return     none
  */
-void i2c_set_pin(gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin);
+void i2c_set_pin(i2c_chn_e chn,gpio_func_pin_e sda_pin, gpio_func_pin_e scl_pin);
+
 
 /**
  * @brief      This function serves to enable i2c master function.
  * @return     none.
  */
-void i2c_master_init(void);
+void i2c_master_init(i2c_chn_e chn);
 
 
 /**
@@ -704,7 +706,15 @@ void i2c_master_init(void);
  * @note      This function can be rewritten according to the application scenario,can by g_i2c_error_timeout_code to obtain details about the timeout reason,
  *            for the solution, refer to the i2c_set_error_timeout note.
  */
-__attribute__((weak)) void i2c_timeout_handler(unsigned int i2c_error_timeout_code);
+__attribute__((weak)) void i2c0_timeout_handler(unsigned int i2c_error_timeout_code);
+/**
+ * @brief     This function serves to record the api status.
+ * @param[in] i2c_error_timeout_code - i2c_api_error_code_e.
+ * @return    none.
+ * @note      This function can be rewritten according to the application scenario,can by g_i2c_error_timeout_code to obtain details about the timeout reason,
+ *            for the solution, refer to the i2c_set_error_timeout note.
+ */
+__attribute__((weak)) void i2c1_timeout_handler(unsigned int i2c_error_timeout_code);
 
 
 /**
@@ -722,12 +732,11 @@ __attribute__((weak)) void i2c_timeout_handler(unsigned int i2c_error_timeout_co
  *            1.reset master,reset slave(i2c_hw_fsm_reset);
  *            2.ensure that the clk/data is high(gpio_get_level);
  */
-void i2c_set_error_timeout(unsigned int timeout_us);
+void i2c_set_error_timeout(i2c_chn_e chn,unsigned int timeout_us);
 
 /**
  * @brief     This function serves to return the i2c api error code.
  * @return    none.
  */
-i2c_api_error_timeout_code_e i2c_get_error_timeout_code(void);
-
+i2c_api_error_timeout_code_e i2c_get_error_timeout_code(i2c_chn_e chn);
 #endif
