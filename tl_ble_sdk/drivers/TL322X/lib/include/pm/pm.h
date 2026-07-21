@@ -283,6 +283,24 @@ static inline void pm_set_usb1_wakeup(void)
     reg_wakeup_en |= FLD_USB1_PWDN_I;
 }
 
+/**
+ * @brief       This function serves to enable core wakeup.
+ * @return      none.
+ */
+static inline void pm_set_core_wakeup_mask(soc_core_wakeup_mask_e core_wakeup_mask)
+{
+    reg_wakeup_en |= core_wakeup_mask;
+}
+
+/**
+ * @brief       This function serves to disable core wakeup.
+ * @return      none.
+ */
+static inline void pm_clr_core_wakeup_mask(soc_core_wakeup_mask_e core_wakeup_mask)
+{
+    reg_wakeup_en &= ~core_wakeup_mask;
+}
+
 #if (PM_WFI_OPTIMIZATION)
 #define analog_write_reg8_pwr_opt(addr, data)                                                   \
 do {                                                                                            \

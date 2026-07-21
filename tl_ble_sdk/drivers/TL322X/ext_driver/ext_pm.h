@@ -154,5 +154,4 @@ typedef enum{
  * @return     indicate whether the cpu is wake up successful.
  */
 int  cpu_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
-
 #endif /* DRIVERS_TL721X_DRIVER_EXT_EXT_PM_H_ */
