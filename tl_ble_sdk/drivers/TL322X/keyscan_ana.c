@@ -388,8 +388,8 @@ void ks_ana_init(ks_ana_gpio_pin_t ks_ana_gpio_pin, ks_ana_mode_e ks_ana_mode, k
  * @note       the disable order: ks_ana_disable-> dma_chn_dis
  */
 void ks_ana_disable(void){
-    while(!(( ks_ana_get_irq_status() & (FLD_KS_FRM_END_STA | FLD_KS_FRM_END1_STA))==0x3))
-    ks_ana_clr_irq_status(FLD_KS_FRM_END_STA | FLD_KS_FRM_END1_STA);
+    // while(!(( ks_ana_get_irq_status() & (FLD_KS_FRM_END_STA | FLD_KS_FRM_END1_STA))==0x3)) //2.4G use
+    // ks_ana_clr_irq_status(FLD_KS_FRM_END_STA | FLD_KS_FRM_END1_STA); //2.4G use
     reg_rst5 &= ~FLD_RST5_KEY_SCAN;
     reg_clk_en5 &= ~FLD_CLK5_KEYSCAN_EN;
     reg_ks_a_en1 &= ~(FLD_KS_A_EN|FLD_KS_ADC_EN | FLD_KS_ADC1_EN | FLD_KS_MOD_A | FLD_KS_CLK_A_EN);//keyscan enable
