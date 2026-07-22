@@ -46,8 +46,16 @@
 
 
 /******************************* core_start ******************************************************************/
-#define irq_disable                 core_interrupt_disable
-#define irq_enable                  core_interrupt_enable
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+    #define irq_disable                 core_interrupt_disable
+    #define irq_enable                  core_interrupt_enable
+#else
+    #undef irq_disable
+    #undef irq_enable
+    #define irq_disable                 core_interrupt_disable
+    #define irq_enable                  core_interrupt_enable
+#endif /* BLC_ZEPHYR_BLE_INTEGRATION */
+
 #define irq_restore(en)             core_restore_interrupt(en)
 
 /******************************* core_end ********************************************************************/
