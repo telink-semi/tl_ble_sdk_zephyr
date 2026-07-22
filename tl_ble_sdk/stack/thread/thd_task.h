@@ -106,8 +106,8 @@ extern void (*thd_insertTsk_switch_to_802154_cb)(void);
 extern void (*thd_insertTsk_switch_to_ble_cb)(void);
 extern void (*tlksdk_switch_to_802154_rf_cb)(void);
 extern void (*tlksdk_switch_to_ble_rf_cb)(void);
-void (*tlksdk_switch_to_802154_rf_isr_cb)(const void *);
-void (*tlksdk_switch_to_ble_rf_isr_cb)(const void *);
+extern void (*tlksdk_switch_to_802154_rf_isr_cb)(const void *);
+extern void (*tlksdk_switch_to_ble_rf_isr_cb)(const void *);
 
 
 void tlksdk_thd_registerModeChangeCb(void (*to_802154_cb)(void), void (*to_ble_cb)(void));
