@@ -72,6 +72,8 @@
 #include "stack/ble/controller/ll/prdadv/pda_sync.h"
 #include "stack/ble/controller/ll/prdadv/PAwR_sync.h"
 
+#include "stack/ble/controller/ll/chn_sound/cs.h"
+
 #include "stack/ble/controller/whitelist/whitelist.h"
 #include "stack/ble/controller/whitelist/resolvelist.h"
 

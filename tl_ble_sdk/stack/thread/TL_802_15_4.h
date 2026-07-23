@@ -73,6 +73,7 @@ void tlksdk_switch_to_ble_rf_ctx(void);
  */
 void tlksdk_rf_802154_isr(void);
 
+void tlksdk_init_ble_rf_hw(rf_power_level_e rf_power_level);
 
 #endif
 

@@ -32,7 +32,7 @@
 
 #include "tl_common.h"
 #include "stack/ble/ble.h"
-#include "algorithm/hadm/tlk_algo4/include/libcs_tlk4.h"
+// #include "algorithm/hadm/tlk_algo4/include/libcs_tlk4.h"
 
 
 #if HOST_PROFILE_SUPPORT_CHANNEL_SOUNDING_EN

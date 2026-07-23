@@ -25,10 +25,8 @@
 #define TLKSTK_THD_TASK_H_
 
 #include "common/types.h"
-#include "stack/ble/controller/ll/ll_stack.h"
-#include "stack/system/system_internal.h"
 
-#if THREAD_LL_FUNCTION_ENABLE
+
 /**
  * @brief Enumeration defining values for thread task enable or disable
  */
@@ -115,6 +113,3 @@ void tlksdk_thd_registerSwitchTo802154RfCb(void (*switch_to_802154_rf_cb)(void),
 void tlksdk_thd_registerRfIsrCb(void (*switch_to_802154_rf_isr_cb)(const void *), void (*switch_to_ble_rf_isr_cb)(const void *));
 
 #endif
-
-
-#endif /* TLKSTK_THD_TASK_H_ */
