@@ -59,7 +59,16 @@ typedef struct __attribute__((packed)) {
 }misc_para_t;
 extern  _attribute_aligned_(4) misc_para_t              blt_miscParam;
 
-
+/**
+ * @brief      Enter sleep mode using the internal 32 kHz RC clock.
+ * @param[in]  sleep_mode  Sleep mode.
+ * @param[in]  wakeup_src  Wake-up source.
+ * @param[in]  wakeup_tick Wake-up timer tick.
+ * @return     Sleep entry status.
+ */
+int cpu_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,
+			    pm_sleep_wakeup_src_e wakeup_src,
+			    unsigned int wakeup_tick);
 
 /**
  * @brief      This function serves to determine whether wake up source is internal 32k RC.
