@@ -809,7 +809,9 @@ static inline void rf_set_crc_byte_order(unsigned char order)
  * @param[in]   config - crc config address pointer
  * @return      none.
  */
-static inline void rf_set_crc_config(const rf_crc_config_t *config)
+__attribute__((always_inline)) static 
+inline /* ble used to avoid warning */
+void rf_set_crc_config(const rf_crc_config_t *config)
 {
     rf_set_crc_init_value(config->init_value);
     rf_set_crc_poly(config->poly);

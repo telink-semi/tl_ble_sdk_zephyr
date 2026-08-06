@@ -23,7 +23,6 @@
  *******************************************************************************************************/
 #pragma once
 
-
 #define SERVICE_GATT_START_HANDLE          0x0001
 
 #define SERVICE_HID_START_HDL              0x00C0
@@ -53,7 +52,6 @@
 #define SERVICE_REFERENCE_TIME_UPDATE_HDL  0x090A
 
 #define SERVICE_POSITIONING_HDL            0x0910
-
 
 //Telink private Service all 128 uuid
 #define SERVICE_TELINK_PRIVATE_START_HDL 0x8000

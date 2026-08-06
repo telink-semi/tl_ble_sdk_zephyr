@@ -85,6 +85,10 @@
         #define UART_TX_PIN GPIO_PD7
         #define UART_RX_PIN GPIO_PD6
         #define BAUDRATE    115200
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
+        #define UART_TX_PIN GPIO_PC4
+        #define UART_RX_PIN GPIO_PC5
+        #define BAUDRATE    115200
     #endif
     /**
  *  @brief phytest buffer related setting.

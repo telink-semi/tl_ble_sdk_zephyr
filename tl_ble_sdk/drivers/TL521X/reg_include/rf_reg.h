@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    rf_reg.h
  *
- * @brief   This is the header file for tl323x
+ * @brief   This is the header file for tl521x
  *
  * @author  Driver Group
  * @date    2025
@@ -546,9 +546,6 @@ enum
     FLD_RF_TLK_MIC_ERR = BIT(3),
     FLD_RF_PKT_DEC_ERR = BIT_RNG(4, 7),
 };
-
-/* ble cs added */
-#define    reg_rf_tx_frac_time_pose_time    REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x48)
 
 #define reg_rf_timestamp REG_ADDR32(REG_BASEBAND_BASE_ADDR + 0x50)
 #define reg_rf_tstamp0   REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x50)

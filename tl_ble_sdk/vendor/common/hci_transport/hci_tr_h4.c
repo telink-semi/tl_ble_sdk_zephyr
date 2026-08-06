@@ -100,6 +100,7 @@ void HCI_Tr_H4Init(hci_fifo_t *pHciRxFifo)
 
 void HCI_Tr_H4ChangeBaudrate(hci_fifo_t *pHciRxFifo,u32 baudrate)
 {
+    (void)pHciRxFifo;
     hciH4TrCB.pRxFifo->rptr = 0;
     hciH4TrCB.pRxFifo->wptr = 0;
     memset(&hci_h4_uart, 0, sizeof(ext_hci_InitTypeDef));

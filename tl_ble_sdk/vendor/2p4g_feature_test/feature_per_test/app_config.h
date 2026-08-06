@@ -29,7 +29,7 @@
 
 ///////////////////////// Mode Configuration/////////////////////////////////////////////
 #define GENFSK                        0
-#define TPSLL                         1
+//#define TPSLL                         1
 #define TPLL                          2
 
 #define RF_MODE                       GENFSK

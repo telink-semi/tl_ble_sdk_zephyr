@@ -53,7 +53,7 @@
  */
 #if (UI_KEYBOARD_ENABLE)
     #define MATRIX_ROW_PULL    PM_PIN_PULLDOWN_100K
-    #define MATRIX_COL_PULL    PM_PIN_PULLUP_10K
+    #define MATRIX_COL_PULL    PM_PIN_PULLUP_20K
 
     #define KB_LINE_HIGH_VALID 0 //drive pin output 0 when scan key, scan pin read 0 is valid
 

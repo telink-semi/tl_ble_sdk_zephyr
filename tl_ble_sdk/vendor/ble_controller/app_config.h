@@ -57,6 +57,14 @@
         #define HCI_TR_RX_PIN              GPIO_FC_PD6 //UART0_RX_PB3 //--->EBQ TX
         #define HCI_TR_TX_PIN              GPIO_FC_PD7 //UART0_TX_PB2 //--->EBQ RX
         #define HCI_TR_BAUDRATE (1000000)
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
+        #define HCI_TR_RX_PIN              GPIO_FC_PC4
+        #define HCI_TR_TX_PIN              GPIO_FC_PC5
+        #define HCI_TR_BAUDRATE (1000000)
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
+        #define HCI_TR_RX_PIN              GPIO_FC_PB0
+        #define HCI_TR_TX_PIN              GPIO_FC_PB1
+        #define HCI_TR_BAUDRATE (1000000)
     #endif
 
     #define DBG_HCI_TR      0

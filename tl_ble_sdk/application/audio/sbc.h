@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    sbc.h
  *
- * @brief   This is the header file for TL521X
+ * @brief   This is the header file for BLE SDK
  *
  * @author  BLE GROUP
  * @date    06,2020
@@ -50,6 +50,6 @@ size_t sbc_get_frame_length(int type);
 /* Returns the input block size in bytes */
 size_t sbc_get_codesize(int type);
 
-void msbc_init_ctx();
-void msbc_release_ctx();
+void msbc_init_ctx(void);
+void msbc_release_ctx(void);
 #endif /* SBC_H_ */

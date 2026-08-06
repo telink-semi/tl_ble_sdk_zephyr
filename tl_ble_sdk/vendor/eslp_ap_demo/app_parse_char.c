@@ -27,11 +27,12 @@
 
 #include "tl_common.h"
 #include "drivers.h"
-#include <stdarg.h>
 #include "application/usbstd/usbdesc.h"
 #include "application/usbstd/usb.h"
 #include "application/app/usbcdc.h"
 #include "app_parse_char.h"
+#include <strings.h>
+#include <stdarg.h>
 
 typedef struct {
     u16 write_index;

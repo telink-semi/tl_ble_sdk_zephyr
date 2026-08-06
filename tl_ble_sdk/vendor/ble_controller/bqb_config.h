@@ -49,13 +49,13 @@
 /**
  * @brief         enable the periodic advertisement module.
  */
-#define APP_LE_PERIODIC_ADV_EN 1
+#define APP_LE_PERIODIC_ADV_EN 0
 
 
 /**
  * @brief         enable the periodic advertisement with response module.
  */
-#define APP_LE_PAWR_ADV_EN 1
+#define APP_LE_PAWR_ADV_EN 0
 
 
 /**
@@ -67,7 +67,7 @@
 /**
  * @brief         enable the extended initiating module.
  */
-#define APP_LE_EXTENDED_INIT_EN 0
+#define APP_LE_EXTENDED_INIT_EN 1
 
 
 /**
@@ -92,6 +92,22 @@
  * @brief         enable the ChnClassification feature.
  */
 #define APP_CHN_CLASS_EN 0
+
+/**
+ * @brief         enable the Periodic sync feature.
+ */
+#define APP_SYNCHRONIZED_RECEIVER_EN 0
+
+/**
+ * @brief         enable the power control feature.
+ */
+#define APP_POWER_CONTROL 0
+
+
+/**
+ * @brief         enable the PAST feature.
+ */
+#define APP_PAST_EN 0
 
 
 /**

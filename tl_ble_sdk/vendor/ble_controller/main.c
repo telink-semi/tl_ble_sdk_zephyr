@@ -110,13 +110,13 @@ __INLINE void blc_app_system_init(void)
     wd_stop();
     PLL_192M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M;
 #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
-    sys_init(LDO_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
     pm_update_status_info(1);
     gpio_shutdown(GPIO_ALL);
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
     wd_32k_stop();
     wd_stop();
-    PLL_144M_CCLK_72M_HCLK_36M_PCLK_18M_MSPI_36M;
+    PLL_144M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M;
 #else
     #error "Not Supported Chip!!!"
 #endif

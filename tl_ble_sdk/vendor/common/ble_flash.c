@@ -58,8 +58,10 @@ _attribute_data_retention_ u32 flash_sector_simple_sdp_att = FLASH_SDP_ATT_ADDRE
 _attribute_data_retention_ unsigned int  blc_flash_mid    = 0;
 _attribute_data_retention_ unsigned int  blc_flash_vendor = 0;
 _attribute_data_retention_ unsigned char blc_flash_capacity;
+#if MCU_RUN_IN_NVM
 extern void write_storage_from_ram(unsigned int addr, unsigned int len, unsigned int *data);
 extern void read_storage_to_ram(unsigned int addr, unsigned int len, unsigned char *data);
+#endif
 /**
  * @brief       This function is used to read flash mid, get flash vendor, and set flash capacity
  * @param[in]   none

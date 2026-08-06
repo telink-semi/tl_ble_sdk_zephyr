@@ -151,11 +151,17 @@ void user_init_normal(void)
 
     blc_ll_initStandby_module(mac_public); //mandatory
 
+#if !APP_LE_EXTENDED_ADV_EN
     blc_ll_initLegacyAdvertising_module();
+#endif
 
+#if !APP_LE_EXTENDED_SCAN_EN
     blc_ll_initLegacyScanning_module();
+#endif
 
+#if !APP_LE_EXTENDED_INIT_EN
     blc_ll_initLegacyInitiating_module();
+#endif
 
     blc_ll_initAclConnection_module();
 #if ACL_CENTRAL_MAX_NUM
@@ -246,7 +252,7 @@ void user_init_normal(void)
     blc_ll_initExtendedInitiating_module();
 #endif
 
-#if (APP_SYNCHRONIZED_RECEIVER_EN || APP_ISOCHRONOUS_BROADCASTER_SYNC_EN)
+#if (APP_SYNCHRONIZED_RECEIVER_EN)
     blc_ll_initPeriodicAdvertisingSynchronization_module();
 #endif
 

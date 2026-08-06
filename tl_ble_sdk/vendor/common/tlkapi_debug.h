@@ -33,6 +33,15 @@
     #define TLKAPI_DEBUG_ENABLE 0
 #endif
 
+/**
+ * @brief   Telink debug log force flush enable or disable
+ *          When enabled, call tlkapi_debug_handler immediately after log buffer write.
+ *          Mitigate log data loss caused by continuous buffer enqueue without timely handler execution.
+ *          user can set it in app_config.h, default disable if user not set it
+ */
+#ifndef TLKAPI_DEBUG_FORCE_FLUSH_ENABLE
+    #define TLKAPI_DEBUG_FORCE_FLUSH_ENABLE 0
+#endif
 
 /**
  * @brief   Telink debug log channel select

@@ -326,7 +326,6 @@
        #define BOARD_SELECT BOARD_322X_EVK_C1T371A20
     #elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
         #define BOARD_SELECT BOARD_323X_EVK_C1T388A20
-    /*Don't apply these to SDK*/
     #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
         #define BOARD_SELECT BOARD_521X_EVK_C1T416A20
     #else
@@ -374,8 +373,6 @@
     #include "boards/TL321X_C1T335A20.h"
 #elif (BOARD_SELECT == BOARD_321X_EVK_C1T335A78)
     #include "boards/TL321X_C1T335A78.h"
-#elif (BOARD_SELECT == BOARD_322X_EVK_C1T382A20)
-    #include "boards/TL322X_C1T382A20.h"
 #elif (BOARD_SELECT == BOARD_322X_EVK_C1T371A20)
     #include "boards/TL322X_C1T371A20.h"
 #elif (BOARD_SELECT == BOARD_521X_EVK_C1T416A20)

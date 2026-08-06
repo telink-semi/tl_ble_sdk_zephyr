@@ -155,7 +155,7 @@
         /**     The battery voltage sample range is 1.8~3.5V    **/
     #else
         /**     if the battery voltage > 3.6V, should take some external voltage divider    **/
-        #define ADC_INPUT_PIN_CHN SD_ADC_GPIO_PC1P
+        #define ADC_INPUT_PIN_CHN_P SD_ADC_GPIO_PC1P
         #define ADC_INPUT_PIN_CHN_N SD_ADC_GNDN
     #endif
 #endif
@@ -202,14 +202,10 @@
     #define PG5_OUTPUT_ENABLE      1
 #endif //end of DEBUG_GPIO_ENABLE
 
-#if TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_GSUART
-    #if MCU_CORE_D25F_ENABLE
-    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PA6
-    #elif MCU_CORE_N22_ENABLE
-    #define TLKAPI_DEBUG_GPIO_PIN        GPIO_PA5
-    #endif
-    #define TLKAPI_DEBUG_GSUART_BAUDRATE 1000000
-#endif
+
+#define TLKAPI_DEBUG_GPIO_PIN        GPIO_PA6
+#define TLKAPI_DEBUG_GSUART_BAUDRATE 1000000
+
 
 #ifndef DEBUG_GPIO_CHAN_ENABLE
     #define DEBUG_GPIO_CHAN_ENABLE 0

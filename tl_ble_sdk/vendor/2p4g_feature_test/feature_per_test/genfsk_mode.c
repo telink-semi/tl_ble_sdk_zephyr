@@ -31,19 +31,21 @@
 #define TX  1
 #define RX  2
 #define RF_TX_RX_MODE   TX
-volatile static unsigned char rf_run_step               = 0;
+static volatile unsigned char rf_run_step               = 0;
 
 // RF PARAMETER
 #define PREAMBLE_LEN_BIT 8
-volatile static unsigned char chn                       = 4;
+static volatile unsigned char chn                       = 4;
 
 //TX
 #define TX_PAYLOAD_LEN 32
 #define TX_BUF_LEN     64
 #define TX_BUF_NUM     2
+#if(RF_TX_RX_MODE == TX)
 static unsigned char __attribute__ ((aligned (4))) tx_buffer[64] = {0};
+#endif
 unsigned char                                      tx_payload[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-volatile static unsigned char                      tx_done_flag  = 0;
+static volatile unsigned char                      tx_done_flag  = 0;
 volatile unsigned int                              irq_cnt_tx    = 0;
 volatile unsigned int                              tx_cnt        = 0;
 
@@ -75,15 +77,21 @@ gen_fsk_generic_header_t GEN_FSK_GenericHeader = {
 
 
 
-volatile static unsigned char rx_buf[RX_BUF_LEN * RX_BUF_NUM] __attribute__ ((aligned (4))) = {};
-volatile static unsigned char rx_flag                                                       = 0;
-volatile static unsigned char rx_first_timeout_flag                                         = 0;
-volatile static unsigned int  irq_cnt_rx                                                    = 0;
-volatile static unsigned int  irq_cnt_rx_crc_ok                                             = 0;
-volatile static unsigned int  irq_cnt_rx_first_timeout                                      = 0;
-volatile static unsigned char *rx_packet                                                    = 0;
+static unsigned char rx_buf[RX_BUF_LEN * RX_BUF_NUM] __attribute__ ((aligned (4))) = {};
+static volatile unsigned char rx_flag                                                       = 0;
+static volatile unsigned char rx_first_timeout_flag                                         = 0;
+static volatile unsigned int  irq_cnt_rx                                                    = 0;
+static volatile unsigned int  irq_cnt_rx_crc_ok                                             = 0;
+static volatile unsigned int  irq_cnt_rx_first_timeout                                      = 0;
+static volatile unsigned char *rx_packet                                                    = 0;
 static volatile unsigned int  print_time                                                    = 0;
 
+struct rf_rx_info {
+    unsigned int rx_cnt;
+    unsigned int rx_crc_ok_cnt;
+};
+struct rf_rx_info g_rx_info_statistic[6] = {0};
+unsigned char g_rx_info_idx = 0;
 
 _attribute_ram_code_sec_ void rf_irq_handler(void)
 {
@@ -92,7 +100,7 @@ _attribute_ram_code_sec_ void rf_irq_handler(void)
         irq_cnt_tx++;
         rf_clr_irq_status(FLD_RF_IRQ_TX);
     } else if (rf_get_irq_status(FLD_RF_IRQ_RX)) {
-        rx_packet = rf_get_rx_packet_addr(RX_BUF_NUM, RX_BUF_LEN, rx_buf);
+        rx_packet = rf_get_rx_packet_addr(RX_BUF_NUM, RX_BUF_LEN, (void *)rx_buf);
         irq_cnt_rx++;
         if (!rf_get_crc_err()) {
             irq_cnt_rx_crc_ok++;
@@ -249,7 +257,6 @@ _attribute_ram_code_ void sdk_2p4g_main_loop(void)
         rx_flag = 0;
         print_time = clock_time();
         gen_fsk_srx_start(clock_time() + 50 * 16, 0);
-//        printf("rx:0x%x %x %x %x %x %x\n", rx_packet[0], rx_packet[1], rx_packet[2], rx_packet[3], rx_packet[4], rx_packet[5]);
     }
 
     if (1 == rx_first_timeout_flag)
@@ -260,7 +267,9 @@ _attribute_ram_code_ void sdk_2p4g_main_loop(void)
 
     if(clock_time_exceed(print_time, 3000000)){ //per_test_done, print result
         rf_set_tx_rx_off();
-        printf("genfsk_irq_cnt_rx: %d, genfsk_irq_cnt_rx_crc_ok: %d\r\n", irq_cnt_rx, irq_cnt_rx_crc_ok);
+        g_rx_info_statistic[g_rx_info_idx].rx_cnt = irq_cnt_rx;
+        g_rx_info_statistic[g_rx_info_idx].rx_crc_ok_cnt = irq_cnt_rx_crc_ok;
+        g_rx_info_idx = g_rx_info_idx + 1;
         irq_cnt_rx = 0;
         irq_cnt_rx_crc_ok = 0;
         rf_run_step++;
@@ -323,7 +332,15 @@ _attribute_ram_code_ void sdk_2p4g_main_loop(void)
             gen_fsk_srx_start(clock_time() + 50 * 16, 0);
         }
         else{
-            printf("genfsk_per_test_done!\r\n");
+            tlk_printf("\n2404/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2404/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n"
+                       "2434/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2434/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n"
+                       "2474/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2474/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n ",
+                    g_rx_info_statistic[0].rx_cnt, g_rx_info_statistic[0].rx_crc_ok_cnt,
+                    g_rx_info_statistic[1].rx_cnt, g_rx_info_statistic[1].rx_crc_ok_cnt,
+                    g_rx_info_statistic[2].rx_cnt, g_rx_info_statistic[2].rx_crc_ok_cnt,
+                    g_rx_info_statistic[3].rx_cnt, g_rx_info_statistic[3].rx_crc_ok_cnt,
+                    g_rx_info_statistic[4].rx_cnt, g_rx_info_statistic[4].rx_crc_ok_cnt,
+                    g_rx_info_statistic[5].rx_cnt, g_rx_info_statistic[5].rx_crc_ok_cnt);
 #if (TLKAPI_DEBUG_ENABLE)
             tlkapi_debug_handler();
 #endif

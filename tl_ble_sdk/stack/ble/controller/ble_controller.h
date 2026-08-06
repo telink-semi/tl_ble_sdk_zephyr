@@ -51,6 +51,8 @@
 
 #include "stack/ble/controller/ll/past/past.h"
 
+#include "stack/ble/controller/ll/acl_conn/acl_sci.h"
+
 #include "stack/ble/controller/ll/adv/adv.h"
 #include "stack/ble/controller/ll/adv/leg_adv.h"
 #include "stack/ble/controller/ll/adv/ext_adv.h"

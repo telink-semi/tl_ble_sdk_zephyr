@@ -26,9 +26,7 @@
 #include "chip_config.h"
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
-
 #include "lib/include/rf/rf_common.h"
-
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
@@ -52,7 +50,6 @@
 #include "usbhw.h"
 #endif
 #include "watchdog.h"
-#include "s7816.h"
 #include "lib/include/core.h"
 
 #include "uart.h"
@@ -72,3 +69,4 @@
 #endif
 #include "cache.h"
 #include "pem.h"
+#include "rz.h"

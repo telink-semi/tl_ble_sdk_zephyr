@@ -64,7 +64,6 @@ extern u8 app_extScanRspData_buf[];
 /**************************************** CS rx Buffer allocation, Begin *******************************************/
 
 /**
-/**
  * @brief   CS RX Data buffer length
  */
 #if ANTENNA_SWITCHING_AUTO_EN

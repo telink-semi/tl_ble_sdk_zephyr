@@ -27,9 +27,7 @@
 #include "feature_config.h"
 
 
-#if (FEATURE_TEST_MODE == OTA)
-    #include "2p4g_ota/app_config.h"
-#elif (FEATURE_TEST_MODE == PER)
+#if (FEATURE_TEST_MODE == PER)
     #include "feature_per_test/app_config.h"
 #elif (FEATURE_TEST_MODE == PM)
     #include "feature_pm_test/app_config.h"

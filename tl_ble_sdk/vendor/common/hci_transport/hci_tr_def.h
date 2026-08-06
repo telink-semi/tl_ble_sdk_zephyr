@@ -28,6 +28,10 @@
 #define DBG_HCI_TR    0
 #endif
 
+#ifndef TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM
+#define TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM    0
+#endif
+
 
 /*!  HCI Transmit Type. */
 #define HCI_TR_TYPE_NONE  0x00

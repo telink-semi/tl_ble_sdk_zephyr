@@ -107,12 +107,12 @@ static inline int noise_suppression(s16 md)
 void voice_iir_OOB(signed short *ps, signed short *pd, int *coef, int nsample, u8 shift);
 void voice_iir(signed short *ps, signed short *pd, int *coef, int nsample, u8 shift);
 void Audio_VolumeSet(unsigned char input_output_select, unsigned char volume_set_value);
-void filter_setting();
+void filter_setting(void);
 
 void audio_mic_param_init(void);
 void proc_mic_encoder(void);
 void proc_mic_encoder_reset(void);
-int *mic_encoder_data_buffer();
+int *mic_encoder_data_buffer(void);
 void mic_encoder_data_read_ok(void);
 
 #elif (TL_AUDIO_MODE & DONGLE_PROJECT) //Dongle

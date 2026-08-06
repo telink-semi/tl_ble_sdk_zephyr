@@ -38,7 +38,7 @@ extern "C"
 #define TPLL_PRX_3BIT  4  // only tl323x support this mode
 #endif
 
-#define TPLL_MODE TPLL_PRX
+#define TPLL_MODE TPLL_PTX
 
 /* Flash Protection:
  * 1. Flash protection is enabled by default in SDK. User must enable this function on their final mass production application.

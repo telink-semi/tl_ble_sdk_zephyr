@@ -25,7 +25,8 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "../stack/2p4g/tpll/tpll.h"
-#if ((MCU_CORE_TYPE == MCU_CORE_TL323X) && (TPLL_MODE == TPLL_PRX_3BIT))
+#if ((MCU_CORE_TYPE == MCU_CORE_TL323X))
+#if (TPLL_MODE == TPLL_PRX_3BIT)
     #define PRX_PIPE        0
     #define PRI_FLT_MODE_EN 0
     #define TX_PAYLOAD_LEN  16
@@ -222,4 +223,5 @@ _attribute_no_inline_ void main_loop(void)
         printf("rx:0x%x %x %x %x %x %x\n", rx_packet[6], rx_packet[7], rx_packet[8], rx_packet[9], rx_packet[10], rx_packet[11]);
     }
 }
+#endif
 #endif

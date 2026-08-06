@@ -38,7 +38,7 @@
 #include "common/usb_dbg/myudb.h"
 #include "common/sdk_version.h"
 
-#include "vendor/common/user_config.h"
+
 #include "vendor/common/app_common.h"
 #include "vendor/common/ble_flash.h"
 #include "vendor/common/blt_led.h"
@@ -48,6 +48,7 @@
 #include "vendor/common/flash_fw_check.h"
 #include "vendor/common/flash_prot.h"
 #include "vendor/common/tlkapi_debug.h"
+#include "vendor/common/hci_transport/hci_tr_def.h"
 #include "vendor/common/battery_check.h"
 #include "gpio_default.h"
 

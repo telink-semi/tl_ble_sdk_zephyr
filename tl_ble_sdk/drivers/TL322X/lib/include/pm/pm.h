@@ -216,6 +216,16 @@ typedef struct
     unsigned char rsvd;
 } pm_status_info_s;
 
+/**
+ * @brief Operation of ADC register protection mode
+ **/
+typedef enum
+{
+    PROTECT_VOLTAGE_RECOVER_MODE = 0,   /* undertension */
+    PROTECT_VOLTAGE_PROTECT_MODE = 1    /* overtension */
+} pm_protect_adc_voltage_mode_t;
+
+
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 
 extern unsigned char                                g_areg_aon_7f;
@@ -382,6 +392,9 @@ static inline void pm_exit_wfi_optimization(void)
 /**
  * @brief       This function configures a GPIO pin as the wakeup pin.
  * @param[in]   pin - the pins can be set to all GPIO except GPIOD and GPIOI groups.
+ *                    Recommend using 1M internal pull-up, do not use 10K pull-up;
+ *                    If 10K pull-up must be used, do not use this IO as low-level wakeup IO;
+ *                    If this IO must be used as low-level wakeup IO, set 1M pull-up before entering sleep and restore 10K pull-up after wakeup;
  * @param[in]   pol - the wakeup polarity of the pad pin(0: low-level wakeup, 1: high-level wakeup).
  * @param[in]   en  - enable or disable the wakeup function for the pan pin(1: enable, 0: disable).
  * @return      none.
@@ -542,3 +555,13 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_
  * @return     DRV_API_SUCCESS - the calibration value update, DRV_API_FAILURE - the calibration value is not update.
  */
 drv_api_status_e pm_efuse_calib_ret_ldo_voltage(void);
+
+/**
+ * @brief       Adjusts the output voltage for the current power mode.
+ * @param       mode  Adjustment mode: 1 to increase, 0 to decrease.
+ * @note        When operating the ADC-related analog registers, make sure to raise the LDO and DCCD voltages by two levels. 
+ *              After the operation, the voltages should return to their original levels.
+ * @return      Indicates whether the operation was successful.
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ char power_adc_protected_mode(pm_protect_adc_voltage_mode_t mode);
+

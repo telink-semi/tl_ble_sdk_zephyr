@@ -55,13 +55,13 @@ _attribute_ram_code_sec_ void rf_enable_debug_IO(void)
     rf_dbg_bb_set_pin(GPIO_PA0); //tx_en
     rf_dbg_bb_set_pin(GPIO_PA1); //tx_on
     rf_dbg_bb_set_pin(GPIO_PA2); //rx_en
-    rf_dbg_bb_set_pin(GPIO_PA3); //clk_bb
+//    rf_dbg_bb_set_pin(GPIO_PA3); //clk_bb
     rf_dbg_bb_set_pin(GPIO_PA4); //hit_sync
 
 //    rf_dbg_bb_set_pin(GPIO_PB0); //sclk
-    rf_dbg_bb_set_pin(GPIO_PB1); //tx_data
-    rf_dbg_bb_set_pin(GPIO_PB2); //rx_data_vld
-    rf_dbg_bb_set_pin(GPIO_PB3); //rx_data
+//    rf_dbg_bb_set_pin(GPIO_PB1); //tx_data
+//    rf_dbg_bb_set_pin(GPIO_PB2); //rx_data_vld
+//    rf_dbg_bb_set_pin(GPIO_PB3); //rx_data
 }
 #else
 _attribute_ram_code_sec_ void dbg_io_set_pin(gpio_pin_e pin)
@@ -86,13 +86,13 @@ _attribute_ram_code_sec_ void rf_enable_debug_IO(void)
     dbg_io_set_pin(GPIO_PA0);       //tx_en
     dbg_io_set_pin(GPIO_PA1);       //tx_on
     dbg_io_set_pin(GPIO_PA2);       //rx_en
-    dbg_io_set_pin(GPIO_PA3);       //clk_bb
+//    dbg_io_set_pin(GPIO_PA3);       //clk_bb
     dbg_io_set_pin(GPIO_PA4);       //hit_sync
 
-    dbg_io_set_pin(GPIO_PB0);       //sclk
-    dbg_io_set_pin(GPIO_PB1);       //tx_data
-    dbg_io_set_pin(GPIO_PB2);       //rx_data_vld
-    dbg_io_set_pin(GPIO_PB3);       //rx_data
+//    dbg_io_set_pin(GPIO_PB0);       //sclk
+//    dbg_io_set_pin(GPIO_PB1);       //tx_data
+//    dbg_io_set_pin(GPIO_PB2);       //rx_data_vld
+//    dbg_io_set_pin(GPIO_PB3);       //rx_data
 }
 #endif // (MCU_CORE_TYPE)
 #endif
@@ -178,7 +178,7 @@ __INLINE void blc_app_system_init(void)
     wd_stop();
     PLL_192M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M;
 #elif (MCU_CORE_TYPE == MCU_CORE_TL521X)
-    sys_init(LDO_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
     pm_update_status_info(1);
     gpio_shutdown(GPIO_ALL);
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);

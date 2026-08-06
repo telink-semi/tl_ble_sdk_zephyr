@@ -29,7 +29,7 @@
 
 ///////////////////////// Mode Configuration/////////////////////////////////////////////
 #define GENFSK                        0
-#define TPSLL                         1
+//#define TPSLL                         1
 #define TPLL                          2
 
 #define RF_MODE                       GENFSK
@@ -62,7 +62,7 @@
 #define APP_FLASH_INIT_LOG_EN               1
 #define APP_FLASH_PROT_LOG_EN               1
 #define APP_BATT_CHECK_LOG_EN               1
-#define RF_DEBUG_IO_ENABLE                  0
+#define RF_DEBUG_IO_ENABLE                  1
 /////////////////////// Sample Board Select Configuration ///////////////////////////////
 #if (MCU_CORE_TYPE == MCU_CORE_B91)
     #define BOARD_SELECT BOARD_951X_EVK_C1T213A20

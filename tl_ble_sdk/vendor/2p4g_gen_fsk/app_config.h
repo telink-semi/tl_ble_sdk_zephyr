@@ -38,7 +38,7 @@ extern "C"
 #define GEN_FSK_TX     5
 #define GEN_FSK_RX     6
 
-#if (MCU_CORE_TYPE == MCU_CORE_TL321X)
+#if (MCU_CORE_TYPE == MCU_CORE_TL323X)
 #define GEN_FSK_STX_3BIT    7
 #define GEN_FSK_SRX_3BIT    8
 #endif

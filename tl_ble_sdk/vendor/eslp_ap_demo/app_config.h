@@ -89,7 +89,7 @@
  */
 #define APP_FLASH_PROTECTION_ENABLE 1
 ///////////////////////// ! OS settings////////////////////////////////////////////////
-#define FREERTOS_ENABLE                             1
+#define FREERTOS_ENABLE                             0
 #define MODULE_USB_ENABLE                           1
 #define USB_CDC_ENABLE                              1
 

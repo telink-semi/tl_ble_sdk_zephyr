@@ -27,6 +27,56 @@
 #include "drivers.h"
 #include "vendor/common/user_config.h"
 
+#ifndef FLASH_P25Q80U_SUPPORT_EN
+    #define FLASH_P25Q80U_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_P25Q16SU_SUPPORT_EN
+    #define FLASH_P25Q16SU_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_P25Q32SU_SUPPORT_EN
+    #define FLASH_P25Q32SU_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_P25Q128H_SUPPORT_EN
+    #define FLASH_P25Q128H_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_P25Q80SU_SUPPORT_EN
+    #define FLASH_P25Q80SU_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_GD25LE80E_SUPPORT_EN
+    #define FLASH_GD25LE80E_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_GD25LE80E_SUPPORT_EN
+    #define FLASH_GD25LE80E_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_GD25LQ16E_SUPPORT_EN
+    #define FLASH_GD25LQ16E_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_GD25LE16E_SUPPORT_EN
+    #define FLASH_GD25LE16E_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_P25Q128L_SUPPORT_EN
+    #define FLASH_P25Q128L_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_GD25LQ80E_SUPPORT_EN
+    #define FLASH_GD25LQ80E_SUPPORT_EN 0
+#endif
+
+#ifndef FLASH_TH25Q32U_SUPPORT_EN
+    #define FLASH_TH25Q32U_SUPPORT_EN 0
+#endif
+
+
+
 /*Configure slave num (mspi_slave_device_num_e)*/
 #ifndef APP_FLASH_SLAVE_DEVICE_NUM
     #define APP_FLASH_SLAVE_DEVICE_NUM 0 //default slave 0

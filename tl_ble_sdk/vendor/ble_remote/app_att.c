@@ -648,22 +648,22 @@ static const attribute_t my_Attributes[] = {
 
 #if(TL_AUDIO_MODE & TL_AUDIO_MASK_HID_SERVICE_CHANNEL)
     //audio character 1     //HID_NORMAL_AUDIO_REPORT_INPUT_FIRST_CD_H
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioFirstCharVal),     (u8*)(&my_characterUUID),                        (u8*)(&my_hidReportAudioFirstCharVal),             0,                                            0   }, //prop
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleFirst),                  (u8*)(&hidReportUUID),                           (u8*)(AudioHandleFirst),                           0,                                            0   }, //value  handle 36
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCFirst),                     (u8*)(&clientCharacterCfgUUID),                  (u8*)(AudioCCCFirst),                              0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportFirst),                  (u8*)(&reportRefUUID),                           (u8*)(AudioReportFirst),                           0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioFirstCharVal),     (u8 *)(size_t)(&my_characterUUID),               (u8*)(&my_hidReportAudioFirstCharVal),             0,                                            0   }, //prop
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleFirst),                  (u8 *)(size_t)(&hidReportUUID),                  (u8*)(AudioHandleFirst),                           0,                                            0   }, //value  handle 36
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCFirst),                     (u8 *)(size_t)(&clientCharacterCfgUUID),         (u8*)(AudioCCCFirst),                              0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportFirst),                  (u8 *)(size_t)(&reportRefUUID),                  (u8*)(AudioReportFirst),                           0,                                            0   }, //value
 
     //audio character 2     //HID_NORMAL_AUDIO_REPORT_INPUT_SEC_CD_H
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioSecondCharVal),    (u8*)(&my_characterUUID),                        (u8*)(&my_hidReportAudioSecondCharVal),            0,                                            0   }, //prop
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleSecnd),                  (u8*)(&hidReportUUID),                           (u8*)(AudioHandleSecnd),                           0,                                            0   }, //value handle 40
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCSecnd),                     (u8*)(&clientCharacterCfgUUID),                  (u8*)(AudioCCCSecnd),                              0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportSecnd),                  (u8*)(&reportRefUUID),                           (u8*)(AudioReportSecnd),                           0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioSecondCharVal),    (u8 *)(size_t)(&my_characterUUID),               (u8*)(&my_hidReportAudioSecondCharVal),            0,                                            0   }, //prop
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleSecnd),                  (u8 *)(size_t)(&hidReportUUID),                  (u8*)(AudioHandleSecnd),                           0,                                            0   }, //value handle 40
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCSecnd),                     (u8 *)(size_t)(&clientCharacterCfgUUID),         (u8*)(AudioCCCSecnd),                              0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportSecnd),                  (u8 *)(size_t)(&reportRefUUID),                  (u8*)(AudioReportSecnd),                           0,                                            0   }, //value
 
     //audio character 3     //HID_NORMAL_AUDIO_REPORT_INPUT_THIRD_CD_H
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioThirdCharVal),     (u8*)(&my_characterUUID),                        (u8*)(&my_hidReportAudioThirdCharVal),             0,                                            0   }, //prop
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleThird),                  (u8*)(&hidReportUUID),                           (u8*)(AudioHandleThird),                           0,                                            0   }, //value  handle 44
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCThird),                     (u8*)(&clientCharacterCfgUUID),                  (u8*)(AudioCCCThird),                              0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportThird),                  (u8*)(&reportRefUUID),                           (u8*)(AudioReportThird),                           0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_hidReportAudioThirdCharVal),     (u8 *)(size_t)(&my_characterUUID),               (u8*)(&my_hidReportAudioThirdCharVal),             0,                                            0   }, //prop
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(AudioHandleThird),                  (u8 *)(size_t)(&hidReportUUID),                  (u8*)(AudioHandleThird),                           0,                                            0   }, //value  handle 44
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioCCCThird),                     (u8 *)(size_t)(&clientCharacterCfgUUID),         (u8*)(AudioCCCThird),                              0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(AudioReportThird),                  (u8 *)(size_t)(&reportRefUUID),                  (u8*)(AudioReportThird),                           0,                                            0   }, //value
 #endif
     ////////////////////////////////////// Battery Service /////////////////////////////////////////////////////
     // 002a - 002d
@@ -699,18 +699,18 @@ static const attribute_t my_Attributes[] = {
     * TELINK AUDIO service
     ********************************************************************************************/
     //0032
-    {8,                                     ATT_PERMISSIONS_READ,  2,  16,                                        (u8*)(&my_primaryServiceUUID),                   (u8*)(&my_AudioUUID),                              0,                                            0   },
+    {8,                                     ATT_PERMISSIONS_READ,  2,  16,                                        (u8*)(size_t)(&my_primaryServiceUUID),                   (u8*)(&my_AudioUUID),                              0,                                            0   },
 
     // 0033 - 0036  MIC
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_MicCharVal),                     (u8*)(&my_characterUUID),                        (u8*)(my_MicCharVal),                              0,                                            0   }, //prop
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_MicCharVal),                     (u8 *)(size_t)(&my_characterUUID),               (u8 *)(size_t)(my_MicCharVal),                     0,                                            0   }, //prop
     {0,                                     ATT_PERMISSIONS_READ,  16, sizeof(my_MicData),                        (u8*)(&my_MicUUID),                              (u8*)(&my_MicData),                                0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(micDataCCC),                        (u8*)(&clientCharacterCfgUUID),                  (u8*)(micDataCCC),                                 0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof (my_MicName),                       (u8*)(&userdesc_UUID),                           (u8*)(my_MicName),                                 0,                                            0   },
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof(micDataCCC),                        (u8 *)(size_t)(&clientCharacterCfgUUID),         (u8*)(micDataCCC),                                 0,                                            0   }, //value
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof (my_MicName),                       (u8 *)(size_t)(&userdesc_UUID),                  (u8*)(my_MicName),                                 0,                                            0   },
 
     // 0037 - 0039  SPEAKER
-    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_SpeakerCharVal),                 (u8*)(&my_characterUUID),                        (u8*)(my_SpeakerCharVal),                          0,                                            0   }, //prop
+    {0,                                     ATT_PERMISSIONS_READ,  2,  sizeof(my_SpeakerCharVal),                 (u8 *)(size_t)(&my_characterUUID),               (u8 *)(size_t)(my_SpeakerCharVal),                 0,                                            0   }, //prop
     {0,                                     ATT_PERMISSIONS_WRITE, 16, sizeof(my_SpeakerData),                    (u8*)(&my_SpeakerUUID),                          (u8*)(&my_SpeakerData),                            0,                                            0   }, //value
-    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof (my_SpeakerName),                   (u8*)(&userdesc_UUID),                           (u8*)(my_SpeakerName),                             0,                                            0   },
+    {0,                                     ATT_PERMISSIONS_RDWR,  2,  sizeof (my_SpeakerName),                   (u8 *)(size_t)(&userdesc_UUID),                  (u8*)(my_SpeakerName),                             0,                                            0   },
 
 #elif(TL_AUDIO_MODE == TL_AUDIO_RCU_ADPCM_GATT_GOOGLE)
     /********************************************************************************************

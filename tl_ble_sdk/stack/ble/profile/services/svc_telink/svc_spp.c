@@ -67,6 +67,7 @@ ble_sts_t blc_spp_pushHandleValue(u16 connHandle, u8 *p, int len){
 
 int telinkSppWrite(u16 connHandle, u8 opcode, u16 attrHandle, u8 *writeValue, u16 valueLen)
 {
+    (void)opcode;
     if (attrHandle == SPP_START_HDL + 2) {
         // sppInData
         sppInDataLen = valueLen > sizeof(sppInData) ? sizeof(sppInData) : valueLen;

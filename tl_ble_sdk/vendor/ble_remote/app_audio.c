@@ -54,10 +54,12 @@ u32     audio_stick = 0;
 extern s16 buffer_mic[TL_MIC_BUFFER_SIZE >> 1] __attribute__((aligned(4)));
 
 void proc_mic_encoder(void);
-int *mic_encoder_data_buffer();
+int *mic_encoder_data_buffer(void);
 void mic_encoder_data_read_ok(void);
-void audio_mic_param_init(void);
-
+#if ((TL_AUDIO_MODE == TL_AUDIO_RCU_ADPCM_HID) || (TL_AUDIO_MODE == TL_AUDIO_RCU_SBC_HID) \
+               || (TL_AUDIO_MODE == TL_AUDIO_RCU_MSBC_HID) )   //HID Service,ADPCM
+    void audio_mic_param_init(void);
+#endif
 
 audio_codec_stream0_input_t audio_codec_stream0_input =
     {
@@ -234,7 +236,6 @@ void ui_enable_mic (int en)
             audio_send_index = 0;
             extern u16 buffer_mic_rptr;
             buffer_mic_rptr = 0;
-            extern s16 buffer_mic[];
             memset(buffer_mic, 0, TL_MIC_BUFFER_SIZE);
         #elif ((TL_AUDIO_MODE == TL_AUDIO_RCU_ADPCM_HID) || (TL_AUDIO_MODE == TL_AUDIO_RCU_SBC_HID) \
                || (TL_AUDIO_MODE == TL_AUDIO_RCU_MSBC_HID) )   //HID Service,ADPCM
@@ -261,13 +262,9 @@ void ui_enable_mic (int en)
         audio_codec_input_path_en(audio_codec_stream0_input.fifo_chn); /* Step4 - enable codec input path, codec data come in */
         audio_fade_pga_gain(CODEC_IN_GAIN_9P0_DB);
 
-    #if (TL_AUDIO_MODE == TL_AUDIO_RCU_ADPCM_GATT_GOOGLE)
-//        extern  u32     latest_user_event_tick;
-//        latest_user_event_tick = clock_time() | 1;
-    #endif
-    #if (IIR_FILTER_ENABLE)
+    #if defined(IIR_FILTER_ENABLE) && IIR_FILTER_ENABLE
         //only used for debugging EQ Filter parameters, removed after mass production
-        extern void filter_setting();
+        extern void filter_setting(void);
         filter_setting();
     #endif
         if(audioProcDelay_us)

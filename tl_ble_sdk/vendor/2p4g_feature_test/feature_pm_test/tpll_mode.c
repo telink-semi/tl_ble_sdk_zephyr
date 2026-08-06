@@ -145,19 +145,6 @@ void user_gpio_init(void)
 {
 }
 
-/**
- * @brief       user initialization when MCU wake_up from deepSleep_retention mode
- * @param[in]   none
- * @return      none
- */
-void user_init_deepRetn(void)
-{
-    user_init_normal();
-#if (TLKAPI_DEBUG_ENABLE)
-    printf("user_init_deepRetn\n");
-#endif
-}
-
 void user_init_normal(void)
 {
     user_gpio_init();
@@ -198,9 +185,27 @@ void user_init_normal(void)
     rf_clr_irq_mask(FLD_RF_IRQ_ALL);
     rf_set_irq_mask(FLD_RF_IRQ_TX | FLD_RF_IRQ_TX_DS | FLD_RF_IRQ_TX_RETRYCNT | FLD_RF_IRQ_RX_DR | FLD_RF_IRQ_PKT_UNMATCH | FLD_RF_IRQ_PKT_MATCH);
 
+#if (RF_DEBUG_IO_ENABLE)
+    extern _attribute_ram_code_sec_ void rf_enable_debug_IO(void);
+    rf_enable_debug_IO();
+#endif
     TPLL_WriteTxPayload(PTX_PIPE, ptx_buffer, (unsigned char *)tx_data, 32);
     TPLL_PTXTrig();
 }
+
+/**
+ * @brief       user initialization when MCU wake_up from deepSleep_retention mode
+ * @param[in]   none
+ * @return      none
+ */
+void user_init_deepRetn(void)
+{
+    user_init_normal();
+#if (TLKAPI_DEBUG_ENABLE)
+    printf("user_init_deepRetn\n");
+#endif
+}
+
 
 _attribute_ram_code_ void sdk_2p4g_main_loop(void)
 {

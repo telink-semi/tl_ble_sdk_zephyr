@@ -31,8 +31,8 @@
 #define HW_EVK                            1
 #define HW_C1T335A78                      2            // TL321X
 
-#define HARDWARE_BOARD_SELECT             HW_C1T335A78 //HW_C1T233A78
-#define BOARD_SELECT                      BOARD_321X_EVK_C1T335A78
+#define HARDWARE_BOARD_SELECT             HW_EVK
+#define BOARD_SELECT                      BOARD_321X_EVK_C1T335A20
 
 #define APP_IMAGE_STORAGE_FLASH                     1
 #if (APP_IMAGE_STORAGE_FLASH)

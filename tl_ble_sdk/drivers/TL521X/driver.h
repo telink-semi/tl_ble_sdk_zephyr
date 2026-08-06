@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    driver.h
  *
- * @brief   This is the header file for tl323x
+ * @brief   This is the header file for tl521x
  *
  * @author  Driver Group
  * @date    2025
@@ -26,9 +26,7 @@
 
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
-
 #include "lib/include/rf/rf_common.h"
-
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
@@ -37,6 +35,7 @@
 #include "lib/include/crypto_common/common_config.h"
 #include "lib/include/emi.h"
 #include "lib/include/analog.h"
+#include "audio.h"
 #include "dma.h"
 #include "gpio.h"
 #include "i2c.h"
@@ -46,7 +45,6 @@
 #include "flash.h"
 #include "usbhw.h"
 #include "watchdog.h"
-
 #include "lib/include/core.h"
 
 #include "uart.h"
@@ -55,9 +53,14 @@
 #include "lib/include/clock.h"
 #include "lib/include/mspi.h"
 #include "sd_adc.h"
-
+#include "qdec.h"
+#include "plic_sw.h"
+#include "plmt.h"
 #include "pem.h"
 #include "flash/flash_type.h"
 #include "flash/flash_common.h"
 #include "ir_learn.h"
 #include "keyscan.h"
+#include "can.h"
+#include "rz.h"
+#include "lpc.h"

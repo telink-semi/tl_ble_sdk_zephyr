@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    gl_audio.h
  *
- * @brief   This is the header file for TL521X
+ * @brief   This is the header file for BLE SDK
  *
  * @author  BLE GROUP
  * @date    06,2020
@@ -143,7 +143,6 @@ typedef enum {
 }MicOpenError_TypeDef;
 
 unsigned char app_audio_key_start(u16 connHandle, unsigned char isPress);
-int app_audio_timeout_proc(void);
 int app_audio_timeout_proc(void);
 int app_auido_google_callback(u16 connHandle, void* p);
 void google_handle_init(u16 ctl_dp_h, u16 report_dp_h);

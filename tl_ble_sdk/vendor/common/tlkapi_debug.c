@@ -37,12 +37,14 @@ _attribute_ble_data_retention_ tlk_dbg_t tlkDbgCtl = {
 _attribute_ble_data_retention_ my_fifo_t *tlkapi_print_fifo = NULL;
 _attribute_ble_data_retention_ u16        g_debug_serial    = 0;
 
+/* Reentrancy guard flag for FIFO operations */
+static volatile u8 s_tlkapi_debug_busy = 0;
 
 #if (TLKAPI_DEBUG_ENABLE)
 
 
 //MYFIFO_INIT_IRAM(print_fifo, TLKAPI_DEBUG_FIFO_SIZE, TLKAPI_DEBUG_FIFO_NUM);
-#if (FREERTOS_ENABLE && ((__PROJECT_SNIF_MAIN_NODE__==1) || (__PROJECT_CS_INITIATOR_DEMO__==1) || (__PROJECT_CS_INITIATOR_TEST__==1)))
+#if (FREERTOS_ENABLE)
 u8 print_fifo_b[TLKAPI_DEBUG_FIFO_SIZE * TLKAPI_DEBUG_FIFO_NUM];
 #else
 _attribute_iram_noinit_data_ u8 print_fifo_b[TLKAPI_DEBUG_FIFO_SIZE * TLKAPI_DEBUG_FIFO_NUM];
@@ -75,10 +77,8 @@ void tlkapi_debug_customize_usb_id(u16 cus_usb_id)
 
 _attribute_ble_data_retention_ static uint32 sTlkApiDebugBitIntv;
 
-_attribute_ram_code_sec_noinline_ void tlkapi_debug_putchar(uint08 byte)
+_attribute_ram_code_sec_optimize_o2_noinline_ void tlkapi_debug_putchar(uint08 byte)
 {
-    uint32 r = irq_disable();
-
         #if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92))
     uint08 bits[14]  = {0};
     uint08 out_level = reg_gpio_out(TLKAPI_DEBUG_GPIO_PIN);
@@ -104,6 +104,7 @@ _attribute_ram_code_sec_noinline_ void tlkapi_debug_putchar(uint08 byte)
         }
     }
     bits[13] = bit1;
+    uint32 r = irq_disable();
     if (sys_clk.cclk <= 32 && TLKAPI_DEBUG_GSUART_BAUDRATE > 115200) {
         bits[0] = bit1;
         bits[1] = bit1;
@@ -134,6 +135,9 @@ _attribute_ram_code_sec_noinline_ void tlkapi_debug_putchar(uint08 byte)
                 time1 = clock_time();
             }
             reg_gpio_out(TLKAPI_DEBUG_GPIO_PIN) = bits[i];
+
+           // Timing calibration. Eliminate cycle extension caused by GPIO operation latency, avoid accumulated timing error.
+            time1 = time2 + sTlkApiDebugBitIntv;
         }
     }
     irq_restore(r);
@@ -173,7 +177,7 @@ _attribute_ram_code_sec_ void tlkapi_uart_irq_handler(void)
             PLIC_ISR_REGISTER(tlkapi_uart_irq_handler, IRQ_UART1)
         #endif
     #elif (TLKAPI_DEBUG_UART_PORT == DBG_UART_PORT2)
-        #if(CLIC_ENABLE == 1)
+        #if defined(CLIC_ENABLE) && (CLIC_ENABLE == 1)
             CLIC_ISR_REGISTER(tlkapi_uart_irq_handler, IRQ_UART2)
         #else
             PLIC_ISR_REGISTER(tlkapi_uart_irq_handler, IRQ_UART2)
@@ -390,13 +394,6 @@ _attribute_ram_code_sec_noinline_ void tlkapi_send_str_data(char *str, u8 *pData
         }
     #endif
 
-    tlkapi_debug_handler();
-
-    if(tlkapi_send_str_isFifoFull(tlkapi_print_fifo))
-    {
-        g_debug_serial++;
-        return;
-    }
 
     extern int tlk_strlen(const char *str);
     int        ns = str ? tlk_strlen(str) : 0;
@@ -408,6 +405,22 @@ _attribute_ram_code_sec_noinline_ void tlkapi_send_str_data(char *str, u8 *pData
     }
 
     u32 r = irq_disable();
+
+    if (s_tlkapi_debug_busy) {
+       g_debug_serial++;
+       irq_restore(r);
+       return ;
+    }
+    s_tlkapi_debug_busy = 1;
+
+   if(tlkapi_send_str_isFifoFull(tlkapi_print_fifo))
+    {
+       g_debug_serial++;
+       s_tlkapi_debug_busy = 0;
+       irq_restore(r);
+       return ;
+    }
+
 
     u8 *pd = tlkapi_print_fifo->p + (tlkapi_print_fifo->wptr & (tlkapi_print_fifo->num - 1)) * tlkapi_print_fifo->size;
 
@@ -510,7 +523,15 @@ _attribute_ram_code_sec_noinline_ void tlkapi_send_str_data(char *str, u8 *pData
 
     tlkapi_print_fifo->wptr++;
 
+    s_tlkapi_debug_busy = 0;
+
     irq_restore(r);
+
+#if (TLKAPI_DEBUG_FORCE_FLUSH_ENABLE)
+    tlkapi_debug_handler();
+#endif
+
+
 #else
     (void)str;
     (void)pData;
@@ -564,9 +585,19 @@ __attribute__((used)) int _write(int fd, const unsigned char *buf, int size)
         return 0;
     }
 
+    u32 _r = irq_disable();
+    if (s_tlkapi_debug_busy) {
+        irq_restore(_r);
+        g_debug_serial++;
+        return 0;
+    }
+    s_tlkapi_debug_busy = 1;
+    irq_restore(_r);
+
     if(tlkapi_send_str_isFifoFull(tlkapi_print_fifo))
     {
         g_debug_serial++;
+        s_tlkapi_debug_busy = 0;
         return 0;
     }
 
@@ -595,6 +626,13 @@ __attribute__((used)) int _write(int fd, const unsigned char *buf, int size)
         *pd++ = 0;
     }
     tlkapi_print_fifo->wptr++;
+
+#if (TLKAPI_DEBUG_FORCE_FLUSH_ENABLE)
+    tlkapi_debug_handler();
+#endif
+
+    s_tlkapi_debug_busy = 0;
+
     return size;
 #endif
 }
@@ -619,11 +657,19 @@ int tlk_printf(const char *format, ...)
         return 0;
     }
 
-    tlkapi_debug_handler();
+    u32 _r = irq_disable();
+    if (s_tlkapi_debug_busy) {
+        irq_restore(_r);
+        g_debug_serial++;
+        return 0;
+    }
+    s_tlkapi_debug_busy = 1;
+    irq_restore(_r);
 
     if(tlkapi_send_str_isFifoFull(tlkapi_print_fifo))
     {
         g_debug_serial++;
+        s_tlkapi_debug_busy = 0;
         return 0;
     }
 
@@ -694,6 +740,13 @@ int tlk_printf(const char *format, ...)
     }
 
     tlkapi_print_fifo->wptr++;
+
+#if (TLKAPI_DEBUG_FORCE_FLUSH_ENABLE)
+    tlkapi_debug_handler();
+#endif
+
+    s_tlkapi_debug_busy = 0;
+
     return ret;
 #else
     (void)format;

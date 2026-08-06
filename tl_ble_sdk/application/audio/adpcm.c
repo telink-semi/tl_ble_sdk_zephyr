@@ -292,6 +292,7 @@ int predict_idx = 0;
 /////////////////////////////////////////////////////////////////////////////////
 _attribute_ram_code_ void mic_to_adpcm_split(signed short *ps, int len, signed short *pds, int start)
 {
+    (void) start;
     int                  i, j;
     unsigned short       code   = 0;
     unsigned short       code16 = 0;

@@ -43,124 +43,8 @@
     #define __PROJECT_BLE_REMOTE__ 0
 #endif
 
-#ifndef __PROJECT_INTERNAL_TEST__
-    #define __PROJECT_INTERNAL_TEST__ 0
-#endif
-
-#ifndef __PROJECT_AUDIO_UNICAST_CLIENT__
-    #define __PROJECT_AUDIO_UNICAST_CLIENT__ 0
-#endif
-
-#ifndef __PROJECT_AUDIO_UNICAST_SERVER__
-    #define __PROJECT_AUDIO_UNICAST_SERVER__ 0
-#endif
-
-#ifndef __PROJECT_AUDIO_BROADCAST_SOURCE__
-    #define __PROJECT_AUDIO_BROADCAST_SOURCE__ 0
-#endif
-
-#ifndef __PROJECT_AUDIO_BROADCAST_SINK__
-    #define __PROJECT_AUDIO_BROADCAST_SINK__ 0
-#endif
-
 #ifndef __PROJECT_BLE_CONTROLLER__
     #define __PROJECT_BLE_CONTROLLER__ 0
-#endif
-
-#ifndef __PROJECT_N22_BLE_CONTROLLER__
-    #define __PROJECT_N22_BLE_CONTROLLER__ 0
-#endif
-
-#ifndef __PROJECT_D25F_BLE_HOST__
-    #define __PROJECT_D25F_BLE_HOST__ 0
-#endif
-
-#ifndef __PROJECT_D25F_RAS_CLIENT__
-    #define __PROJECT_D25F_RAS_CLIENT__ 0
-#endif
-
-#ifndef __PROJECT_D25F_RAS_SERVER__
-    #define __PROJECT_D25F_RAS_SERVER__ 0
-#endif
-
-#ifndef __PROJECT_BQB_CONTROLLER__
-    #define __PROJECT_BQB_CONTROLLER__ 0
-#endif
-
-#ifndef __PROJECT_B91M_CONTROLLER__
-    #define __PROJECT_B91M_CONTROLLER__ 0
-#endif
-
-#ifndef __PROJECT_CIS_CEN__
-    #define __PROJECT_CIS_CEN__ 0
-#endif
-
-#ifndef __PROJECT_CIS_PER__
-    #define __PROJECT_CIS_PER__ 0
-#endif
-
-#ifndef __PROJECT_AUDIO_BROADCAST_ASSISTANT__
-    #define __PROJECT_AUDIO_BROADCAST_ASSISTANT__ 0
-#endif
-
-#ifndef __PRODUCT_BIS_SOURCE_DEMO__
-    #define __PRODUCT_BIS_SOURCE_DEMO__ 0
-#endif
-
-#ifndef __PRODUCT_BIS_SINK_DEMO__
-    #define __PRODUCT_BIS_SINK_DEMO__ 0
-#endif
-
-#ifndef __PRODUCT_CIS_SOURCE_DEMO__
-    #define __PRODUCT_CIS_SOURCE_DEMO__ 0
-#endif
-
-#ifndef __PRODUCT_CIS_SINK_DEMO__
-    #define __PRODUCT_CIS_SINK_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_CS_INITIATOR_DEMO__
-    #define __PROJECT_CS_INITIATOR_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_CS_INITIATOR_TEST__
-    #define __PROJECT_CS_INITIATOR_TEST__ 0
-#endif
-
-#ifndef __PROJECT_CS_REFLECTOR_DEMO__
-    #define __PROJECT_CS_REFLECTOR_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_CS_REFLECTOR_TEST__
-    #define __PROJECT_CS_REFLECTOR_TEST__ 0
-#endif
-
-#ifndef __PROJECT_RAS_CLIENT_TEST__
-    #define __PROJECT_RAS_CLIENT_TEST__ 0
-#endif
-
-#ifndef __PROJECT_RAS_SERVER_TEST__
-    #define __PROJECT_RAS_SERVER_TEST__ 0
-#endif
-
-#ifndef __PROJECT_PRODUCT_UNICAST_SERVER__
-    #define __PROJECT_PRODUCT_UNICAST_SERVER__ 0
-#endif
-
-#ifndef __PROJECT_SNIF_MAIN_NODE__
-    #define __PROJECT_SNIF_MAIN_NODE__ 0
-#endif
-
-#ifndef __PROJECT_SNIF_SUB_NODE__
-    #define __PROJECT_SNIF_SUB_NODE__ 0
-#endif
-
-#ifndef __PROJECT_SNIF_FOB_NODE__
-    #define __PROJECT_SNIF_FOB_NODE__ 0
-#endif
-
-#ifndef __PROJECT_PRODUCT_ULL_HID_DEMOE__
-    #define __PROJECT_PRODUCT_ULL_HID_DEMOE__ 0
 #endif
 
 #ifndef __PROJECT_TPLL_DEMOE__
@@ -171,68 +55,16 @@
     #define __PROJECT_GEN_FSK_DEMOE__ 0
 #endif
 
+#ifndef __PROJECT_2P4G_FEATURE_DEMOE__
+    #define __PROJECT_2P4G_FEATURE_DEMOE__ 0
+#endif
+
 #ifndef __PROJECT_ESLP_ESL_DEMO__
     #define __PROJECT_ESLP_ESL_DEMO__ 0
 #endif
 
 #ifndef __PROJECT_ESLP_AP_DEMO__
     #define __PROJECT_ESLP_AP_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_FEATURE_DEMOE__
-    #define __PROJECT_2P4G_FEATURE_DEMOE__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_SC_HID_DONGLE_DEMO__
-    #define __PROJECT_2P4G_SC_HID_DONGLE_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_SC_HID_MOUSE_DEMO__
-    #define __PROJECT_2P4G_SC_HID_MOUSE_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_SC_HID_KEYBOARD_DEMO__
-    #define __PROJECT_2P4G_SC_HID_KEYBOARD_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_LED_BLINKY_DEMO__
-    #define __PROJECT_2P4G_LED_BLINKY_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_SC_BOOTLOADER_DEMO__
-    #define __PROJECT_2P4G_SC_BOOTLOADER_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_USB_DEMO__
-    #define __PROJECT_USB_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_TAG_SDK_DEMO__
-    #define __PROJECT_TAG_SDK_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_D25F_DONGLE_DEMO__
-    #define __PROJECT_2P4G_D25F_DONGLE_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_N22_DONGLE_DEMO__
-    #define __PROJECT_2P4G_N22_DONGLE_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_N22_2M_DONGLE_DEMO__
-    #define __PROJECT_2P4G_N22_2M_DONGLE_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_BLE_N22_KB_DEMO__
-    #define __PROJECT_2P4G_BLE_N22_KB_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_BLE_N22_2M_KB_DEMO__
-    #define __PROJECT_2P4G_BLE_N22_2M_KB_DEMO__ 0
-#endif
-
-#ifndef __PROJECT_2P4G_BLE_D25F_KB_DEMO__
-    #define __PROJECT_2P4G_BLE_D25F_KB_DEMO__ 0
 #endif
 
 
@@ -246,64 +78,8 @@
     #include "vendor/feature_test/app_config.h"
 #elif (__PROJECT_BLE_REMOTE__)
     #include "vendor/ble_remote/app_config.h"
-#elif (__PROJECT_INTERNAL_TEST__)
-    #include "vendor/internal_test/app_config.h"
-#elif (__PROJECT_AUDIO_UNICAST_CLIENT__)
-    #include "vendor/audio_unicast_client/app_config.h"
-#elif (__PROJECT_AUDIO_UNICAST_SERVER__)
-    #include "vendor/audio_unicast_server/app_config.h"
-#elif (__PROJECT_PRODUCT_UNICAST_SERVER__)
-    #include "vendor/product_unicast_server/app_config.h"
-#elif (__PROJECT_AUDIO_BROADCAST_SOURCE__)
-    #include "vendor/audio_broadcast_source/app_config.h"
-#elif (__PROJECT_AUDIO_BROADCAST_SINK__)
-    #include "vendor/audio_broadcast_sink/app_config.h"
 #elif (__PROJECT_BLE_CONTROLLER__)
     #include "vendor/ble_controller/app_config.h"
-#elif (__PROJECT_N22_BLE_CONTROLLER__)
-    #include "vendor/n22_ble_controller/app_config.h"
-#elif (__PROJECT_D25F_BLE_HOST__)
-    #include "vendor/d25f_ble_host/app_config.h"
-#elif (__PROJECT_D25F_RAS_CLIENT__)
-    #include "vendor/d25f_ras_client/app_config.h"
-#elif (__PROJECT_D25F_RAS_SERVER__)
-    #include "vendor/d25f_ras_server/app_config.h"
-#elif (__PROJECT_BQB_CONTROLLER__)
-    #include "vendor/BQB_controller/app_config.h"
-#elif (__PROJECT_CIS_CEN__)
-    #include "vendor/cis_central/app_config.h"
-#elif (__PROJECT_CIS_PER__)
-    #include "vendor/cis_peripheral/app_config.h"
-#elif (__PROJECT_AUDIO_BROADCAST_ASSISTANT__)
-    #include "vendor/audio_broadcast_assistant/app_config.h"
-#elif (__PRODUCT_BIS_SOURCE_DEMO__)
-    #include "vendor/product_bis_source/app_config.h"
-#elif (__PRODUCT_BIS_SINK_DEMO__)
-    #include "vendor/product_bis_sink/app_config.h"
-#elif (__PRODUCT_CIS_SOURCE_DEMO__)
-    #include "vendor/product_cis_source/app_config.h"
-#elif (__PRODUCT_CIS_SINK_DEMO__)
-    #include "vendor/product_cis_sink/app_config.h"
-#elif (__PROJECT_CS_INITIATOR_DEMO__)
-    #include "vendor/cs_initiator_demo/app_config.h"
-#elif (__PROJECT_CS_INITIATOR_TEST__)
-    #include "vendor/CS_Initiator_Test/app_config.h"
-#elif (__PROJECT_CS_REFLECTOR_DEMO__)
-    #include "vendor/cs_reflector_demo/app_config.h"
-#elif (__PROJECT_CS_REFLECTOR_TEST__)
-    #include "vendor/CS_Reflector_Test/app_config.h"
-#elif (__PROJECT_RAS_CLIENT_TEST__)
-    #include "vendor/ras_client_test/app_config.h"
-#elif (__PROJECT_RAS_SERVER_TEST__)
-    #include "vendor/ras_server_test/app_config.h"
-#elif (__PROJECT_SNIF_MAIN_NODE__)
-    #include "vendor/sniffer_main_node/node_config.h"
-#elif (__PROJECT_SNIF_SUB_NODE__)
-    #include "vendor/sniffer_sub_node/node_config.h"
-#elif (__PROJECT_SNIF_FOB_NODE__)
-    #include "vendor/sniffer_fob_node/node_config.h"
-#elif (__PROJECT_PRODUCT_ULL_HID_DEMOE__)
-    #include "vendor/product_ull_hid_demo/ull_hid_config.h"
 #elif (__PROJECT_ESLP_ESL_DEMO__)
     #include "vendor/eslp_esl_demo/app_config.h"
 #elif (__PROJECT_ESLP_AP_DEMO__)
@@ -314,32 +90,6 @@
     #include "vendor/2p4g_gen_fsk/app_config.h"
 #elif (__PROJECT_2P4G_FEATURE_DEMOE__)
     #include "vendor/2p4g_feature_test/app_config.h"
-#elif (__PROJECT_2P4G_SC_HID_DONGLE_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_single_core/dongle/app_config.h"
-#elif (__PROJECT_2P4G_SC_HID_MOUSE_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_single_core/mouse/app_config.h"
-#elif (__PROJECT_2P4G_SC_HID_KEYBOARD_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_single_core/keyboard/app_config.h"
-#elif (__PROJECT_2P4G_LED_BLINKY_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_single_core/nvm_led_blinky/app_config.h"
-#elif (__PROJECT_2P4G_SC_BOOTLOADER_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_single_core/bootloader/app_config.h"
-#elif (__PROJECT_TAG_SDK_DEMO__)
-    #include "vendor/TagSDK/example/Telink/app_config.h"
-#elif (__PROJECT_USB_DEMO__)
-    #include "vendor/usb_demo/app_config.h"
-#elif (__PROJECT_2P4G_D25F_DONGLE_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/d25f_dongle/app_config.h"
-#elif (__PROJECT_2P4G_N22_DONGLE_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/n22_dongle/app_config.h"
-#elif (__PROJECT_2P4G_N22_2M_DONGLE_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/n22_2m_dongle/app_config.h"
-#elif (__PROJECT_2P4G_BLE_N22_KB_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/n22_kb/app_config.h"
-#elif (__PROJECT_2P4G_BLE_N22_2M_KB_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/n22_2m_kb/app_config.h"
-#elif (__PROJECT_2P4G_BLE_D25F_KB_DEMO__)
-    #include "vendor/2p4g_project_code/2p4g_ble_dual_core/d25f_kb/app_config.h"
 #else
     #include "vendor/common/default_config.h"
 #endif

@@ -77,13 +77,13 @@ rf_pkt_flt_t TPLL_PktFlt = {
  *         only generic mode need to configure this!!!
 */
 TPLL_GenericHeader_t TPLL_GenericHeader = {
-    .h0_size         = 5,
-    .h1_size         = 4,
-    .length_size     = 15,
-    .h0_val          = 26, //0x22 to enable no ack
-    .h1_val          = 14,
+    .h0_size         = 8,
+    .h1_size         = 8, // must be <=8
+    .length_size     = 8,
+    .h0_val          = 0, //no ack 0x22
+    .h1_val          = 0,
     .length_val      = TX_PAYLOAD_LEN,
-    .pid_start_bit   = 0,
+    .pid_start_bit   = 0,  //start at h0
     .noack_start_bit = 2,
 };
 
@@ -110,8 +110,8 @@ void user_init_normal(void)
     #endif
 
     //rf configuration
-    TPLL_SetFormatMode(TPLL_MODE_LEGACY_FORMAT);
-    TPLL_SetBitrate(TPLL_BITRATE_250KBPS);
+    TPLL_SetFormatMode(TPLL_MODE_GENERIC_FORMAT);
+    TPLL_SetBitrate(TPLL_BITRATE_2MBPS);
     TPLL_SetOutputPower(TPLL_POWER_INDEX_P0p0dBm);
     TPLL_SetAddressWidth(ADDRESS_WIDTH_5BYTES);
     TPLL_ClosePipe(TPLL_PIPE_ALL);

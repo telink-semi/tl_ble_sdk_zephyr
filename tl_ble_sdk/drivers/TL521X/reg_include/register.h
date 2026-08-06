@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    register.h
  *
- * @brief   This is the header file for tl323x
+ * @brief   This is the header file for tl521x
  *
  * @author  Driver Group
  * @date    2025
@@ -44,6 +44,8 @@
 #include "uart_reg.h"
 #include "stimer_reg.h"
 #include "sd_adc_reg.h"
+#include "swire_reg.h"
+#include "qdec_reg.h"
 #include "pem_reg.h"
 #include "analog_afe3v_reg.h"
 #include "analog_afe1v_reg.h"

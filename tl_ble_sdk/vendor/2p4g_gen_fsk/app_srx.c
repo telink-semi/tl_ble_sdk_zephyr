@@ -24,7 +24,7 @@
 #include "app_config.h"
 #include "tl_common.h"
 #include "drivers.h"
-#include "../../stack/2p4g/genfsk_ll/genfsk_ll.h"
+#include "stack/2p4g/genfsk_ll/genfsk_ll.h"
 #if (GEN_FSK_MODE == GEN_FSK_SRX)
 
     #define PRI_FLT_MODE_EN 0

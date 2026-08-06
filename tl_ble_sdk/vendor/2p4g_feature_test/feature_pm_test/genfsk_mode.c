@@ -28,7 +28,6 @@
 #include "app_config.h"
 
 #if(FEATURE_TEST_MODE == PM && RF_MODE == GENFSK)
-
     #define PRI_FLT_MODE_EN 0
     #define TX_PAYLOAD_LEN  8
     //TX Buffer related
@@ -47,8 +46,6 @@ static volatile unsigned char  rx_flag                = 0;
 static volatile unsigned char  rx_timeout_flag        = 0;
 static volatile unsigned int   irq_cnt_rx_timeout_cnt = 0;
 static unsigned char          *rx_packet              = 0;
-static unsigned char           rx_payload_len         = 0;
-static volatile unsigned char *rx_payload             = 0;
 static volatile unsigned char  rssi                   = 0;
 static volatile unsigned int   rx_timestamp           = 0;
 static volatile unsigned int   irq_cnt_rx_crc_ok      = 0;
@@ -139,17 +136,6 @@ void user_gpio_init(void)
 {
 }
 
-/**
- * @brief       user initialization when MCU wake_up from deepSleep_retention mode
- * @param[in]   none
- * @return      none
- */
-void user_init_deepRetn(void)
-{
-    user_init_normal();
-    printf("user_init_deepRetn\n");
-}
-
 void user_init_normal(void)
 {
     user_gpio_init();
@@ -186,8 +172,24 @@ void user_init_normal(void)
     rf_clr_irq_status(FLD_RF_IRQ_ALL);
     core_interrupt_enable();
 
+#if (RF_DEBUG_IO_ENABLE)
+    extern _attribute_ram_code_sec_ void rf_enable_debug_IO(void);
+    rf_enable_debug_IO();
+#endif
+
     gen_fsk_write_payload(tx_buffer, tx_payload, TX_PAYLOAD_LEN);
     gen_fsk_stx2rx_start(tx_buffer, rf_stimer_get_tick() + 50 * RF_SYSTEM_TIMER_TICK_1US, 250);
+}
+
+/**
+ * @brief       user initialization when MCU wake_up from deepSleep_retention mode
+ * @param[in]   none
+ * @return      none
+ */
+void user_init_deepRetn(void)
+{
+    user_init_normal();
+    printf("user_init_deepRetn\n");
 }
 
 _attribute_ram_code_ void sdk_2p4g_main_loop(void)

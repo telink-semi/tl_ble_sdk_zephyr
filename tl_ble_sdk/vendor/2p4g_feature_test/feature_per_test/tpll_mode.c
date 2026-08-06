@@ -32,9 +32,9 @@
 #define RX  2
 #define RF_TX_RX_MODE   TX
 
-volatile static unsigned char rf_run_step               = 0;
+static volatile unsigned char rf_run_step               = 0;
 #define PTX_PIPE                                          0//warning:B80 only support pipe0,B80B support pipe0~5
-volatile static unsigned char chn                       = 4;
+static volatile unsigned char chn                       = 4;
 volatile unsigned char tmp           = 1;
 
 volatile unsigned char tx_flag          = 0;
@@ -46,11 +46,11 @@ unsigned char          tx_payload_len   = 8;
 unsigned char          preamble_len     = 0;
 volatile unsigned char tx_ds_flag          = 0;
 int                    ret              = 0;
-static unsigned char tx_payload[8] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+
 volatile unsigned char       rx_payload[128]              = {0};
 
-volatile static unsigned int irq_cnt_rx_sync              = 0;
-volatile static unsigned int irq_cnt_rx_head_done         = 0;
+static volatile unsigned int irq_cnt_rx_sync              = 0;
+static volatile unsigned int irq_cnt_rx_head_done         = 0;
 volatile unsigned int        irq_cnt_invalid_pid          = 0;
 volatile unsigned int        irq_cnt_tx_max_retry            = 0;
 volatile unsigned int        irq_cnt_tx_ds                = 0;
@@ -60,12 +60,22 @@ volatile unsigned int        irq_cnt_rx_dr                = 0;
 static volatile unsigned int print_time                   = 0;
 volatile unsigned int test_tx_cnt = 0;
 
+struct rf_rx_info {
+    unsigned int rx_cnt;
+    unsigned int rx_crc_ok_cnt;
+};
+struct rf_rx_info g_rx_info_statistic[6] = {0};
+unsigned char g_rx_info_idx = 0;
+
 #define TX_PAYLOAD_LEN  8
 #define ACK_PAYLOAD_LEN         6
+#if (RF_TX_RX_MODE == RX)
 static unsigned char    ack_payload[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f};
+#endif
+#if (RF_TX_RX_MODE == TX)
 static unsigned char   tx_data[32]   = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
                                         0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
-
+#endif
 unsigned char rx_buf[TPLL_PIPE_RX_FIFO_SIZE * TPLL_PIPE_RX_FIFO_NUM] __attribute__((aligned(4)))           = {};
 
 #if (RF_TX_RX_MODE == TX)
@@ -343,6 +353,9 @@ _attribute_ram_code_ void sdk_2p4g_main_loop(void)
     if(clock_time_exceed(print_time, 3000000)){ //per_test_done, print result
         rf_set_tx_rx_off();
         printf("tpll_irq_cnt_rx: %d, tpll_irq_cnt_rx_crc_ok: %d\r\n", irq_cnt_rx, irq_cnt_rx_dr);
+        g_rx_info_statistic[g_rx_info_idx].rx_cnt = irq_cnt_rx;
+        g_rx_info_statistic[g_rx_info_idx].rx_crc_ok_cnt = irq_cnt_rx_dr;
+        g_rx_info_idx = g_rx_info_idx + 1;
         irq_cnt_rx = 0;
         irq_cnt_rx_dr = 0;
         rf_run_step++;
@@ -400,7 +413,15 @@ _attribute_ram_code_ void sdk_2p4g_main_loop(void)
             TPLL_PRXTrig();
         }
         else{
-            printf("tpll_per_test_done!\r\n");
+            tlk_printf("\n2404/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2404/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n"
+                                   "2434/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2434/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n"
+                                   "2474/1M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n2474/2M:rx cnt=%5d, rx_crc_ok_cnt=%5d\n ",
+                                g_rx_info_statistic[0].rx_cnt, g_rx_info_statistic[0].rx_crc_ok_cnt,
+                                g_rx_info_statistic[1].rx_cnt, g_rx_info_statistic[1].rx_crc_ok_cnt,
+                                g_rx_info_statistic[2].rx_cnt, g_rx_info_statistic[2].rx_crc_ok_cnt,
+                                g_rx_info_statistic[3].rx_cnt, g_rx_info_statistic[3].rx_crc_ok_cnt,
+                                g_rx_info_statistic[4].rx_cnt, g_rx_info_statistic[4].rx_crc_ok_cnt,
+                                g_rx_info_statistic[5].rx_cnt, g_rx_info_statistic[5].rx_crc_ok_cnt);
 #if (TLKAPI_DEBUG_ENABLE)
             tlkapi_debug_handler();
 #endif
@@ -418,18 +439,6 @@ _attribute_no_inline_ void main_loop(void)
     tlkapi_debug_handler();
     #endif
     sdk_2p4g_main_loop();
-//    if (tx_ds_flag || tx_maxretry_flag) {
-//        if (tx_ds_flag) {
-//        }
-//        tx_ds_flag       = 0;
-//        tx_maxretry_flag = 0;
-//        delay_ms(500);
-//        tx_data[4]++;
-//        tmp = TPLL_WriteTxPayload(PTX_PIPE, ptx_buffer, (unsigned char *)tx_data, TX_PAYLOAD_LEN);
-//        if (!tmp) {
-//            TPLL_PTXTrig();
-//        }
-//    }
 }
 
 #endif // FEATURE_TEST_MODE == PER && RF_MODE == TPLL

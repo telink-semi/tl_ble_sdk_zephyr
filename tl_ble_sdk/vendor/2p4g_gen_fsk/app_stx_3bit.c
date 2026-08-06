@@ -25,7 +25,7 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "../stack/2p4g/genfsk_ll/genfsk_ll.h"
-
+#if (MCU_CORE_TYPE == MCU_CORE_TL323X)
 #if (GEN_FSK_MODE == GEN_FSK_STX_3BIT)
 
     //TX Buffer related
@@ -141,4 +141,5 @@ _attribute_no_inline_ void main_loop(void)
     delay_ms(200);
 }
 
+#endif
 #endif

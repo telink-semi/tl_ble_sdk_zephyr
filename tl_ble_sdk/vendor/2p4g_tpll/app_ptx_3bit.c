@@ -111,7 +111,7 @@ void user_init_normal(void)
     TPLL_ClosePipe(TPLL_PIPE_ALL);
 
     #if PTX_PIPE == 0
-    unsigned char tx_address[4] = {0xe7, 0xe7, 0xe7, 0xe7, 0xe7}; //{0xaa,0xbb,0xcc,0xdd,0xee};
+    unsigned char tx_address[5] = {0xe7, 0xe7, 0xe7, 0xe7, 0xe7}; //{0xaa,0xbb,0xcc,0xdd,0xee};
     TPLL_SetAddress(TPLL_PIPE0, tx_address);
     TPLL_OpenPipe(TPLL_PIPE0);
     TPLL_SetTXPipe(TPLL_PIPE0);

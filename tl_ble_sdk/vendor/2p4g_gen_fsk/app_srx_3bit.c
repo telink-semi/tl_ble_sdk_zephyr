@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    app_srx.c
+ * @file    app_srx_3bit.c
  *
  * @brief   This is the source file for 2.4G SDK
  *
@@ -25,6 +25,7 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "../../stack/2p4g/genfsk_ll/genfsk_ll.h"
+#if (MCU_CORE_TYPE == MCU_CORE_TL323X)
 #if (GEN_FSK_MODE == GEN_FSK_SRX_3BIT)
 
     #define PRI_FLT_MODE_EN 0
@@ -192,4 +193,5 @@ _attribute_no_inline_ void main_loop(void)
         gen_fsk_srx_start(rf_stimer_get_tick() + 50 * RF_SYSTEM_TIMER_TICK_1US, 0);
     }
 }
+#endif
 #endif
