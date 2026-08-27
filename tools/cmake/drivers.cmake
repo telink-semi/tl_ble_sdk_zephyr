@@ -23,7 +23,7 @@ if(CONFIG_SOC_RISCV_TELINK_B92)
 	)
 endif()
 
-if(CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+if(CONFIG_SOC_FAMILY_TELINK_TLX)
 	zephyr_include_directories(
 		${TL_BLE_SRC_DIR}/drivers/${SOC}/lib/include/rf
 		${TL_BLE_SRC_DIR}/drivers/${SOC}/lib/include/ske
@@ -32,7 +32,7 @@ if(CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 	)
 endif()
 
-if(CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+if(CONFIG_SOC_FAMILY_TELINK_TLX)
 	zephyr_include_directories(${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/driver_internal)
 elseif(CONFIG_SOC_SERIES_RISCV_TELINK_B9X)
 	zephyr_include_directories(${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/driver_lib)
