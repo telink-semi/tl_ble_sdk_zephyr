@@ -547,6 +547,9 @@ enum
     FLD_RF_PKT_DEC_ERR = BIT_RNG(4, 7),
 };
 
+/* ble cs used */
+#define    reg_rf_tx_frac_time_pose_time    REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x48) // BLE SDK USE
+
 #define reg_rf_timestamp REG_ADDR32(REG_BASEBAND_BASE_ADDR + 0x50)
 #define reg_rf_tstamp0   REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0x50)
 
@@ -1132,6 +1135,12 @@ enum
     //BLE mode
     FLD_RF_INIT_PRX_PID = BIT_RNG(4, 5),
     FLD_RF_INIT_PTX_PID = BIT_RNG(6, 7),
+
+    /* ble cs used */
+    FLD_RF_BRX_SN_INIT          = BIT(4),
+    FLD_RF_BRX_NESN_INIT        = BIT(5),
+    FLD_RF_BTX_SN_INIT          = BIT(6),
+    FLD_RF_BTX_NESN_INIT        = BIT(7),
 };
 
 #define FSM_TIMEOUT_ENABLE  (reg_rf_ll_ctrl_1 |= FLD_RF_FSM_TIMEOUT_EN)
@@ -1258,7 +1267,7 @@ enum
 enum
 {
     FLD_RF_R_TX_ID       = BIT_RNG(0, 6),
-    FLD_RF_R_LL_IRQ_MASK = BIT(7),
+    FLD_RF_R_TX_PRE_EN = BIT(7),    /* ble cs used */
 };
 
 #define reg_rf_irq_status    REG_ADDR16(REG_BB_LL_BASE_ADDR + 0x20)
@@ -1269,7 +1278,7 @@ enum
     do {                               \
         reg_rf_irq_status    = 0xffff; \
         reg_rf_irq_status_h  = 0xff;   \
-        reg_rf_irq_status_h1 = 0x07;   \
+        reg_rf_irq_status_h1 = 0x0f;   \
     } while (0)
 
 typedef enum
@@ -1308,7 +1317,9 @@ typedef enum
     FLD_RF_IRQ_RX_FREQ_HOP_FIXED = BIT(24), /*Auto/Manual:When Zigbee performs dual-channel detection, the interrupt is generated when it stays in one of the channels to successfully receive packets and fixes the interrupt when it continues to receive over-the-air packets in this channel.*/
     FLD_RF_IRQ_TRX_FCAL_DONE     = BIT(25), /*After RF is turned on, the interrupt generated at the moment of fcal calibration is completed at tx or rx (including switching channels during dual-channel detection by zigbee).*/
     FLD_RF_IRQ_RADIO_DONE        = BIT(26), /*TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)*/
-    FLD_RF_IRQ_ALL               = 0x7ffffff,
+    FLD_RF_IRQ_SW_CRYPT          = BIT(27), 
+
+    FLD_RF_IRQ_ALL               = 0x0fffffff,
 } rf_irq_e;
 
 #define reg_rf_ll_pid_l REG_ADDR8(REG_BB_LL_BASE_ADDR + 0x22)

@@ -76,3 +76,4 @@
 #include "gpio_default.h"
 #include "ir_learn.h"
 #include "rz.h"
+#include "ctb.h"
