@@ -242,8 +242,7 @@ typedef struct
     rf_ldo_trim_t  ldo_trim;
     rf_dcoc_cal_t  dcoc_cal;
     rf_rccal_cal_t rccal_cal;
-    unsigned char  tx_fcal[81];
-    unsigned char  rx_fcal[81];
+    unsigned char  fcal[81];
 } rf_fast_settle_t;
 
 /**
@@ -493,8 +492,7 @@ static inline void rf_set_irq_mask(rf_irq_e mask)
 {
     BM_SET(reg_rf_irq_mask, mask);
     BM_SET(reg_rf_ll_irq_mask_h, (mask & 0xff0000) >> 16);
-    BM_SET(reg_rf_ll_cmd, (mask & 0x5000000) >> 20);
-    BM_SET(reg_rf_ll_irq_mask_h1, (mask & 0x2000000) >> 24);
+    BM_SET(reg_rf_ll_irq_mask_h1, (mask & 0xff000000) >> 24);
 }
 
 /**
@@ -506,8 +504,7 @@ static inline void rf_clr_irq_mask(rf_irq_e mask)
 {
     BM_CLR(reg_rf_irq_mask, mask);
     BM_CLR(reg_rf_ll_irq_mask_h, (mask & 0xff0000) >> 16);
-    BM_CLR(reg_rf_ll_cmd, (mask & 0x5000000) >> 20);
-    BM_CLR(reg_rf_ll_irq_mask_h1, (mask & 0x2000000) >> 24);
+    BM_CLR(reg_rf_ll_irq_mask_h1, (mask & 0xff000000) >> 24);
 }
 
 /**
@@ -533,7 +530,7 @@ static inline void rf_clr_irq_status(rf_irq_e status)
 {
     reg_rf_irq_status    = status;
     reg_rf_irq_status_h  = (status & 0xff0000) >> 16;
-    reg_rf_irq_status_h1 = (status & 0x7000000) >> 24;
+    reg_rf_irq_status_h1 = (status & 0xff000000) >> 24;
 }
 
 /**

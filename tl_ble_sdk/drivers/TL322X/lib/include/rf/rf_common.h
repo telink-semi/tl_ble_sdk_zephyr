@@ -263,9 +263,8 @@ typedef struct
     rf_ldo_trim_t  ldo_trim;
     rf_dcoc_cal_t  dcoc_cal;
     rf_rccal_cal_t rccal_cal;
-    unsigned char  tx_fcal[8];
-    unsigned char  rx_fcal[8];
-} rf_fast_settle_t;
+    unsigned char  fcal[81];
+} rf_fast_settle_t; 
 
 /**
  * @brief       RF CRC config.
@@ -611,8 +610,7 @@ static inline void rf_set_irq_mask(rf_irq_e mask)
 {
     BM_SET(reg_rf_irq_mask, mask);
     BM_SET(reg_rf_ll_irq_mask_h, (mask & 0xff0000) >> 16);
-    BM_SET(reg_rf_ll_cmd, (mask & 0x5000000) >> 20);
-    BM_SET(reg_rf_ll_irq_mask_h1, (mask & 0x2000000) >> 24);
+    BM_SET(reg_rf_ll_irq_mask_h1, (mask & 0x0f000000) >> 24);
 }
 
 /**
@@ -624,8 +622,7 @@ static inline void rf_clr_irq_mask(rf_irq_e mask)
 {
     BM_CLR(reg_rf_irq_mask, mask);
     BM_CLR(reg_rf_ll_irq_mask_h, (mask & 0xff0000) >> 16);
-    BM_CLR(reg_rf_ll_cmd, (mask & 0x5000000) >> 20);
-    BM_CLR(reg_rf_ll_irq_mask_h1, (mask & 0x2000000) >> 24);
+    BM_CLR(reg_rf_ll_irq_mask_h1, (mask & 0x0f000000) >> 24);
 }
 
 /**
@@ -651,7 +648,7 @@ static inline void rf_clr_irq_status(rf_irq_e status)
 {
     reg_rf_irq_status    = status;
     reg_rf_irq_status_h  = (status & 0xff0000) >> 16;
-    reg_rf_irq_status_h1 = (status & 0x7000000) >> 24;
+    reg_rf_irq_status_h1 = (status & 0x0f000000) >> 24;
 }
 
 /**
@@ -873,7 +870,7 @@ static inline void rf_set_crc_byte_order(unsigned char order)
  * @param[in]   config - crc config address pointer
  * @return      none.
  */
-static _attribute_ram_code_sec_ inline  void rf_set_crc_config(const rf_crc_config_t *config) // BLE SDK USE 
+__attribute__((always_inline)) static inline void rf_set_crc_config(const rf_crc_config_t *config) // BLE SDK USE
 {
     rf_set_crc_init_value(config->init_value);
     rf_set_crc_poly(config->poly);
@@ -1673,6 +1670,12 @@ void rf_3wire_pta_init(gpio_func_pin_e ble_active_pin, gpio_func_pin_e ble_statu
  {
      reg_rf_t_coex_t2 = (time_us - 1);
  }
-
+ 
+/**
+ * @brief      This function is mainly used to set the fcal value.
+ * @param[in]  fcal_value- variables are used to set the fcal value.
+ * @return     none.
+ */
+ void rf_set_fcal_value(unsigned char fcal_value);
 
 #endif

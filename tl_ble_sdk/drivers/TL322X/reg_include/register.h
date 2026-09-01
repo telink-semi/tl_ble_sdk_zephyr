@@ -61,4 +61,5 @@
 #include "sd_adc_reg.h"
 #include "can_reg.h"
 #include "ir_learn_reg.h"
+#include "ctb_reg.h"
 #endif
