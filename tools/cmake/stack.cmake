@@ -3,8 +3,3 @@ zephyr_include_directories(
 	${TL_BLE_SRC_DIR}/stack/system
 	${TL_BLE_SRC_DIR}/stack/thread
 )
-
-if(CONFIG_BT_TLX_CHANNEL_SOUNDING)
-    zephyr_include_directories(${TL_BLE_SRC_DIR}/algorithm/hadm)
-    zephyr_link_libraries(${TL_BLE_SRC_DIR}/algorithm/hadm/tlk_algo1/lib/libcs_tlk1_zephyr.a)
-endif()
