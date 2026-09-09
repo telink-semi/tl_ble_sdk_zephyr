@@ -1,0 +1,18 @@
+tools/cmake/multirole_compile_options.cmake
+  h_12ef4c25fb166d 31
+tools/cmake/central_compile_options.cmake
+  h_12ef4c25fb166d 31
+tools/cmake/peripheral_compile_options.cmake
+  h_12ef4c25fb166d 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "47c7ae6ffd16c907c282bc3aa14c13855dfc4097",
+  "prompts": {},
+  "humans": {
+    "h_12ef4c25fb166d": {
+      "author": "Zhihan Tao <zhihan.tao@telink-semi.com>"
+    }
+  }
+}
