@@ -1,3 +1,627 @@
+## V4.0.1
+
+### Version
+
+* SDK Version: tl_platform_sdk V4.0.1
+* Chip Version
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* Hardware EVK Version
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 In the C1T315A20_V1_5 and earlier versions, the PD4 pin used for KEY1 is not available for any functional use.
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL752X: C1T387A20
+  * TL521X: C1T416A20
+* Hardware AIOT_DK1 Version
+  * C1TXA104
+* Demo Platform Requirements
+
+  | Demo Name       | Main Board | Sub-Board            |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC1/AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* Toolchain Version
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL521x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgb(146, 240, 161)">
+
+### Note
+* N/A
+### Features
+* **lpd**
+  * (TL521X) Add LPD Flash power‑down protection feature to improve system robustness.(merge_requests/@2828) 
+* **rf**
+  * (TL521X) Rename the file `emi_internal` to `emi_cert`.(merge_requests/@2897)
+* **sd adc**
+  * (TL521X) Add ADC calibration logic implementation.(merge_requests/@2935) 
+* **gpio**
+  * (TL323X) PA5/PA6 add pin re-mapping function.(merge_requests/@2956) 
+* **audio**
+  * (TL751X) Add `audio_codec1_set_input_filter_mode` interface to set codec1 dmic filter mode.(merge_requests/@2962) 
+### Bug Fixes
+* **gpio**
+    * (TL521X): Fix the issue where the second‑level and third‑level GPIO drive‑strength configurations are swapped.(merge_requests/@2889)
+    * Detailed description: Fix swapped DRV_STRENGTH_14P1MA and DRV_STRENGTH_9P4MA GPIO drive‑strength configurations, add gpio_set_data_strength prototype in gpio.h file.
+    * Fixing effect: Implement correct configuration for the GPIO drive‑strength setting API.
+    * Update suggestion: Requires update when using the GPIO drive‑strength setting API.
+
+    * (TL521X): Fixed abnormal IO functionality issues on PC2 and PC3. (merge_requests/@2908) 
+    * Detailed description: crystal_manual_settle enables the 32K XTAL, which forces PC3 to function as a crystal oscillator pin, making its GPIO functionality unavailable. This affects version 4.0.0.
+    * Fixing effect: PC2 and PC3 function normally after the fix.
+    * Update suggestion: Update when using PC2 and PC3.
+  
+* **rf**
+  * (TL521X): Fix the bad RX performance on BLE 2M at 2424, 2448, and 2472 MHz.(merge_requests/@2897)
+    * Detailed description: Some chips show bad RX sensitivity (about -40 dBm) on BLE 2M at 2424, 2448, and 2472 MHz.
+    * Fixing effect: Improve reception sensitivity to normal levels.
+    * Update suggestion: An update is required when using RF BLE2M.
+    
+  * (TL321X): Fixed the failure where the 99‑percentile of BLE‑1M delta‑f2 was on the low side for some chips at ‑40 °C.(merge_requests/@2958)
+    * Detailed description:After modification, the TX delta‑f metrics are normal at both room temperature and low‑temperature conditions.
+    * Fixing effect: Improve reception sensitivity to normal levels.
+    * Update suggestion: must be updated.
+
+  * (TL322X): Fixed an abnormal waveform occurring on channel 2464 at 15 μs for TX Fast‑Settle.(merge_requests/@2952)
+    * Detailed description: After modification, the 15‑μs fast‑settle function will not cause a spike on the 2464 MHz frequency point.
+    * Fixing effect: Improve TX performance.
+    * Update suggestion: Must update.
+
+  * (TL752X/TL751X/TL711X/TL522X/TL521X/TL323X/TL322X/TL321X): Align the number of RF interrupt masks with the register table; fix errors in some interrupt sources for the RF interrupt mask set/clear interfaces. (merge_requests/@2934)
+    * Detailed Description: In the previous version, some interrupt sources were incorrect in the RF interrupt mask set and clear interfaces. This issue has been fixed in this version, and the number of RF interrupt masks is aligned with the register table.
+    * Fix Effect: The RF interrupt mask set and clear interfaces can perform correct configuration.
+    * Update suggestion: Some RF interrupts may not be triggered correctly, and an update is required.git 
+### Refactoring
+* **rf**
+  * (TL521X)  Update RF Tx Power Table to match actual output power.(merge_requests/@2897)
+  * (TL321X/TL322X/TL721X) Modify the implementation scheme of Fast‑Settle at 15 μs (switch FCAL from group‑based configuration to single‑frequency‑point configuration).(merge_requests/@2952)
+### BREAKING CHANGES
+* N/A
+### Performance Improvements
+* **clock**
+  * (TL521X) Optimized clock driver to reduce code execution time and code size.(merge_requests/@2923)
+* **bg**
+  * (TL521X) Adjust bandgap trim levels to improve ADC performance under high‑temperature and low‑temperature conditions.(merge_requests/@/2712)
+* **sd adc**
+  * (TL521X) Optimize sys_init() configuration to mitigate errors caused by SD ADC aging; optimize SD ADC driver to reduce sampling errors under different downsample settings.(merge_requests/@2899)
+* **nvm**
+  * (TL322X) disable wr_en after transfer for power consumption save.(merge_requests/@2947)
+
+## V4.0.1
+
+### 版本
+
+* SDK 版本: tl_platform_sdk V4.0.1
+* 芯片版本
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* 硬件评估板版本
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 在C1T315A20_V1_5及之前版本中，KEY1所使用的PD4引脚无法作为任何功能使用。
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL323X: C1T387A20
+  * TL521X: C1T416A20
+* 硬件AIOT_DK1版本
+  * C1TXA104
+* Demo平台要求
+
+  | 示例名称        | 主板       | 子板                 |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* 工具链版本
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL521x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgba(36, 190, 62, 1)">
+
+* N/A
+### Features
+* **lpd**
+  * (TL521X) 添加lpd flash下电保护功能，提高鲁棒性。(merge_requests/@2828)
+* **rf**
+  * (TL521X) 将文件 `emi_internal` 重命名为 `emi_cert`。(merge_requests/@2897)
+* **sd adc**
+  * (TL521X)添加sd adc校准逻辑。(merge_requests/@2935)
+* **gpio**
+  * (TL323X) PA5\PA6 新增管脚复用功能.(merge_requests/@2956) 
+* **audio**
+  * (TL751X) 增加 `audio_codec1_set_input_filter_mode` 接口用于配置codec1 dmic滤波器模式.(merge_requests/@2962) 
+### Bug Fixes
+* **gpio**
+  * (TL521X): 修复gpio驱动能力设置接口中第二档和第三档配置写反的问题。(merge_requests/@2889)
+    * 详细描述：上一版本中，gpio驱动能力DRV_STRENGTH_14P1MA和DRV_STRENGTH_9P4MA配置写反了，这个版本中已修复，并且在gpio.h文件中添加void gpio_set_data_strength(gpio_pin_e pin, gpio_drv_strength_e value)声明。
+    * 修复效果：gpio驱动能力设置接口实现正确配置。
+    * 更新建议：使用GPIO设置驱动能力接口时，必须更新。
+
+  * (TL521X)：修复pc2和pc3 IO功能异常问题。(merge_requests/@2908) 
+    * 详细描述： 因 crystal_manual_settle 中开启了32k XTAL，PC3 强制作为晶振引脚，导致其 GPIO 功能不可用，影响4.0.0版本。
+    * 修复效果： 修复后pc2和pc3功能正常。
+    * 更新建议： 使用PC2和PC3时必须更新。
+  
+* **rf**
+  * (TL521X): 修复BLE2M在2424/2448/2472MHz频段下，RX性能差问题。(merge_requests/@2897)
+    * 详细描述：部分芯片存在在BLE2M在2424/2448/2472MHz频段下，接收灵敏度较差，仅-40dBm左右。
+    * 修复效果：提升接收灵敏度到正常水平。
+    * 更新建议：使用RF BLE2M时，必须更新。
+    
+  * (TL321X): 修复了部分芯片低温下-40℃ 下BLE1M delta f2 99%偏低fail。(merge_requests/@2958)
+    * 详细描述：部分芯片低温下-40℃ 下BLE1M delta f2 99%偏低fail。。
+    * 修复效果：修改后常温低温的 tx delta f 指标均正常。
+    * 更新建议：必须更新。
+
+  * (TL322X): 修复了tx fast settle 15us时会在2464频点出现一个异常波形。(merge_requests/@2952)
+    * 详细描述：使能tx fast settle 15us后，在2464频点会出现一个异常波形，导致TX性能下降。
+    * 修复效果：修改后在2464频点TX性能正常。
+    * 更新建议：必须更新。
+
+  * (TL752X/TL751X/TL711X/TL522X/TL521X/TL323X/TL322X/TL321X): RF中断mask个数和寄存器表对齐；设置和清除RF中断mask接口，部分中断源有错误，进行改正。(merge_requests/@2934)
+    * 详细描述：上一版本中，设置和清除RF中断mask接口，部分中断源有错误，这个版本中已修复，并且将RF中断mask个数和寄存器表对齐。
+    * 修复效果：设置和清除RF中断mask接口实现正确配置。
+    * 更新建议：部分RF中断可能不会被正确触发，必须更新。
+### Refactoring
+* **rf**
+  * (TL521X) 更新rf tx power表以保证与实际输出power一致。(merge_requests/@2897)
+  * (TL321X/TL322X/TL721X) 修改fast settle 15us的实现方案（fcal从分组设置切换到单频点设置）。(merge_requests/@2952)
+### BREAKING CHANGES
+* N/A
+### Performance Improvements
+* **clock**
+  * (TL521X) 优化 clock 驱动以节省代码执行时间和代码量。(merge_requests/@2923)
+* **bg**
+  * (TL521X)修改bandgap挡位以提高高低温条件下的adc性能.(merge_requests/@/2712)
+* **sd adc**
+  * (TL521X)优化sys_init里配置以减少sd adc老化引起的误差，优化sd adc驱动以减小不同 downsample 下的采样误差(merge_requests/@/2899)
+* **nvm**
+  * (TL322X) nvm数据传输结束后关闭写使能，以节省功耗.(merge_requests/@2947)
+
+## 4.0.0
+
+### Version
+
+* SDK Version: tl_platform_sdk V4.0.0
+* Chip Version
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* Hardware EVK Version
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 In the C1T315A20_V1_5 and earlier versions, the PD4 pin used for KEY1 is not available for any functional use.
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL752X: C1T387A20
+  * TL521X: C1T416A20
+* Hardware AIOT_DK1 Version
+  * C1TXA104
+* Demo Platform Requirements
+
+  | Demo Name       | Main Board | Sub-Board            |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC1/AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* Toolchain Version
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL521x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgb(146, 240, 161)">
+
+### Note
+* N/A
+
+### Features
+* **pm**
+  * (TL322X) Support multi-address booting。(merge_requests/@2853) 
+  * (TL322X) Support 32k xtal。(merge_requests/@2886) 
+* **rz**
+  * (TL321X) Support rz function.(merge_requests/@2842)
+
+### Bug Fixes
+* **sd adc**
+  * (TL323X): Fixed the issue where the adaptive switching of the voltage divider in the SD ADC caused the differential mode to exceed the measurement range due to the sd_adc_div_switch_adjust_rescale function.(merge_requests/@2884)
+    *  Detailed description: When the voltage at both ends reaches 1.3V in the GPIO differential mode, it exceeds the initial range, resulting in the detected voltage being wrongly judged as less than 50mV and triggering the automatic switch to 1-stage voltage division, which in turn causes an over-range situation. This modification to sd_adc_div_switch_adjust_rescale adds the n_pin parameter to identify the differential mode and disables the adaptive voltage division switch in the differential mode.
+    * Fixing effect: When using the differential mode, the voltage division will no longer be automatically switched, and the over-range problem has been resolved.
+    * Update suggestion: The differential function of the SD ADC must be updated.
+* **sar adc**
+    * (TL322X): Fixed the prolonged settling time issue following the adc_power_on operation. (merge_requests/@2624)
+    * Detailed description: Previously, to ensure the accuracy and consistency of Analog-to-Digital Converter (ADC) sampling data, a 30μs stabilization period was required after executing the adc_power_on instruction. Insufficient settling time could lead to data deviations or sampling errors.
+    * Fixing effect: Application-level software delays are no longer required after calling the adc_power_on interface. The system now supports immediate sampling, with the underlying driver ensuring precise and reliable conversion results.
+    * Update suggestion: The adc must be updated.
+* **watchdog**
+    * (TL323X):Fixed an issue where the 32k watchdog reset time could be shorter than the configured interval due to hardware inaccuracies. (merge_requests/@2829)
+    * Detailed description:To ensure that the watchdog reset time never falls below the set interval, software compensation has been introduced by adding a maximum allowable timing error as an offset during interval configuration.  
+    * Fixing effect:The 32k watchdog reset time will never be less than the configured interval. 
+    * Update suggestion: Using the watchdog must be updated.
+* **rz**
+    * (TL322X): Fixed the issue that an incorrect offset address configuration in `rz_t0l_t1l_jitter_config` and `rz_t0h_t1h_jitter_config` caused jitter configuration to have no effect. (merge_requests/@2842)
+    * Detailed description: Previously, the jitter enable/disable functions mistakenly wrote to `reg_rz_ctrl0` (RZ_CTRL0, offset 0x00), but the jitter control bits `FLD_RZ_JITTER_L_EN` (bit[0]) and `FLD_RZ_JITTER_H_EN` (bit[1]) are actually located in `reg_rz_ctrl1` (RZ_CTRL1, offset 0x01). This caused jitter configuration to have no effect.
+    * Fixing effect: The jitter functions now correctly operate on the jitter register address, ensuring that jitter on T0L/T1L and T0H/T1H can be properly enabled or disabled.
+    * Update suggestion: The rz driver must be updated.
+* **rf**
+    * (TL751X): Fixed the abnormal RX performance issue occurring with partial access codes. (merge_requests/@2868)
+    * Detailed description: Abnormal RX performance under certain access codes (packet loss rate exceeds 80% at 0 dBm transmit power).
+    * Fixing effect: After repair, RX performance of the problematic access codes returns to normal.
+    * Update suggestion: must be updated.
+* **GPIO**
+    * (TL322X): Fixed the issues with abnormal IO functions of PC2 and PC3. (merge_requests/@2886)
+    * Detailed description: In crystal_manual_settle, a 32k XTAL was enabled, causing PC2/PC3 to be forcibly used as the crystal oscillator pin. This resulted in the loss of GPIO functionality, affecting 3.11.0-3.11.3 versions.  
+    * Fixing effect: After the fix, pc2 and pc3 functions operate normally.  
+    * Update suggestion: must be updated when using PC2 and PC3.
+
+### Refactoring
+* **rf**
+  * (TL323X)  Update RF Tx Power Table to match actual output power.(merge_requests/@2813)
+
+### BREAKING CHANGES
+* N/A
+
+### Performance Improvements
+* N/A
+
+## 4.0.0
+
+### 版本
+
+* SDK 版本: tl_platform_sdk V4.0.0
+* 芯片版本
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* 硬件评估板版本
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 在C1T315A20_V1_5及之前版本中，KEY1所使用的PD4引脚无法作为任何功能使用。
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL323X: C1T387A20
+  * TL521X: C1T416A20
+* 硬件AIOT_DK1版本
+  * C1TXA104
+* Demo平台要求
+
+  | 示例名称        | 主板       | 子板                 |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* 工具链版本
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL521x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgba(36, 190, 62, 1)">
+
+### Note
+* N/A
+
+### Features
+* **pm**
+  * (TL322X) 支持多地址启动。(merge_requests/@2853) 
+  * (TL322X) 支持32k xtal。(merge_requests/@2886) 
+* **rz**
+  * (TL321X) 支持rz功能。(merge_requests/@2842)
+
+### Bug Fixes 
+* **sd adc**
+  * (TL323X): 修复了 SD ADC 中 sd_adc_div_switch_adjust_rescale 自适应切换分压导致差分模式超量程的问题。(merge_requests/@2884)
+    * 详细描述：GPIO 差分模式下两端电压均达到 1.3V 时超出初始量程，导致检测到的电压被误判为小于 50mV 并触发自动切至 1 分压，进而引发超量程。本次修改为 sd_adc_div_switch_adjust_rescale 增加了 n_pin 参数用于识别差分模式，并在差分模式下关闭自适应分压切换。
+    * 修复效果：使用差分模式时不再自动切换分压，超量程问题解决。
+    * 更新建议：使用 SD ADC 差分功能必须更新。
+* **sar adc**
+  * (TL322X): 修复了adc_power_on后建立时间长的问题。(merge_requests/@2624)
+  * 详细描述：为了确保模数转换器 (ADC) 采样数据的精确性与一致性，在执行 adc_power_on 指令后，模数转换器需要预留 30us 的稳定时间。未提供充足的建立时间可能导致采样结果出现偏差或错误。
+  * 修复效果：调用 adc_power_on 接口后无需在应用层插入任何软件延时，系统支持立即发起采样操作，并由底层确保转换结果的绝对精准。
+  * 更新建议：使用adc必须更新。
+* **watchdog**
+    * (TL323X): 修复了32k watchdog因硬件误差导致复位时间可能小于设置时间的问题(merge_requests/@2829)
+    * 详细描述: 为了保证在设置interval时，watchdog的复位时间不会小于设置时间，在设置interval时，软件上增加了最大的时间误差，作为补偿值。
+    * 修复效果: 32k watchdog复位时间永远不会小于设置时间。
+    * 更新建议：使用watchdog必须更新。
+* **rz**
+    * (TL322X): 修复了 `rz_t0l_t1l_jitter_config` 和 `rz_t0h_t1h_jitter_config` 两个接口中偏移地址配置错误导致 jitter 配置无效的问题。(merge_requests/@2842)
+    * 详细描述：此前 jitter 使能/禁能函数错误地写入了 `reg_rz_ctrl0`（RZ_CTRL0，偏移 0x00），但 jitter 控制位 `FLD_RZ_JITTER_L_EN`（bit[0]）和 `FLD_RZ_JITTER_H_EN`（bit[1]）实际位于 `reg_rz_ctrl1`（RZ_CTRL1，偏移 0x01），导致 jitter 配置无效。
+    * 修复效果：jitter 函数现正确操作 jitter 寄存器地址，确保 T0L/T1L 和 T0H/T1H 上的抖动可正常使能或禁能。
+    * 更新建议：使用 rz 驱动必须更新。
+* **rf**
+    * (TL751X)： 修复了部分access code rx 性能异常的问题。 (merge_requests/@2868)
+    * 详细描述： 部分 access code 下 rx 性能异常（0dbm 发送下，丢包率超过 80%）。
+    * 修复效果： 修复后异常 access code rx 性能恢复正常。
+    * 更新建议： 必须更新。
+* **GPIO**
+    * (TL322X)：修复pc2和pc3 IO功能异常问题。(merge_requests/@2886) 
+    * 详细描述： 因 crystal_manual_settle 中开启了32k XTAL，PC2/PC3 强制作为晶振引脚，导致其 GPIO 功能不可用，影响3.11.0-3.11.3版本。
+    * 修复效果： 修复后pc2和pc3功能正常。
+    * 更新建议： 使用PC2和PC3时必须更新。
+
+### Refactoring
+* **rf**
+  * (TL323X)  更新rf tx power表以保证与实际输出power一致。(merge_requests/@2813) 
+
+### BREAKING CHANGES
+* N/A
+
+### Performance Improvements
+* N/A
+
+
+## 3.11.3
+
+### Version
+
+* SDK Version: tl_platform_sdk V3.11.3
+* Chip Version
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* Hardware EVK Version
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 In the C1T315A20_V1_5 and earlier versions, the PD4 pin used for KEY1 is not available for any functional use.
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL752X: C1T387A20
+* Hardware AIOT_DK1 Version
+  * C1TXA104
+* Demo Platform Requirements
+
+  | Demo Name       | Main Board | Sub-Board            |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC1/AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* Toolchain Version
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgb(146, 240, 161)">
+
+### Note
+* N/A
+
+### Features
+* **pem**
+  * (TL721X/TL321X/TL322X/TL323X)Add PEM DEMO.(merge_requests/@2730)
+* **rf**
+  * (TL322X)Added RF PTA related interfaces including rf_2wire_pta_init, rf_3wire_pta_init, rf_set_pta_t1_time, rf_set_pta_t2_time, and completed the demo adaptation.(merge_requests/@2734)
+* **PMP_Demo**
+  * ((TLSR921x/TLSR951x/TLSR922x/TLSR952x/TL751x/TL721x/TL321x/TL322x/TL323x))Add PMP (Physical Memory Protection) Demo.(merge_requests/@2657)
+* **sys**
+  * (TL321x) A4 version adaptation and deepret sleep power consumption optimization through calibration. (merge_requests/@2773)
+* **flash**
+  * (TL752X): Add the flash support about TH25Q16U. (merge_requests/@2784)
+  * (B91): Add the flash support about ZB25WQ80A. (merge_requests/@2677)
+* **audio**
+  * (B92): Add the I2S support 4line mode. (merge_requests/@2787)
+* **nvm**
+  * (TL322x): Add calibration adaption for NVM only chip. (merge_requests/@2655)
+### Bug Fixes
+* **sd adc**
+    * (TL323X) Fixed SD ADC aging accuracy degradation issue,. (merge_requests/@2374)
+    * Detailed description: The accuracy of SD ADC will be degraded with aging after a long time of use, resulting in the difference between the measured value and the real value.
+    * Fix effect: Add anti-aging mechanism to ensure the accuracy of SD ADC remains stable after long time usage.
+    * Update suggestion: must be updated.
+
+* **flash**
+  * (TL752X):Fix flash ZB25VQ32E 4-wire enable failure issue.(merge_requests/@2807)
+    * Detailed description: The drv_nor_enable_quad() interface does not support enabling ZB25VQ32E four-wire mode, causing the program to fail to run.
+    * Fix effect: Added support for ZB25VQ32E four-wire mode, allowing programs to run normally on ZB25VQ32E.
+    * Update suggestion: Using the ZB25VQ32E flash must be updated.
+
+* **pm**
+    * (TL322X) resolves the issue of potential abnormal operation when opening USB/AUDIO/ZB during runtime. (merge_requests/@2782)
+    * Detailed Description: When enabling USB/AUDIO/ZB during high-frequency operation, abnormal behavior may occur. The enablement has been moved to the initialization interface, and a new interface pm_set_active_power_cfg has been added to configure modules that are not used by the entire application, thereby saving power consumption.  
+    * Fix Effect: The system will no longer experience operational anomalies due to enabling USB/AUDIO/ZB during runtime, although overall power consumption will slightly increase.  
+    * Update suggestion: must be updated.
+    
+* **rf**
+    * (TL323X) Fix the issue that some chips cannot transmit packets normally under low-temperature conditions. (merge_requests/@2802)
+    * Detailed description: Some chips fail to transmit packets when the temperature drops below -36°C.
+    * Fix effect: After repair, the RF functions work normally under the temperature condition of -40°C.
+    * Update suggestion: must be updated.
+
+* **pwm**
+  * (TL752X):Fix timer6 clock configuration error and optimize pwm demo configuration.(merge_requests/@2807)
+    * Detailed Description: Fix the problem that timer6 clock source is configured as timer5 and optimize the demo configuration.
+    * Fix Effect: After the fix timer6 works fine, the pwm demo is easier to use.
+    * Update suggestion: must be updated.
+
+* **charger**
+  * (TL752X) Add calibration logic for the CC gear, to prevent some chips from being unable to trim to 90~05 mA.(merge_requests/@2711)
+    * Detailed description: For some chips that cannot be trimmed within the 90-95mA range, the ATE will increase the cc gear and write the offset value of the cc gear into the efuse. When the driver sets the cc, it will add the offset value and write it into the corresponding register.For some higher CC gears, the theoretical charging current may not be achievable, which is related to the deviation value of the CC gear.
+    * After Fix: After the new calibration, chips whose default trimmed current is not within the 90-95 mA range can meet the requirements.
+    * Update recommendation: Updates are required when using the charger.
+### Refactoring
+* **pm**
+  * (TL321X)Adapt power-related configurations for A4 chip.(merge_requests/@2735)
+
+* **rf**
+  * (TL752X) Refactored the rf internal register write interfaces (wr_reg, sub_wr, sub_wr32, wr_reg32) by adding volatile qualifiers and fence memory barriers to prevent register write failures caused by -O2 compiler optimization. (merge_requests/@2753)
+  
+### BREAKING CHANGES
+
+* **audio**
+  * (TL321X) The digital gain of A4 dmic is modified in audio_set_stream0_dig_gain interface and audio_get_stream0_dig_gain is updated as well.(merge_requests/@2728)
+  * Detailed Description: Due to the internal digital update of the DMIC of A4 chip, the DMIC path of A4 has an additional gain of 15.5dB compared to the before (1->6, -1->-6, 20lg6=15.5dB). Therefore,the gain of A4 is modified in audio_set_stream0_dig_gain interface. And make corresponding adjustments to the audio_get_stream0_dig_gain interface as well.
+  * After Effect: The same digital macro has the similar effect in A4 and previous chip, the gain of A4 is only 1dB greater than that of before after using updated interface.
+  * Update Recommendation: Mandatory update.
+
+* **clock**
+  * (TL322X) Remove the interfaces clock_cclk_hclk_pclk_config and clock_mspi_clk_config; separate configuration is no longer supported. To configure clocks, use the clock_init interface to set them up together. (merge_requests/@/2782)
+
+### Performance Improvements
+* **sys**
+  * (TL322X/TL323X/TL321X/TL751X/TL721X/TL521X) Optimize sys_init clock init: check current clock source first. Only switch and configure divider if not already RC_24M, avoiding redundant operations.(merge_requests/@2631)
+* **rf**
+  * (TL323X)  Optimize the Δf performance difference among chips with different packages.(merge_requests/@/2802)
+
+## 3.11.3
+
+### 版本
+
+* SDK 版本: tl_platform_sdk V3.11.3
+* 芯片版本
+  - TLSR921x/TLSR951x(B91)(A0/A1/A2),TLSR922x/TLSR952x(B92)(A3/A4),TL751X(A1),TL721X(A2/A3),TL321X(A1/A2/A3/A4),TL322X(A1),TL323X(A0/A1), TL752X(A0)
+* 硬件评估板版本
+  * TLSR951x(B91): C1T213A20
+  * TLSR952x(B92): C1T266A20
+  * TL751X: C1T368A20
+  * TL721X: C1T315A20 在C1T315A20_V1_5及之前版本中，KEY1所使用的PD4引脚无法作为任何功能使用。
+  * TL321X: C1T335A20
+  * TL322X: C1T371A20
+  * TL323X: C1T388A20
+  * TL323X: C1T387A20
+* 硬件AIOT_DK1版本
+  * C1TXA104
+* Demo平台要求
+
+  | 示例名称        | 主板       | 子板                 |
+  |-----------------|------------|----------------------|
+  | Codec_Demo      | AIOT_DK1   | C1TXA8(AIOT-CODEC2)  |
+  | Sensor_Lcd_Demo | AIOT_DK1   | C1TXA99              |
+  | Camera_Demo     | AIOT_DK1   | C1TXA99 + OV7670     |
+  | Other demos     | EVK        | —                    |
+
+* 工具链版本
+  - TLSR921x/TLSR951x(B91): gcc7(TL32 ELF MCULIB V5F GCC7.4 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TLSR922x/TLSR952x(B92): gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL751x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL721x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL321x: gcc12(TL32 ELF MCULIB V5  GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL322x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL323x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+  - TL752x: gcc12(TL32 ELF MCULIB V5F GCC12.2 (riscv32-elf-gcc)) ( IDE:[Telink IoT Studio](https://www.telink-semi.com/development-tools) )
+
+<hr style="border-bottom:2.5px solid rgba(36, 190, 62, 1)">
+
+### Note
+* N/A
+### Features
+
+* **pem**
+  * (TL721X/TL321X/TL322X/TL323X)增加 PEM DEMO.(merge_requests/@2730)
+* **rf**
+  * (TL322X)增加了RF PTA功能相关接口（rf_2wire_pta_init/rf_3wire_pta_init/rf_set_pta_t1_time/rf_set_pta_t2_time），及demo的适配。(merge_requests/@2734)
+* **PMP_Demo**
+  * ((TLSR921x/TLSR951x/TLSR922x/TLSR952x/TL751x/TL721x/TL321x/TL322x/TL323x))增加PMP(Physical Memory Protection) Demo。(merge_requests/@2657)
+* **sys**
+  * (TL321x) A4版本适配，并通过校准优化deepret睡眠功耗。(merge_requests/@2773)
+* **flash**
+  * (TL752X):增加TH25Q16U flash支持。(merge_requests/@2784)
+  * (B91): 增加ZB25WQ80A flash支持。 (merge_requests/@2677)
+* **audio**
+  * (B92): 增加I2S支持4line模式。 (merge_requests/@2787)
+* **nvm**
+  * (TL322x): 增加纯NVM芯片校准适配。 (merge_requests/@2655)
+### Bug Fixes 
+* **sd adc**
+  * (TL323X) 修复了SD ADC老化精度降低问题，。(merge_requests/@2374)
+    * 详细描述：SD ADC长时间使用后，精度会随老化而降低，导致测量值与真实值存在差异。
+    * 修复效果：添加防老化机制，确保SD ADC在长时间使用后精度保持稳定。
+    * 更新建议：必须更新。
+* **pm** 
+  * (TL322X)解决了在运行过程中打开USB/AUDIO/ZB时，可能会运行异常的问题。(merge_requests/@2782)
+    * 详细描述：高频运行时执行打开USB/AUDIO/ZB时，可能会打开异常。修改打开的位置到初始化接口中，添加接口pm_set_active_power_cfg用于配置不打开整个应用都不会使用的模块，用于节省功耗。
+    * 修复效果：不会因为运行过程中打开USB/AUDIO/ZB而导致运行异常，但是整体功耗会略有增加。
+    * 更新建议：必须更新。
+    
+* **rf** 
+  * (TL323X)修复部分芯片低温状态下无法正常发送的问题。(merge_requests/@2802)
+    * 详细描述：部分芯片当温度低于-36°时会出现发不出包的问题。
+    * 修复效果：修复后温度-40°的条件下测试RF功能正常。
+    * 更新建议：必须更新。
+
+* **flash**
+  * (TL752X):修复flash ZB25VQ32E四线使能失败问题。(merge_requests/@2807)
+    * 详细描述：drv_nor_enable_quad()接口不支持使能ZB25VQ32E四线模式，导致程序无法运行。
+    * 修复效果：添加对ZB25VQ32E四线模式的支持，程序能在ZB25VQ32E上正常运行。
+    * 更新建议：使用ZB25VQ32E flash必须更新。
+
+* **pwm**
+  * (TL752X):修复timer6 clock配置错误和优化demo配置。(merge_requests/@2807)
+    * 详细描述：修复timer6时钟源配置成timer5的问题和优化demo配置。
+    * 修复效果：修复后timer6可以正常使用，demo更简单易用。
+    * 更新建议：必须更新。
+    
+* **charger**
+  * (TL752X): 增加cc挡位校准逻辑，防止部分芯片无法达到90-95mA需求。(merge_requests/@2711)
+    * 详细描述：对于默认挡位无法校准到90-95mA范围的芯片，ATE会提高电流控制（cc）档位，并将 cc 档位的偏移值（相对于95mA档）写入efuse。当驱动设置cc时，它会加上该偏移值，并将其写入相应的寄存器中。对于部分较高cc挡位可能无法达到理论充电电流，与cc挡位偏移值有关。
+    * 修复效果: 经过重新校准后，默认挡位后的电流不在90至95毫安范围内的芯片也能够满足要求。
+    * 更新建议：使用charger时必须更新。
+### Refactoring
+* **pm**
+  * (TL321X)适配A4芯片电源相关配置。(merge_requests/@2735)
+* **rf**
+  * (TL752X)重构了rf内部写寄存器接口（wr_reg、sub_wr、sub_wr32、wr_reg32），添加volatile与fence内存屏障，防止-O2编译优化导致寄存器写入异常。(merge_requests/@2753)
+  
+### BREAKING CHANGES
+
+* **audio**
+  * (TL321X) 在audio_set_stream0_dig_gain接口对A4的dmic数字增益做了调整，也同步更新了audio_get_stream0_dig_gain接口。(merge_requests/@2728)
+    * 详细描述：由于A4芯片DMIC数字设计有更新，dmic path A4相比之前芯片有额外+15.5dB增益，因此在audio_set_stream0_dig_gain接口内做了调整，同时audio_get_stream0_dig_gain接口也做了相应的更新。
+    * 修复效果：相同的接口参数下，A4和之前的芯片具有相近的增益，实际效果A4的增益仅比之前大1dB。
+    * 更新建议：使用dmic必须更新
+
+* **clock**
+  * (TL322X)删除接口-clock_cclk_hclk_pclk_config和clock_mspi_clk_config，不再支持单独配置，如果要配置时钟，调用clock_init接口一起配置。(merge_requests/@2782)
+
+### Performance Improvements
+* **sys**
+  * (TL322X/TL323X/TL321X/TL751X/TL721X/TL521X) 优化sys_init中的时钟初始化流程:先读取当前时钟源状态，仅当非RC_24M时才执行时钟切换与分频配置，防止冗余操作.(merge_requests/@2631)
+* **rf**
+  * (TL323X)优化不同封装的芯片间的Δf表现差异。(merge_requests/@2802)
+
 ## 3.11.2
 
 ### Version
@@ -61,7 +685,7 @@
     * Detailed description: memcpy is located in the text segment. At the places where memcpy is called in the flash interface for cleaning purposes, this is done to prevent conflicts that could cause abnormal program behavior.
     * After Fix: After the repair, this problem has been resolved.
     * Update recommendation: The driver must be updated.
-* **rf**	
+* **rf**    
   * (TL323X) Fixed the problem that Δf2 index failed to meet spec requirements when testing TX FDEV performance of some chips.(merge_requests/@2656)(merge_requests/@2690)
     * Detailed description: 99.9% of Δf2 values are below 185KHz in TX FDEV test of partial chips.
     * After Fix: After repair, all TX performance indicators comply with specification requirements.
@@ -77,6 +701,7 @@
     * Detailed description: Modify the implementations of the two macros, __DRV_CPR_GPADC_CLK_ENABLE and __DRV_CPR_GPADC_DEINIT, and remove the configuration unrelated to the ADC.
     * After Fix: Fix the issue where the initialization of ADC causes crashes in N22 or D25F.
     * Update recommendation: The use of ADC requires an update.
+
 ### Refactoring
 * **rf**
   * (TL321X/TL322X/TL721x)Remove the TX settle time configuration in RF initialization. The original setting was 113 μs, while the register default value is 150 μs.(merge_requests/@2686)
@@ -157,13 +782,12 @@
     * 详细描述：Fastsettle 模式下重复调用4M 6M初始化代码可能会导致发包性能异常
     * 修复效果: Fastsettle 模式下重复调用4M 6M初始化代码不会导致tx 发包性能异常
     * 更新建议：使用 BLE4M BLE6M 模式配置必须更新。
-
-
 * **adc**
   * (TL752X): 移除enable/deinit宏实现里除了adc外的操作。(merge_requests/@2648)
     * 详细描述：修改__DRV_CPR_GPADC_CLK_ENABLE 和 __DRV_CPR_GPADC_DEINIT这两个宏的实现方式，删除与 ADC 无关的配置部分。
     * 修复效果: 删除了与ADC无关的宏配置，修复了adc初始化引起的crash问题。
     * 更新建议：使用ADC时必须更新。
+
 ### Refactoring
 * **rf**
   * (TL321X/TL322X/TL721x) 删除RF初始化中对tx settle时间的设置，原设置为113us，寄存器默认值为150us。(merge_requests/@2686)
@@ -656,7 +1280,7 @@
      * Detailed Description: Synchronization errors are observed on certain test instruments when performing BQB certification testing for BLE Coded PHY S2/S8.
      * After Fix：PA ramp-related configurations were modified, and sync errors no longer occur in Coded PHY S2/S8 TX testing.
      * Update Recommendation:  The update is mandatory when using the BLE Coded PHY S2/S8.
-	 
+     
 * **JTAG**
   * (tl322x) Fixed incorrect GPIO mux configuration in the jtag_sdp_set_pin interface, which prevented JTAG from connecting. (merge_requests/@2407)
     * Details: The JTAG GPIO mux function was mis-configured within the jtag_sdp_set_pin interface.
