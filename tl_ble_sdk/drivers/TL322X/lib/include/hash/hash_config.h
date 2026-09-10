@@ -43,7 +43,9 @@
 //#define HASH_CPU_BIG_ENDIAN        //endian choice.
 #define HASH_DMA_FUNCTION
 //support multiple thread function
+#ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
 #define CONFIG_HASH_SUPPORT_MUL_THREAD
+#endif
 //support node style
 #define SUPPORT_HASH_NODE
 //support PBKDF2
