@@ -48,6 +48,8 @@ typedef enum
     PM_SLEEP_CIS_CENTRAL = BIT(9),
 
     PM_SLEEP_CS = BIT(10),
+
+    PM_SLEEP_THREAD_INSERT_TASK = BIT(11),
 } sleep_mask_t;
 
 typedef enum
@@ -196,6 +198,9 @@ void p24g_pm_process_sleep_wakeup(uint32_t wakeup_tick);
 
 
 void blc_ll_recoverSuspend(int wakeup_src);
+
+/* restore the RF to a valid state, shared by suspend wakeup and EMI carrier test exit */
+void blt_ll_rf_recover(void);
 
 #endif //#if !defined(TLK_ONLY_BLE_HOST)
 

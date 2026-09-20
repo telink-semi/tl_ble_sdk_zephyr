@@ -51,6 +51,8 @@ zephyr_compile_definitions(
 	-DLL_FEATURE_ENABLE_CONNECTION_PARA_REQUEST_PROCEDURE=0
 	#used for short connection application, for example, 7.5ms keyboard/mouse
 	-DBLC_ZEPHYR_BLE_INTEGRATION_SHORT_CONNECTION_APPLICATION=0
+	#hw hash under multi-thread environment
+	-DCONFIG_HASH_SUPPORT_MUL_THREAD=1
 )
 
 if(CONFIG_BT_TLX_CHANNEL_SOUNDING)

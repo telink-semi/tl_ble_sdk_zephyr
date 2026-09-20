@@ -34,5 +34,11 @@
  */
 void blc_ll_init2MPhyCodedPhy_feature(void);
 
+/**
+ * @brief      this function is used to notify ll PTA debug us
+ * @param[in]  delay_us -  PTA delay us
+ * @return     none
+ */
+void blc_ll_setLLPTADelay (u8 delay_us);
 
 #endif /* PHY_H_ */

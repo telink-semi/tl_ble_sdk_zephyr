@@ -38,6 +38,7 @@
 #include "audio.h"
 #include "dma.h"
 #include "gpio.h"
+#include "gpio_default.h"
 #include "i2c.h"
 #include "spi.h"
 #include "pwm.h"

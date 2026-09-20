@@ -90,6 +90,15 @@ enum
 
 #define reg_gspi_clk_set REG_ADDR16(SC_BASE_ADDR + 0x2)
 
+
+
+#define reg_i3c0_clk_set REG_ADDR8(SC_BASE_ADDR + 0x04)
+
+enum
+{
+    FLD_I3C0_CLK_MOD    = BIT_RNG(0, 3),
+    FLD_I3C0_DIV_IN_SEL = BIT_RNG(4, 5), //0:rc24m   1:xtl 24m  2:pll
+};
 enum
 {
     FLD_GSPI_CLK_MOD    = BIT_RNG(0, 7),
@@ -203,7 +212,7 @@ enum
     //RSVD
     FLD_RST7_USB    = BIT(0),
     FLD_RST7_CAN0   = BIT(1),
-    FLD_RST6_I3C0   = BIT(3)
+    FLD_RST7_I3C0   = BIT(3)
     //RSVD
 };
 
@@ -318,6 +327,7 @@ enum
 {
     FLD_CLK7_USB1_EN    = BIT(0),
     FLD_CLK7_CAN0_EN    = BIT(1),
+    FLD_CLK7_I3C0_EN    = BIT(3),
     //RSVD
 };
 

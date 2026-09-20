@@ -31,6 +31,14 @@
 #define IUT_HCI_VENDOR_WARN_EN  (1 & IUT_HCI_VENDOR_LOG_EN)
 #define IUT_HCI_VENDOR_ERROR_EN (1 & IUT_HCI_VENDOR_LOG_EN)
 
+/**
+ * @brief Compile-time switch for the command name field in the vendor command tables.
+ *        The name field is only used for debug logging; set to 0 to strip it and save flash/RAM.
+ */
+#ifndef HCI_CMD_LOG_EN
+#define HCI_CMD_LOG_EN 1
+#endif
+
 
 //HCI VS Command (Controller and baseband.)
 //-- OGF --
@@ -39,47 +47,52 @@
 //-- OCF --
 typedef enum
 {
-    HCI_TELINK_REG_OPERATION          = 0x01, //read || write register
-    HCI_TELINK_FLASH_OPERATION         = 0x02,
-    HCI_TELINK_SET_TX_PWR        = 0x03,
-    HCI_TELINK_READ_TX_PWR       = 0x04,
-    HCI_TELINK_REBOOT_MCU        = 0x05,
-    HCI_TELINK_SET_RXTX_DATA_LEN = 0x06,
-    HCI_TELINK_SET_BD_ADDR       = 0x07,
-    HCI_TELINK_RF_OFFSET_CAP      = 0x08,
-    HCI_TELINK_SET_SCAN_FILTER   = 0x0a, //MESH
-
-    HCI_TELINK_READ_MAX_TX_FIFI_NUM      = 0x0b,
-    HCI_TELINK_READ_TX_FIFI_NUM          = 0x0c,
-
-    HCI_TELINK_CONFIG_BLE_LEG_ADV_ADDR       = 0x0d,
-    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM       = 0x0e,
-    HCI_TELINK_CONFIG_CHANGE_UART_BAUDRATE       = 0x0F,
-
-    HCI_EBQ_TEST_CASE_LOG = 0xE2,        //EBQ log case name and timestamp
+    HCI_TELINK_REG_OPERATION               = 0x01, //read || write register
+    HCI_TELINK_FLASH_OPERATION             = 0x02,
+    HCI_TELINK_SET_TX_PWR                  = 0x03,
+    HCI_TELINK_READ_TX_PWR                 = 0x04,
+    HCI_TELINK_REBOOT_MCU                  = 0x05,
+    HCI_TELINK_SET_RXTX_DATA_LEN           = 0x06,
+    HCI_TELINK_SET_BD_ADDR                 = 0x07,
+    HCI_TELINK_RF_OFFSET_CAP               = 0x08,
+    HCI_TELINK_SET_SCAN_FILTER             = 0x0a, //MESH
+    HCI_TELINK_READ_MAX_TX_FIFI_NUM        = 0x0b,
+    HCI_TELINK_READ_TX_FIFI_NUM            = 0x0c,
+    HCI_TELINK_CONFIG_BLE_LEG_ADV_ADDR     = 0x0d,
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM   = 0x0e,
+    HCI_TELINK_CONFIG_CHANGE_UART_BAUDRATE = 0x0F,
+    HCI_TELINK_TRANSMITTER_CARRIER_TEST    = 0x10,
+    HCI_EBQ_TEST_CASE_LOG                  = 0xE2, //EBQ log case name and timestamp
     HCI_TELINK_VENDOR_MAX_CBC
-} hci_vendor_cab_e;
+} hci_vendor_cbc_e;
 
 typedef enum
 {
-  HCI_TELINK_REG_OPERATION_READ          = 0x01,
-  HCI_TELINK_REG_OPERATION_WRITE       = 0x02,
-
+    HCI_TELINK_REG_OPERATION_READ        = 0x01,
+    HCI_TELINK_REG_OPERATION_WRITE       = 0x02,
 } hci_vendor_register_operation_e;
 
 typedef enum
 {
-    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_FIFO          = 0x01,
-    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_INTERVAL       = 0x02,
-
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_FIFO     = 0x01,
+    HCI_TELINK_CONFIG_READ_ACL_CON_PARAM_INTERVAL = 0x02,
 } hci_vendor_read_con_param_e;
 
 typedef enum
 {
-  HCI_TELINK_UART_BAUDRATE_CHANGE_START         = 0x01,
-  HCI_TELINK_UART_BAUDRATE_CHANGE_END       = 0x02,
-
+    HCI_TELINK_UART_BAUDRATE_CHANGE_START = 0x01,
+    HCI_TELINK_UART_BAUDRATE_CHANGE_END   = 0x02,
 } hci_vendor_uart_operation_e;
+
+/**
+ * @brief Sub-operation codes for the HCI_TELINK_TRANSMITTER_CARRIER_TEST vendor command.
+ */
+typedef enum
+{
+    HCI_TELINK_TRANSMITTER_CARRIER_TEST_START = 0x01, // start single tone carrier
+    HCI_TELINK_TRANSMITTER_CARRIER_TEST_END   = 0x02, // stop carrier and restore RF
+} hci_vendor_transmitter_carrier_test_e;
+
 /**
  * @brief Sub-operation codes for the TELINK_FLASH_OPERATION HCI vendor command.
  */
@@ -152,6 +165,5 @@ ble_sts_t blt_hci_vendor_setFuVendorCallback(blt_vendor_FuCallback_t handler);
  *
  * @return data length
  */
-unsigned char hci_vendor_Process(u8 pCmdparaLen, u8 opCode_ogf, u8 opCode_ocf, hci_vendor_CmdParams_t *pCmd, hci_vendor_EndStatusParam_t *pRetParam)
-;
+unsigned char hci_vendor_Process(u8 pCmdparaLen, u8 opCode_ogf, u8 opCode_ocf, hci_vendor_CmdParams_t *pCmd, hci_vendor_EndStatusParam_t *pRetParam);
 #endif /* HCI_VENDOR_H_ */

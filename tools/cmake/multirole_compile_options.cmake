@@ -50,6 +50,8 @@ zephyr_compile_definitions(
 
 	# temporary solution
 	-DTLK_SCH_ACCESS_CODE_TASK_DISABLE=1
+	#hw hash under multi-thread environment
+	-DCONFIG_HASH_SUPPORT_MUL_THREAD=1
 )
 
 if(CONFIG_BT_CENTRAL)
