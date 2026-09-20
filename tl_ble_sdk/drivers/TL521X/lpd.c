@@ -37,7 +37,8 @@ void lpd_power_down_protect_ana_config(void)
 #if WITH_HYSTERESIS
     lpd_set_vbat_threshold(LPD_FALLING_1P673V_RISING_1P777V);
 #else
-    lpd_set_vbat_threshold(LPD_FALLING_1P673V);
+    /* set 1P731V for lixiang'project early before ATE statistical data, confirmed by weihua,wenfeng,lixiang,20260918 */
+    lpd_set_vbat_threshold(LPD_FALLING_1P731V);
 #endif
     lpd_ana_enable();
 }
