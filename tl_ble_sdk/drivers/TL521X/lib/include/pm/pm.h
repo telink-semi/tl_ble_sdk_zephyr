@@ -47,6 +47,24 @@
 #define PM_ANA_REG_POWER_ON_CLR_BUF2 0x3c // initial value 0xff.
 
 /**
+ * @brief peak_btr_trim<2:0>
+ * @note  Best performance is achieved when the peak current is selected between 100 mA and 200 mA
+ *        (a trade-off between efficiency and ripple).
+ *        For example, with a 6.8uH inductor, use levels 3/4/5;
+ *        with a 4.7uH inductor, levels 4/5/6 are recommended.
+ */
+typedef enum                    /*     i_peak/mA       */
+{                               /* L=6.8uH  |  L=3.3uH */
+    PEAK_BTR_TRIM_001 = 1,      /* 399.60   |  765.42  */
+    PEAK_BTR_TRIM_002,          /* 219.70   |  427.52  */
+    PEAK_BTR_TRIM_003,          /* 155.10   |  300.19  */
+    PEAK_BTR_TRIM_004,          /* 124.00   |  239.99  */ /**< peak_btr_trim (default) */
+    PEAK_BTR_TRIM_005,          /* 103.20   |  198.29  */
+    PEAK_BTR_TRIM_006,          /* 89.15    |  170.71  */
+    PEAK_BTR_TRIM_007,          /* 79.12    |  149.33  */
+} pm_peak_btr_trim_e;
+
+/**
  * @brief   gpio wakeup level definition
  */
 typedef enum
@@ -216,6 +234,18 @@ extern _attribute_data_retention_sec_ volatile unsigned char g_areg_0x100;
 extern _attribute_data_retention_sec_ volatile unsigned char g_areg_0x101;
 extern _attribute_data_retention_sec_ volatile unsigned char g_areg_0x102;
 #endif
+
+/**
+ * @brief       This function serves to change the on time of PMOS switch
+ *              and shorten it as the value of control bit increases.
+ *              The smaller the inductance value is,the larger the value needs to be set
+ * @param[in]   peak_btr_trim - peak_btr_current
+ * @return      none
+ */
+static _always_inline void pm_set_peak_btr_current(pm_peak_btr_trim_e peak_btr_trim)
+{
+    analog_write_reg8(0x01, (analog_read_reg8(0x01) & 0xf8) | peak_btr_trim);
+}
 
 /**
  * @brief       This function serves to get wakeup source.
