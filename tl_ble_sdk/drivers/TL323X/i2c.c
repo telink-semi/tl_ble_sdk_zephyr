@@ -331,6 +331,7 @@ static unsigned char i2c_master_data_nack_detect(i2c_chn_e chn)
  */
 unsigned char i2c_master_write(i2c_chn_e chn,unsigned char id, unsigned char *data, unsigned int len)
 {
+    reg_i2c_ctrl2(chn) &= ~FLD_MANUAL_TX_STOP_HIT;
     i2c_clr_irq_status(chn,I2C_TX_BUF_STATUS);
     reg_i2c_id(chn)   = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
     reg_i2c_sct1(chn) = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
@@ -339,6 +340,11 @@ unsigned char i2c_master_write(i2c_chn_e chn,unsigned char id, unsigned char *da
     }
 
     I2C_NACK_DETECT(i2c_master_id_nack_detect,chn);
+    if (len == 0) {
+        reg_i2c_ctrl2(chn) |= FLD_MANUAL_TX_STOP_HIT;
+        reg_i2c_sct1(chn) &= ~FLD_I2C_LS_STOP;
+        reg_i2c_sct1(chn) = (g_i2c_stop_en[chn]); //launch stop cycle
+    }
     i2c_master_set_len(chn,len);
     unsigned int       cnt         = 0;
     unsigned long long start_cycle = stimer_get_tick();
@@ -370,6 +376,7 @@ unsigned char i2c_master_write(i2c_chn_e chn,unsigned char id, unsigned char *da
     if (I2C_WAIT(chn, g_i2c_timeout_error[chn].g_i2c_error_timeout_us, g_i2c_timeout_error[chn].i2c_timeout_handler, I2C_API_ERROR_TIMEOUT_STOP)) {
         return DRV_API_TIMEOUT;
     }
+    reg_i2c_ctrl2(chn) &= ~FLD_MANUAL_TX_STOP_HIT;
 
     return 1;
 }
